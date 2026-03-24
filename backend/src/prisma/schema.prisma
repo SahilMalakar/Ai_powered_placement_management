@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role
+  isProfileCompleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  profile       StudentProfile?
+  documents     Document[]
+  applications  Application[]
+  resumes       Resume[]
+  atsResults    ATSResult[]
+  semesters     SemesterResult[]
+  jobsCreated   Job[] 
+
+  @@index([role])
+}
+
+
+model StudentProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  fullName    String
+  branch      Branch
+
+  cgpa        Float?
+
+  rollNo      String
+  astuRollNo  String
+  dob         DateTime
+  backlog     Boolean
+
+  achievements String?
+  projects     String?
+
+  verificationStatus  VerificationStatus @default(NOT_VERIFIED)
+  verificationReason  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([branch])
+  @@index([cgpa])
+}
+
+
+model SemesterResult {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  semester  Int      // 1–8
+  sgpa      Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Constraints
+  @@unique([userId, semester])
+  @@index([userId])
+}
+
+
+model Document {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  type      DocumentType
+  url       String
+  semester  Int?
+  createdAt DateTime     @default(now())
+  deletedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Prevent duplicate semester docs
+  @@unique([userId, type, semester])
+}
+
+
+model Job {
+  id               Int       @id @default(autoincrement())
+  title            String
+  company          String
+  description      String
+  requiredCgpa     Float
+  allowedBranches  Branch[]
+  backlogAllowed   Boolean
+  status           JobStatus @default(DRAFT)
+  deadline         DateTime
+
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  applications Application[]
+
+  @@index([status])
+  @@index([deadline])
+}
+
+model Application {
+  id        Int               @id @default(autoincrement())
+  userId    Int
+  jobId     Int
+  status    ApplicationStatus @default(APPLIED)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+  job  Job  @relation(fields: [jobId], references: [id])
+
+  // Prevent duplicate applications
+  @@unique([userId, jobId])
+
+  @@index([jobId])
+  @@index([userId])
+}
+
+
+model Resume {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  version   Int
+  jsonData  Json
+  pdfUrl    String?
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, version])
+  @@index([userId])
+}
+
+
+model ATSResult {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  resumeUrl   String
+  jobDesc     String?
+  score       Float
+  strengths   String[]
+  weaknesses  String[]
+  suggestions String[]
+  createdAt   DateTime @default(now())
+  deletedAt   DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  STUDENT
+}
+
+enum VerificationStatus {
+  NOT_VERIFIED
+  PROCESSING
+  VERIFIED
+  FAILED
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  DEACTIVE
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  SELECTED
+}
+
+enum DocumentType {
+  CGPA
+  SGPA
+  OTHER
+}
+
+enum Branch {
+  CSE
+  ETE
+  EE
+  ME
+  IE
+  CE
+  CHE
+  IPE
+}

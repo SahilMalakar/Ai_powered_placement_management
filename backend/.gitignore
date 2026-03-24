@@ -9,6 +9,7 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+src/prisma/generated/prisma
 
 # =========================
 # Environment Variables
