@@ -38,14 +38,13 @@ model StudentProfile {
   branch      Branch
 
   cgpa        Float?
-
   rollNo      String
   astuRollNo  String
   dob         DateTime
   backlog     Boolean
-
-  achievements String?
-  projects     String?
+  
+  phoneNumber String?  // Added
+  summary     String?  // Added
 
   verificationStatus  VerificationStatus @default(NOT_VERIFIED)
   verificationReason  String?
@@ -56,8 +55,55 @@ model StudentProfile {
 
   user User @relation(fields: [userId], references: [id])
 
+  // Relations
+  socialLinks  SocialLink[]
+  experiences  Experience[]
+  projects     Project[]
+  skills       Skill[]
+
   @@index([branch])
   @@index([cgpa])
+}
+
+
+model SocialLink {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  platform  String   // e.g. "LinkedIn", "GitHub", "Portfolio"
+  url       String
+  profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  profileId   Int
+  role        String
+  company     String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime? // Null means "Present"
+  description String?   // Detailed bullets
+  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  profileId   Int
+  title       String
+  description String
+  techStack   String?   // Technologies/tools used
+  link        String?
+  startDate   DateTime?
+  endDate     DateTime?
+  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  name      String
+  category  String?   // e.g. "Core Tech", "Soft Skills"
+  profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 
