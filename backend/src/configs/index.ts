@@ -4,6 +4,7 @@ type ServerConfig = {
   PORT: number;
   DATABASE_URL: string;
   JWT_SECRET: string;
+  REFRESH_TOKEN_SECRET:string;
 };
 
 function loadEnv() {
@@ -19,4 +20,5 @@ export const serverConfig: ServerConfig = {
     process.env.DATABASE_URL ||
     "postgresql://postgres:strongpassword@localhost:5432/placement_db",
   JWT_SECRET: process.env.JWT_SECRET!,
+  REFRESH_TOKEN_SECRET:process.env.REFRESH_TOKEN_SECRET!,
 };

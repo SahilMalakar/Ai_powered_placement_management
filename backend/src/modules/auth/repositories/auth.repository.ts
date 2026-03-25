@@ -46,3 +46,30 @@ export const findUserById = async (userId: number) => {
 
     }
 }
+
+
+export const findUserWithPasswordById = async(userId:number)=>{
+    return prisma.user.findUnique({
+        where:{
+            id:userId,
+            deletedAt:null
+        },
+        select:{
+            password:true,
+        }
+    });
+}
+
+
+export const updateUserPassword = async(userId:number,password:string)=>{
+    // will add transaction to prevent race condition if multi-record updates are added
+
+    return prisma.user.update({
+        where:{
+            id:userId,
+        },
+        data:{
+            password:password,
+        }
+    })
+}
