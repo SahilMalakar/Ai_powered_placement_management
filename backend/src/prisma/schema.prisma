@@ -47,6 +47,9 @@ model StudentProfile {
   
   phoneNumber String?  
   summary     String?
+  university  String?
+  degree      String?
+  graduationYear Int?
 
   verificationStatus  VerificationStatus @default(NOT_VERIFIED)
   verificationReason  String?
@@ -62,6 +65,7 @@ model StudentProfile {
   experiences  Experience[]
   projects     Project[]
   skills       Skill[]
+  achievements Achievement[]
 
   @@index([branch])
   @@index([cgpa])
@@ -85,6 +89,7 @@ model Experience {
   startDate   DateTime
   endDate     DateTime? // Null means "Present"
   description String?   // Detailed bullets
+  toolsUsed   String?   // Technologies/tools used (generic)
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
@@ -93,8 +98,10 @@ model Project {
   profileId   Int
   title       String
   description String
-  techStack   String?   // Technologies/tools used
+  techStack   String?   // Technologies/tools used (deprecated/legacy)
+  keyTools    String?   // Unified generic field
   link        String?
+  secondaryLink String?
   startDate   DateTime?
   endDate     DateTime?
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -106,6 +113,15 @@ model Skill {
   name      String
   category  String?   // e.g. "Core Tech", "Soft Skills"
   profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          Int      @id @default(autoincrement())
+  profileId   Int
+  title       String
+  description String?
+  date        DateTime?
+  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 
