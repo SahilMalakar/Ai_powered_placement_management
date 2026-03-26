@@ -1,11 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../utils/errors/AppError.js";
-import { HTTP_STATUS } from "../utils/httpStatus.js";
+
 import { ForbiddenError, UnauthorizedError } from "../utils/errors/httpErrors.js";
 
-enum Role {
-  SUPER_ADMIN,
-  ADMIN,
+export enum Role {
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  STUDENT = "STUDENT",
 }
 export const requireAdmin = (
   req: Request,
@@ -20,7 +20,7 @@ export const requireAdmin = (
   }
 
   // 2. check role
-  if (req.user.role !== Role.ADMIN && req.user.role !== Role.SUPER_ADMIN) {
+  if (req.user.role !== "ADMIN" && req.user.role !== "SUPER_ADMIN") {
     return next(
       new ForbiddenError("Forbidden: Admin access required",),
     );
@@ -28,3 +28,25 @@ export const requireAdmin = (
 
   next();
 };
+
+export const requireStudent = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  // ensure authenticated
+  if (!req.user) {
+    return next(
+      new UnauthorizedError("Unauthorized: No user found"),
+    );
+  }
+
+  //  check role
+  if (req.user.role !== "STUDENT") {
+    return next(
+      new ForbiddenError("Forbidden: Student access required",),
+    );
+  }
+
+  next();
+};  

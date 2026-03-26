@@ -41,10 +41,12 @@ model StudentProfile {
   rollNo      String
   astuRollNo  String
   dob         DateTime
-  backlog     Boolean
+  backlog         Boolean
+  backlogSubjects String[] 
+
   
-  phoneNumber String?  // Added
-  summary     String?  // Added
+  phoneNumber String?  
+  summary     String?
 
   verificationStatus  VerificationStatus @default(NOT_VERIFIED)
   verificationReason  String?
