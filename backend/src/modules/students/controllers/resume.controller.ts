@@ -8,13 +8,17 @@ import { generateResumeService, getResumeByIdService, getStudentResumesService, 
  * Controller for Resume operations.
  */
 
+/**
+ * AI-Driven Resume Generation.
+ * Derives content entirely from profile facts without user text input.
+ */
 export const generateResumeController = asyncHandler(async (req, res) => {
   if (!req.user) {
     throw new UnauthorizedError("Unauthorized access.");
   }
 
   const userId = req.user.userId;
-  const result = await generateResumeService(userId, req.body);
+  const result = await generateResumeService(userId);
 
   return sendSuccess(
     res,

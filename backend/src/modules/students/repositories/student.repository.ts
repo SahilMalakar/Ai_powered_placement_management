@@ -40,6 +40,7 @@ export const createProfileWithTransaction = async(
           experiences: true,
           projects: true,
           skills: true,
+          additionalDetails: true,
         }
       });
     })
@@ -87,6 +88,7 @@ export const updateProfileWithTransaction = async (
         experiences: true,
         projects: true,
         skills: true,
+        additionalDetails: true,
       }
     });
   });
@@ -132,6 +134,10 @@ async function syncSemesterResults(tx: any, userId: number, results: any[]) {
     {
       model: "skill",
       items: profileData.skills,
+    },
+    {
+      model: "additionalDetail",
+      items: profileData.additionalDetails,
     },
   ];
 
@@ -183,6 +189,7 @@ export const getFullStudentData = async (userId: number) => {
           experiences: true,
           projects: true,
           skills: true,
+          additionalDetails: true,
         }
       },
       semesters: {

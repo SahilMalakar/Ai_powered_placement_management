@@ -65,7 +65,7 @@ model StudentProfile {
   experiences  Experience[]
   projects     Project[]
   skills       Skill[]
-  achievements Achievement[]
+  additionalDetails AdditionalDetail[]
 
   @@index([branch])
   @@index([cgpa])
@@ -88,8 +88,8 @@ model Experience {
   location    String?
   startDate   DateTime
   endDate     DateTime? // Null means "Present"
-  description String?   // Detailed bullets
-  toolsUsed   String?   // Technologies/tools used (generic)
+  description String[]  
+  toolsUsed   String?   
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
@@ -97,8 +97,7 @@ model Project {
   id          Int      @id @default(autoincrement())
   profileId   Int
   title       String
-  description String
-  techStack   String?   // Technologies/tools used (deprecated/legacy)
+  description String[]
   keyTools    String?   // Unified generic field
   link        String?
   secondaryLink String?
@@ -110,16 +109,16 @@ model Project {
 model Skill {
   id        Int      @id @default(autoincrement())
   profileId Int
-  name      String
-  category  String?   // e.g. "Core Tech", "Soft Skills"
+  category  String   // e.g. "Languages", "Tools", "Engineering Tools"
+  skills    String[] // e.g. ["JavaScript", "TypeScript", "Python"]
   profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
-model Achievement {
+model AdditionalDetail {
   id          Int      @id @default(autoincrement())
   profileId   Int
-  title       String
-  description String?
+  title       String   // e.g. "OpenSource Contribution", "Achievement"
+  description String[] // Detailed bullets
   date        DateTime?
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
@@ -135,7 +134,7 @@ model SemesterResult {
   updatedAt DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Constraints
   @@unique([userId, semester])
@@ -153,7 +152,7 @@ model Document {
   deletedAt DateTime?
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Prevent duplicate semester docs
   @@unique([userId, type, semester])
@@ -194,7 +193,7 @@ model Application {
   deletedAt DateTime?
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   job  Job  @relation(fields: [jobId], references: [id])
 
   // Prevent duplicate applications
@@ -215,7 +214,7 @@ model Resume {
   deletedAt DateTime?
 
   // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, version])
   @@index([userId])
@@ -223,19 +222,18 @@ model Resume {
 
 
 model ATSResult {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  resumeUrl   String
-  jobDesc     String?
-  score       Float
-  strengths   String[]
-  weaknesses  String[]
-  suggestions String[]
-  createdAt   DateTime @default(now())
-  deletedAt   DateTime?
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  resumeUrl          String
+  jobDescription     String?
+  score              Float
+  strengths          String[]
+  weaknesses         String[]
+  suggestions        String[]
+  createdAt          DateTime @default(now())
+  deletedAt          DateTime?
 
-  // Relations
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -281,4 +279,5 @@ enum Branch {
   CE
   CHE
   IPE
+  MCA
 }

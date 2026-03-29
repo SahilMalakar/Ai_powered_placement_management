@@ -39,11 +39,13 @@ export const signupService = async (signupData: SignupInput) => {
   const accessToken = await generateToken({
     userId: user.id,
     role: user.role,
+    email: user.email,
   });
 
   const refreshToken = await generateRefreshToken({
     userId: user.id,
-    role: user.role
+    role: user.role,
+    email: user.email,
   });
 
   return { user, accessToken, refreshToken };
@@ -72,12 +74,14 @@ export const loginService = async (loginData: LoginInput) => {
   const accessToken = await generateToken({
     userId: isUserExist.id,
     role: isUserExist.role,
+    email: isUserExist.email,
   });
 
   const refreshToken = await generateRefreshToken({
     userId: isUserExist.id,
-    role: isUserExist.role
-  }) // will store refresh token in Redis or Db for recocation/rotation
+    role: isUserExist.role,
+    email: isUserExist.email,
+  }); // will store refresh token in Redis or Db for recocation/rotation
 
   return { isUserExist, accessToken, refreshToken };
 };
@@ -168,7 +172,8 @@ export const refreshTokenService = async (oldRefreshToken: string) => {
   try {
     const payload = jwt.verify(oldRefreshToken, serverConfig.REFRESH_TOKEN_SECRET) as {
       userId: number,
-      role: string
+      role: string,
+      email: string
     }
 
     // verify if the token exists in Redis/db not revoked
@@ -181,12 +186,14 @@ export const refreshTokenService = async (oldRefreshToken: string) => {
 
     const newAccessToken = await generateToken({
       userId: user.id,
-      role: user.role
+      role: user.role,
+      email: user.email,
     })
 
     const newRefreshToken = await generateRefreshToken({
       userId: user.id,
-      role: user.role
+      role: user.role,
+      email: user.email,
     })
 
     // update the refresh token in Redis/db (rotation)

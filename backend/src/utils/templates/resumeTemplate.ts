@@ -1,5 +1,13 @@
 import type { ResumeJson } from "../../types/students/resume.js";
 
+/**
+ * Utility to convert markdown bold (**text**) to HTML strong tags.
+ */
+const formatMarkdown = (text: string | undefined): string => {
+  if (!text) return "";
+  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+};
+
 export const generateResumeHtml = (data: ResumeJson): string => {
   const { personalInfo, experience, projects, skills, education, achievements } = data;
 
@@ -28,7 +36,6 @@ export const generateResumeHtml = (data: ResumeJson): string => {
             background: white;
             font-size: 10.5pt;
             line-height: 1.2;
-            /* Adjust padding to simulate 0.5in margin around the A4 page */
             padding: 0.5in; 
             max-width: 8.5in;
             margin: 0 auto;
@@ -92,7 +99,7 @@ export const generateResumeHtml = (data: ResumeJson): string => {
         }
 
         .item-date {
-            min-width: 130px;
+            min-width: 140px; /* Increased to accommodate range */
             text-align: right;
         }
 
@@ -107,13 +114,11 @@ export const generateResumeHtml = (data: ResumeJson): string => {
             text-align: justify;
         }
 
-        /* Summary styling */
         .summary-text {
             text-align: justify;
             margin-bottom: 6px;
         }
 
-        /* Skills specific styling */
         .skills-container {
             display: flex;
             flex-direction: column;
@@ -128,10 +133,6 @@ export const generateResumeHtml = (data: ResumeJson): string => {
         .skill-category {
             font-weight: bold;
             margin-right: 5px;
-        }
-        
-        .projects-heading {
-            margin-bottom: 2px;
         }
     </style>
 </head>
@@ -183,7 +184,7 @@ export const generateResumeHtml = (data: ResumeJson): string => {
                 <span class="item-date">${exp.location || ''}</span>
             </div>
             <ul>
-                ${exp.description.map((desc: any) => `<li>${desc}</li>`).join('')}
+                ${exp.description.map((desc: any) => `<li>${formatMarkdown(desc)}</li>`).join('')}
             </ul>
         </div>
         `).join('')}
@@ -195,7 +196,7 @@ export const generateResumeHtml = (data: ResumeJson): string => {
         <h2 class="section-title">Projects</h2>
         ${projects.map((proj: any) => `
         <div class="item">
-            <div class="d-flex projects-heading">
+            <div class="d-flex">
                 <span>
                     <span class="item-title">${proj.title}</span> 
                     ${proj.links && proj.links.length > 0 ? ` | ${proj.links.map((l: any) => `<a href="${l.url}">${l.label}</a>`).join(', ')}` : ''}
@@ -204,7 +205,7 @@ export const generateResumeHtml = (data: ResumeJson): string => {
             </div>
             ${proj.keyTools ? `<div style="font-style: italic; font-size: 9.5pt; margin-bottom: 2px;">Technologies: ${proj.keyTools}</div>` : ''}
             <ul>
-                ${proj.description.map((desc: any) => `<li>${desc}</li>`).join('')}
+                ${proj.description.map((desc: any) => `<li>${formatMarkdown(desc)}</li>`).join('')}
             </ul>
         </div>
         `).join('')}
@@ -234,7 +235,7 @@ export const generateResumeHtml = (data: ResumeJson): string => {
         <h2 class="section-title">Additional Details</h2>
         <ul>
         ${achievements.map((ach: any) => `
-            <li><strong>${ach.title}</strong>${ach.date ? ` (${ach.date})` : ''}${ach.description ? `: ${ach.description}` : ''}</li>
+            <li><strong>${ach.title}</strong>${ach.date ? ` (${ach.date})` : ''}${ach.description ? `: ${formatMarkdown(ach.description)}` : ''}</li>
         `).join('')}
         </ul>
     </div>

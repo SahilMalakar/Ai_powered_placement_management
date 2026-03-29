@@ -110,7 +110,8 @@ async function prepareProfileData(
         socialLinks: allOtherData.socialLinks,
         experiences: allOtherData.experiences,
         projects: allOtherData.projects,
-        skills: allOtherData.skills
+        skills: allOtherData.skills,
+        additionalDetails: allOtherData.additionalDetails
     };
 
     return { isCompleted, processedData };

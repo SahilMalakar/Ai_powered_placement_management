@@ -51,10 +51,11 @@ export const resumeJsonSchema = z.object({
   })).optional()
 });
 
-export const requestResumeSchema = z.object({
-  targetRole: z.string().min(1, "Target role is required"),
-  additionalContext: z.string().optional()
-});
+/**
+ * No user input required for generation. 
+ * AI derives everything from profile data.
+ */
+export const requestResumeSchema = z.object({});
 
 export type ResumeJson = z.infer<typeof resumeJsonSchema>;
 export type RequestResumeInput = z.infer<typeof requestResumeSchema>;
@@ -62,6 +63,4 @@ export type RequestResumeInput = z.infer<typeof requestResumeSchema>;
 export interface ResumeGenerationInput {
   profileData: any;
   branch: string;
-  targetRole: string;
-  additionalContext?: string | undefined;
 }

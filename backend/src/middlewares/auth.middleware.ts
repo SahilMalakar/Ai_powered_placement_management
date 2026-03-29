@@ -6,6 +6,7 @@ import { serverConfig } from "../configs/index.js";
 type JwtPayload = {
   userId: number;
   role: "STUDENT" | "ADMIN" | "SUPER_ADMIN";
+  email: string;
 };
 
 export const authMiddleware = (

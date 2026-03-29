@@ -3,14 +3,15 @@ import { countUserResumes, createResumeRecord, findResumesByUserId, findResumeBy
 import puppeteer from "puppeteer";
 import { generateResumeHtml } from "../../../utils/templates/resumeTemplate.js";
 import { resumeGenerationChain } from "./resume.chain.js";
-import type { RequestResumeInput } from "../../../types/students/resume.js";
 import { BadRequestError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 
 const MAX_RESUMES = 5;
 
-export const generateResumeService = async (
-  userId: number,
-  input: RequestResumeInput) => {
+/**
+ * AI-Driven Resume Generation. 
+ * Entirely automatic based on student profile.
+ */
+export const generateResumeService = async (userId: number) => {
 
   // Enforce business limit (max 5 resumes per student)
   const currentCount = await countUserResumes(userId);
@@ -24,13 +25,10 @@ export const generateResumeService = async (
     throw new NotFoundError("Student profile not found. Please complete your profile before generating a resume.");
   }
 
-  // Orchestrate AI generation chain
-  // This uses LangChain's multi-step logic (Audit -> Pivot -> Generate)
+  // Orchestrate AI generation chain (Audit -> Identity Role -> Generate)
   const generatedResume = await resumeGenerationChain.invoke({
     profileData: fullProfile,
-    branch: fullProfile.profile.branch,
-    targetRole: input.targetRole,
-    additionalContext: input.additionalContext
+    branch: fullProfile.profile.branch
   });
 
   // Persistence with version tracking
