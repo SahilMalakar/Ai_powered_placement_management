@@ -53,3 +53,8 @@ export const resetPasswordSchema = z.object({
 })
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+
+export const idSchema = z.object({
+  id: z.coerce.number()
+})

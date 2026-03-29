@@ -9,7 +9,7 @@ const resumeRouter: Router = Router();
 
 
 resumeRouter.post(
-  "/generate",
+  "/resumes/generate",
   authMiddleware,
   requireStudent,
   validateRequest(requestResumeSchema),
@@ -17,28 +17,28 @@ resumeRouter.post(
 );
 
 resumeRouter.get(
-  "/",
+  "/resumes/",
   authMiddleware,
   requireStudent,
   getStudentResumesController
 );
 
 resumeRouter.get(
-  "/:id",
+  "/resumes/:id",
   authMiddleware,
   requireStudent,
   getResumeByIdController
 );
 
 resumeRouter.patch(
-  "/:id",
+  "/resumes/:id",
   authMiddleware,
   requireStudent,
   updateResumeController 
 );
 
 resumeRouter.get(
-  "/:id/export",
+  "/resumes/:id/export",
   authMiddleware,
   requireStudent,
   exportResumeController

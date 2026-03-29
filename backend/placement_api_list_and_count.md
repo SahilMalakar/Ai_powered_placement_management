@@ -6,95 +6,62 @@
 
 ## Auth (10)
 
-1. `POST` `/auth/signup` ✅ 🟡
-2. `POST` `/auth/login` ✅ 🟡
-3. `POST` `/auth/logout` ✅ 🟡
-4. `GET` `/auth/me` ✅ 🟡
-5. `POST` `/auth/refresh`
-6. `PATCH` `/auth/change-password` 🟡
-7. `POST` `/auth/admins`
-8. `DELETE` `/auth/students/:studentId`
-9. `POST` `/auth/password-reset/request`
-10. `POST` `/auth/password-reset/confirm`
+1. `POST` `/auth/signup` ✅ 🟡 [TRANSACTION, IDEMPOTENCY]
+2. `POST` `/auth/login` ✅ 🟡 [CRUD]
+3. `POST` `/auth/logout` ✅ 🟡 [CRUD]
+4. `GET` `/auth/me` ✅ 🟡 [CRUD]
+5. `POST` `/auth/refresh` [IDEMPOTENCY]
+6. `PATCH` `/auth/change-password` 🟡 [CRUD]
+7. `POST` `/auth/admins` [CRUD]
+8. `DELETE` `/auth/students/:studentId` [TRANSACTION (Cascade Soft Delete)]
+9. `POST` `/auth/password-reset/request` [QUEUE (Email), RATE_LIMIT (Redis, Optional)]
+10. `POST` `/auth/password-reset/confirm` [CRUD]
 
 ## Students (25)
 
-1. `GET` `/students/profile` 🟡
-2. `PUT` `/students/profile` 🟡
-3. `PATCH` `/students/profile` 🟡
-4. `POST` `/students/documents` 🟡
-5. `DELETE` `/students/documents/:documentId` 🟡
-6. `POST` `/students/verification`
-7. `GET` `/students/verification`
-8. `POST` `/students/verification/retry`
-9. `GET` `/students/jobs` 🟡
-10. `GET` `/students/jobs/:jobId` 🟡
-11. `POST` `/students/jobs/:jobId/apply`
-12. `GET` `/students/applications` 🟡
-13. `GET` `/students/applications/:applicationId` 🟡
-14. `POST` `/students/resumes`
-15. `GET` `/students/resumes`
-16. `GET` `/students/resumes/:resumeId`
-17. `PATCH` `/students/resumes/:resumeId`
-18. `POST` `/students/resumes/:resumeId/export`
-19. `POST` `/students/ats`
-20. `GET` `/students/ats`
-21. `GET` `/students/ats/:analysisId`
-22. `POST` `/students/interviews`
-23. `GET` `/students/interviews/:sessionId`
-24. `DELETE` `/students/interviews/:sessionId`
-25. `WS` `/students/interviews/:sessionId/ws`
+1. `GET` `/students/profile` 🟡 [CRUD]
+2. `PUT` `/students/profile` 🟡 [TRANSACTION (Multi-relation sync)]
+3. `PATCH` `/students/profile` 🟡 [TRANSACTION (Partial sync)]
+4. `POST` `/students/documents` 🟡 [CRUD (Cloudinary Logic)]
+5. `DELETE` `/students/documents/:documentId` 🟡 [CRUD (Cloudinary Logic)]
+6. `POST` `/students/verification` [QUEUE (OCR Job), IDEMPOTENCY]
+7. `GET` `/students/verification` [CRUD]
+8. `POST` `/students/verification/retry` [QUEUE]
+9. `GET` `/students/jobs` 🟡 [CRUD (Filtering/Search)]
+10. `GET` `/students/jobs/:jobId` 🟡 [CRUD]
+11. `POST` `/students/jobs/:jobId/apply` [TRANSACTION (Eligibility Check), IDEMPOTENCY, RATE_LIMIT (Optional)]
+12. `GET` `/students/applications` 🟡 [CRUD]
+13. `GET` `/students/applications/:applicationId` 🟡 [CRUD]
+14. `POST` `/students/resumes` [QUEUE (AI Generation), RATE_LIMIT (DB Enforced: Max 5)]
+15. `GET` `/students/resumes` [CRUD]
+16. `GET` `/students/resumes/:resumeId` [CRUD]
+17. `PATCH` `/students/resumes/:resumeId` [CRUD]
+18. `POST` `/students/resumes/:resumeId/export` [CRUD (Puppeteer On-Demand), QUEUE (Optional for high load)]
+19. `POST` `/students/ats` [QUEUE (LLM Worker), RATE_LIMIT (Redis: 5/day), IDEMPOTENCY]
+20. `GET` `/students/ats` [CRUD]
+21. `GET` `/students/ats/:analysisId` [CRUD]
+22. `POST` `/students/interviews` [QUEUE (Gen Context), REDIS (Session)]
+23. `GET` `/students/interviews/:sessionId` [CRUD]
+24. `DELETE` `/students/interviews/:sessionId` [CRUD]
+25. `WS` `/students/interviews/:sessionId/ws` [WEBSOCKET (Real-time AI)]
 
 ## Admin (18)
 
-1. `POST` `/admin/jobs` 🟡
-2. `GET` `/admin/jobs` 🟡
-3. `GET` `/admin/jobs/:jobId` 🟡
-4. `PATCH` `/admin/jobs/:jobId` 🟡
-5. `DELETE` `/admin/jobs/:jobId` 🟡
-6. `POST` `/admin/jobs/:jobId/activate`
-7. `POST` `/admin/jobs/:jobId/deactivate`
-8. `POST` `/admin/jobs/:jobId/notify`
-9. `GET` `/admin/jobs/:jobId/applicants`
-10. `PATCH` `/admin/applications/status`
-11. `GET` `/admin/applications/:applicationId`
-12. `GET` `/admin/students` 🟡
-13. `GET` `/admin/students/:studentId` 🟡
-14. `GET` `/admin/students/:studentId/verification`
-15. `POST` `/admin/students/:studentId/verification/retry`
-16. `POST` `/admin/export`
-17. `POST` `/admin/admins`
-18. `DELETE` `/admin/students/:studentId`
-
-
-
-
-
-
-
-
-docker run -d \
-  --name postgres-placement \
-  --restart unless-stopped \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=strongpassword \
-  -e POSTGRES_DB=placement_db \
-  -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  postgres:16
-
-
-
-
-
-
-
-
-
-  docker run -d \
-  --name redis-placement \
-  --restart unless-stopped \
-  -p 6379:6379 \
-  -v redis_data:/data \
-  redis:7 \
-  redis-server --appendonly yes --requirepass strongredispassword
+1. `POST` `/admin/jobs` 🟡 [CRUD]
+2. `GET` `/admin/jobs` 🟡 [CRUD]
+3. `GET` `/admin/jobs/:jobId` 🟡 [CRUD]
+4. `PATCH` `/admin/jobs/:jobId` 🟡 [CRUD]
+5. `DELETE` `/admin/jobs/:jobId` 🟡 [CRUD (Soft Delete)]
+6. `POST` `/admin/jobs/:jobId/activate` [CRUD (Status update)]
+7. `POST` `/admin/jobs/:jobId/deactivate` [CRUD]
+8. `POST` `/admin/jobs/:jobId/notify` [QUEUE (Batch Email), WORKER, RATE_LIMIT (SMTP Safe)]
+9. `GET` `/admin/jobs/:jobId/applicants` [CRUD]
+10. `PATCH` `/admin/applications/status` [TRANSACTION (Batch update)]
+11. `GET` `/admin/applications/:applicationId` [CRUD]
+12. `GET` `/admin/students` 🟡 [CRUD]
+13. `GET` `/admin/students/:studentId` 🟡 [CRUD]
+14. `GET` `/admin/students/:studentId/verification` [CRUD]
+15. `POST` `/admin/students/:studentId/verification/retry` [QUEUE]
+16. `POST` `/admin/export` [QUEUE (Large CSV), WORKER, RATE_LIMIT (Optional)]
+17. `POST` `/admin/admins` [CRUD]
+18. `DELETE` `/admin/students/:studentId` [TRANSACTION (Cascade Soft Delete)]
