@@ -1,6 +1,9 @@
 import { app } from "./app.js";
 import { serverConfig } from "./configs/index.js";
+import { sendEmailFromQueueViaWorker } from "./workers/notification.worker.js";
 
+// Start the background notification worker
+sendEmailFromQueueViaWorker();
 console.log(`hello from server`);
 
 

@@ -6,6 +6,9 @@ type ServerConfig = {
   JWT_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
   GROQ_API_KEY: string;
+  REDIS_URL: string;
+  MAIL_PASS :string;
+  MAIL_USER :string;
 };
 
 function loadEnv() {
@@ -23,4 +26,7 @@ export const serverConfig: ServerConfig = {
   JWT_SECRET: process.env.JWT_SECRET!,
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
   GROQ_API_KEY: process.env.GROQ_API_KEY!,
+  REDIS_URL: process.env.REDIS_URL!,
+  MAIL_PASS: process.env.MAIL_PASS!,
+  MAIL_USER: process.env.MAIL_USER!,
 };

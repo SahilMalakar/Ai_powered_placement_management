@@ -27,8 +27,9 @@ export const createJobSchema = z.object({
 
 /**
  * Zod schema for partial job updates.
+ * Excludes 'status' to prevent unauthorized manual status changes via the update route.
  */
-export const updateJobSchema = createJobSchema.partial();
+export const updateJobSchema = createJobSchema.omit({ status: true }).partial();
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 export type UpdateJobInput = z.infer<typeof updateJobSchema>;

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -b",
+    "postbuild": "node scripts/copy-templates.js",
     "start": "node dist/index.js",
     "dev": "pnpm run build && pnpm run start"
   },
@@ -18,12 +19,16 @@
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.71.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "handlebars": "^4.7.9",
+    "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "langchain": "^1.2.37",
+    "nodemailer": "^8.0.4",
     "pg": "^8.20.0",
     "puppeteer": "^24.40.0",
     "zod": "^4.3.6"
@@ -35,6 +40,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.5.0",
+    "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.20.0",
     "prisma": "^7.5.0"
   }

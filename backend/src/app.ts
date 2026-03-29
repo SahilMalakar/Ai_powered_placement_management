@@ -9,6 +9,8 @@ const app: Express = express();
 // cors setup to pass specific endpoints only
 app.use(
   cors({
+    // origin: "http://localhost:5173", // Allow only your frontend origin
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true, // allow cookies / auth headers
   }),

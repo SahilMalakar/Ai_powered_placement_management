@@ -1,4 +1,5 @@
 import type { JobCreateInput, JobUpdateInput } from "../../../prisma/generated/prisma/models/Job.js";
+import { JobStatus } from "../../../prisma/generated/prisma/enums.js";
 import { prisma } from "../../../prisma/prisma.js";
 import type { UpdateJobInput } from "../../../types/admin/job.js";
 
@@ -28,5 +29,32 @@ export const updateJob = async (jobId: number, jobData: UpdateJobInput) => {
             id: jobId
         },
         data: jobData as unknown as JobUpdateInput
+    })
+}
+
+export const updateJobStatus = async (jobId: number, status: JobStatus) => {
+    return await prisma.job.update({
+        where: {
+            id: jobId
+        },
+        data: {
+            status
+        }
+    })
+}
+
+export const getStudentsForJobNotification = async () => {
+    return await prisma.user.findMany({
+        where: {
+            role: "STUDENT"
+        },
+        select: {
+            email: true,
+            profile: {
+                select: {
+                    fullName: true
+                }
+            }
+        }
     })
 }
