@@ -1,4 +1,4 @@
-import { app } from "./app.js";
+import { app } from "./server.js";
 import { serverConfig } from "./configs/index.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { InternalServerError } from "./utils/errors/httpErrors.js";
