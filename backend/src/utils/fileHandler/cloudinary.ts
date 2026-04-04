@@ -1,11 +1,16 @@
-import cloudinary from "../configs/cloudinary.config.js";
+import cloudinary from "../../configs/cloudinary.config.js";
 
 // Uploads a local file to Cloudinary and returns the result.
-export const uploadToCloudinary = async (filePath: string, folder: string = "ats_resumes") => {
+export const uploadToCloudinary = async (
+  filePath: string, 
+  folder: string = "ats_resumes",
+  resourceType: "auto" | "image" | "raw" | "video" = "auto"
+) => {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
       folder,
-      resource_type: "auto", // Automatically detects PDF/Raw
+      resource_type: resourceType,
+      access_mode: "public", // Ensures the file is publicly accessible via URL
     });
     return result;
   } catch (error: any) {

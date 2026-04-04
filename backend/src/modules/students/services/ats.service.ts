@@ -1,6 +1,6 @@
-import { uploadToCloudinary, deleteFromCloudinary } from "../../../utils/cloudinary.util.js";
-import { extractTextFromPdf } from "../../../utils/pdfParser.util.js";
-import { extractTextFromDocx } from "../../../utils/docxParser.util.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../../utils/fileHandler/cloudinary.js";
+import { extractTextFromPdf } from "../../../utils/fileHandler/pdfParser.js";
+import { extractTextFromDocx } from "../../../utils/fileHandler/docxParser.js";
 import { addAtsJobToQueue } from "../../../queues/ats.queue.js";
 import { countAtsAnalysesToday, findLatestAtsResultByUserId } from "../repositories/ats.repository.js";
 import { BadRequestError, ForbiddenError } from "../../../utils/errors/httpErrors.js";
@@ -17,7 +17,7 @@ export const requestAtsAnalysisService = async (userId: number, filePath: string
   // Text Extraction: Based on file extension
   const ext = path.extname(filePath).toLowerCase();
   let resumeText = "";
-  
+
   if (ext === ".pdf") {
     resumeText = await extractTextFromPdf(filePath);
   } else if (ext === ".doc" || ext === ".docx") {
@@ -43,10 +43,10 @@ export const requestAtsAnalysisService = async (userId: number, filePath: string
       resumeUrl: secure_url,
     });
 
-    return { 
+    return {
       message: "ATS analysis is being processed. It will appear in your history shortly.",
       jobId: job.id,
-      resumeUrl: secure_url 
+      resumeUrl: secure_url
     };
   } catch (error) {
     // Rollback: Delete from Cloudinary if queueing fails to maintain consistency

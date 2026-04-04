@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 import { requireStudent } from "../../../middlewares/rbac.middleware.js";
-import { atsUpload } from "../../../utils/multer.util.js";
+import { atsUpload } from "../../../utils/fileHandler/multer.js";
 import { requestAtsAnalysisController, getAtsResultsController } from "../../../modules/students/controllers/ats.controller.js";
 
 const atsRouter: Router = Router();

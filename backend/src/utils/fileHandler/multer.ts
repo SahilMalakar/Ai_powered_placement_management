@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { BadRequestError } from "./errors/httpErrors.js";
+import { BadRequestError } from "../errors/httpErrors.js";
 
 // Ensure the local upload directory exists synchronously at startup
 const uploadDir = path.join(process.cwd(), "public/uploads");
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedExtensions = [".pdf", ".doc", ".docx"];
   const ext = path.extname(file.originalname).toLowerCase();
-  
+
   if (allowedExtensions.includes(ext)) {
     cb(null, true);
   } else {
