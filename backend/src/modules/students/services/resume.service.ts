@@ -4,6 +4,7 @@ import {
   findResumesByUserId, 
   findResumeById, 
   updateResumeJson, 
+  updateResumePdfUrl,
   createResumeRecord, 
   getLatestResumeVersion 
 } from "../repositories/resume.repository.js";
@@ -77,7 +78,10 @@ export const exportResumePdfService = async (id: number, userId: number) => {
     throw new NotFoundError("Resume not found or unauthorized access.");
   }
 
-  // En-queue for background PDF generation & Cloudinary upload
+  // 2. Reset the PDF URL to null to indicate a new export is in progress
+  await updateResumePdfUrl(id, ""); // Passing empty string effectively clears it
+
+  // 3. En-queue for background PDF generation & Cloudinary upload
   const job = await addResumeJobToQueue({
     type: "EXPORT_RESUME",
     userId,
