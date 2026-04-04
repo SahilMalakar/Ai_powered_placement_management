@@ -31,10 +31,16 @@ export const countAtsAnalysesToday = async (userId: number) => {
   });
 };
 
-// Fetches all ATS analysis results for a specific user.
-export const findAtsResultsByUserId = async (userId: number) => {
-  return await prisma.aTSResult.findMany({
+// Fetches the latest ATS analysis result for a specific user.
+export const findLatestAtsResultByUserId = async (userId: number) => {
+  return await prisma.aTSResult.findFirst({
     where: { userId, deletedAt: null },
+    select: {
+      score: true,
+      strengths: true,
+      weaknesses: true,
+      suggestions: true,
+    },
     orderBy: { createdAt: "desc" },
   });
 };

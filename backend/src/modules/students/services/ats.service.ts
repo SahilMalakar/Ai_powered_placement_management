@@ -1,8 +1,8 @@
-import { uploadToCloudinary } from "../../../utils/cloudinary.util.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../../utils/cloudinary.util.js";
 import { extractTextFromPdf } from "../../../utils/pdfParser.util.js";
 import { extractTextFromDocx } from "../../../utils/docxParser.util.js";
 import { addAtsJobToQueue } from "../../../queues/ats.queue.js";
-import { countAtsAnalysesToday, findAtsResultsByUserId } from "../repositories/ats.repository.js";
+import { countAtsAnalysesToday, findLatestAtsResultByUserId } from "../repositories/ats.repository.js";
 import { BadRequestError, ForbiddenError } from "../../../utils/errors/httpErrors.js";
 import path from "path";
 
@@ -32,24 +32,30 @@ export const requestAtsAnalysisService = async (userId: number, filePath: string
 
   // Cloudinary Upload: Securely store the resume for reference
   const uploadResult = await uploadToCloudinary(filePath);
-  const resumeUrl = uploadResult.secure_url;
+  const { secure_url, public_id } = uploadResult;
 
-  // En-queue for AI Analysis: Background processing via BullMQ
-  const job = await addAtsJobToQueue({
-    userId,
-    resumeText,
-    jobDescription,
-    resumeUrl,
-  });
+  try {
+    // En-queue for AI Analysis: Background processing via BullMQ
+    const job = await addAtsJobToQueue({
+      userId,
+      resumeText,
+      jobDescription,
+      resumeUrl: secure_url,
+    });
 
-  return { 
-    message: "ATS analysis is being processed. It will appear in your history shortly.",
-    jobId: job.id,
-    resumeUrl 
-  };
+    return { 
+      message: "ATS analysis is being processed. It will appear in your history shortly.",
+      jobId: job.id,
+      resumeUrl: secure_url 
+    };
+  } catch (error) {
+    // Rollback: Delete from Cloudinary if queueing fails to maintain consistency
+    await deleteFromCloudinary(public_id);
+    throw error;
+  }
 };
 
-// Service to fetch all previous analysis results for a student.
+// Service to fetch the latest analysis result for a student.
 export const getAtsResultsService = async (userId: number) => {
-  return await findAtsResultsByUserId(userId);
+  return await findLatestAtsResultByUserId(userId);
 };
