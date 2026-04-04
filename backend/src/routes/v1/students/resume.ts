@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 import { requireStudent } from "../../../middlewares/rbac.middleware.js";
-import { validateRequest } from "../../../middlewares/validate.middlware.js";
-import { requestResumeSchema } from "../../../types/students/resume.js";
 import { generateResumeController, getResumeByIdController, getStudentResumesController, updateResumeController, exportResumeController } from "../../../modules/students/controllers/resume.controller.js";
 
 const resumeRouter: Router = Router();
@@ -12,7 +10,6 @@ resumeRouter.post(
   "/resumes/generate",
   authMiddleware,
   requireStudent,
-  validateRequest(requestResumeSchema),
   generateResumeController
 );
 

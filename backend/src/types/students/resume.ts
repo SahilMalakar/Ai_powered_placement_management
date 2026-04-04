@@ -55,10 +55,8 @@ export const resumeJsonSchema = z.object({
  * No user input required for generation. 
  * AI derives everything from profile data.
  */
-export const requestResumeSchema = z.object({});
 
 export type ResumeJson = z.infer<typeof resumeJsonSchema>;
-export type RequestResumeInput = z.infer<typeof requestResumeSchema>;
 
 export interface ResumeGenerationInput {
   profileData: any;

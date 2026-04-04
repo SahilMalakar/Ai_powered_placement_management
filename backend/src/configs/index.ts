@@ -7,8 +7,11 @@ type ServerConfig = {
   REFRESH_TOKEN_SECRET: string;
   GROQ_API_KEY: string;
   REDIS_URL: string;
-  MAIL_PASS :string;
-  MAIL_USER :string;
+  MAIL_PASS: string;
+  MAIL_USER: string;
+  CLOUDINARY_CLOUD_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
 };
 
 function loadEnv() {
@@ -29,4 +32,7 @@ export const serverConfig: ServerConfig = {
   REDIS_URL: process.env.REDIS_URL!,
   MAIL_PASS: process.env.MAIL_PASS!,
   MAIL_USER: process.env.MAIL_USER!,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_KEY_NAME!,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY!,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET!,
 };

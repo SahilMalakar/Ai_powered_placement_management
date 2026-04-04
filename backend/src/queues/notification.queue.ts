@@ -10,7 +10,14 @@ export const notificationQueuePayload = "notificationQueuePayload"
 
 // initialize the queue instance
 export const notificationQueue = new Queue(notifcationQueue, {
-    connection: getRedisConnection() as any
+    connection: getRedisConnection() as any,
+    defaultJobOptions:{
+        attempts: 3,
+        backoff: {
+            type: "exponential",
+            delay: 5000
+        }
+    }
 });
 
 
@@ -38,14 +45,7 @@ export const addBulkEmailsToQueue = async(notifications: NotificationTypes[]) =>
     try {
         const jobs = notifications.map(notification => ({
             name: notifcationQueue,
-            data: notification,
-            opts: {
-                attempts: 3,
-                backoff: {
-                    type: "exponential",
-                    delay: 5000
-                }
-            }
+            data: notification
         }));
         
         await notificationQueue.addBulk(jobs);

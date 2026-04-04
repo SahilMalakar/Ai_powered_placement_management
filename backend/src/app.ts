@@ -1,7 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { router } from "./routes/v1/index.js";
 
 const app: Express = express();
@@ -37,7 +36,5 @@ console.log("hello from app");
 app.use("/api", router);
 
 
-
-app.use(errorMiddleware);
 
 export { app };

@@ -71,4 +71,5 @@ out/
 # =========================
 # Agent Rules
 # =========================
-.agents/rules/
+.agents/rules/
+api.md

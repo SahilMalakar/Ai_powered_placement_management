@@ -55,7 +55,7 @@ export const createStudentProfileService = async (
         throw new BadRequestError("Backlog subjects are required when backlog is true");
     }
 
-    // persistence via Trasaction
+    // persistence via Transaction
     return await createProfileWithTransaction(userId, processedData, isCompleted);
 }
 

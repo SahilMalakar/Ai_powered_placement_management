@@ -4,8 +4,6 @@ import { BadRequestError } from "../utils/errors/httpErrors.js";
 import { getRedisConnection } from "../configs/redis.config.js";
 import { readMailTemplate } from "../utils/templates/mail.templet.handler.js";
 import { notifcationQueue, sendNotification } from "../queues/notification.queue.js";
-import type Redis from "ioredis";
-
 
 
 export const sendEmailFromQueueViaWorker = async () => {
