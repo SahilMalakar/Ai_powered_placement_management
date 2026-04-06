@@ -2,7 +2,7 @@ import { sendSuccess } from "../../../utils/ApiResonse.js";
 import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { UnauthorizedError } from "../../../utils/errors/httpErrors.js";
 import { HTTP_STATUS } from "../../../utils/httpStatus.js";
-import { createJobService, updateJobByIdService, activateJobService, deactivateJobService } from "../services/job.service.js";
+import { createJobService, updateJobByIdService, activateJobService, deactivateJobService, getAllJobsService } from "../services/job.service.js";
 
 export const createJobController = asyncHandler(async(req,res)=>{
     if (!req.user) {
@@ -81,6 +81,20 @@ export const deactivateJobController = asyncHandler(async(req,res)=>{
         res,
         job,
         "Job deactivated successfully",
+        HTTP_STATUS.OK
+    );
+})
+
+export const getAllJobsController = asyncHandler(async(req,res)=>{
+    if (!req.user) {
+        throw new UnauthorizedError("Unauthorized")
+    }
+
+    const jobs = await getAllJobsService();
+    return sendSuccess(
+        res,
+        jobs,
+        "Jobs fetched successfully",
         HTTP_STATUS.OK
     );
 })

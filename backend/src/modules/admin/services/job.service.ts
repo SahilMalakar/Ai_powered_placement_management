@@ -1,9 +1,11 @@
-import { createJob, updateJob, getJobById, updateJobStatus, getStudentsForJobNotification } from "../repositories/job.repository.js";
+import { createJob, updateJob, getJobById, updateJobStatus, getStudentsForJobNotification, getAllJobs } from "../repositories/job.repository.js";
 import { BadRequestError } from "../../../utils/errors/httpErrors.js";
 import type { CreateJobInput, UpdateJobInput } from "../../../types/admin/job.js";
 import type { JobCreateInput } from "../../../prisma/generated/prisma/models/Job.js";
 import type { NotificationTypes } from "../../../types/admin/notification.js";
 import { addBulkEmailsToQueue } from "../../../queues/notification.queue.js";
+import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
 
 
 export const createJobService = async (
@@ -27,6 +29,12 @@ export const updateJobByIdService = async (
     if (!job) {
         throw new BadRequestError("Failed to update job")
     }
+
+    // Cache Invalidation
+    const cacheClient = getRedisConnectionForCaching();
+    await cacheClient.del(CACHE_KEYS.JOBS_LIST);
+    console.log("🧹 Cache Invalidated: ", CACHE_KEYS.JOBS_LIST);
+
     return job
 }
 
@@ -76,6 +84,11 @@ export const activateJobService = async (jobId: number) => {
     
     await addBulkEmailsToQueue(notifications);
     
+    // Cache Invalidation
+    const cacheClient = getRedisConnectionForCaching();
+    await cacheClient.del(CACHE_KEYS.JOBS_LIST);
+    console.log("🧹 Cache Invalidated: ", CACHE_KEYS.JOBS_LIST);
+
     return activatedJob;
 }
 
@@ -95,5 +108,31 @@ export const deactivateJobService = async (jobId: number) => {
     // 2. Update status to DEACTIVE
     const deactivatedJob = await updateJobStatus(jobId, "DEACTIVE");
 
+    // Cache Invalidation
+    const cacheClient = getRedisConnectionForCaching();
+    await cacheClient.del(CACHE_KEYS.JOBS_LIST);
+    console.log("🧹 Cache Invalidated: ", CACHE_KEYS.JOBS_LIST);
+
     return deactivatedJob;
 }
+
+export const getAllJobsService = async () => {
+    const cacheKey = CACHE_KEYS.JOBS_LIST;
+    const cacheClient = getRedisConnectionForCaching();
+
+    // Try Cache Hit
+    const cachedJobs = await cacheClient.get(cacheKey);
+    if (cachedJobs) {
+        console.log("🚀 Cache Hit: ", cacheKey);
+        return JSON.parse(cachedJobs);
+    }
+
+    // Cache Miss
+    console.log("⚡ Cache Miss: ", cacheKey);
+    const jobs = await getAllJobs();
+
+    // Set Cache with 5-minute TTL (300 seconds)
+    await cacheClient.set(cacheKey, JSON.stringify(jobs), "EX", 300);
+
+    return jobs;
+};
