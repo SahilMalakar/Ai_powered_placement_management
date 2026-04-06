@@ -2,61 +2,31 @@ import { Redis } from "ioredis";
 import { serverConfig } from "./index.js";
 
 
-export function connectToRedis(){
+export function connectToRedis(connectionName: string = "Default") {
     try {
-        let redisClient :Redis;
+        let redisClient: Redis;
 
-        return ()=>{
+        return () => {
             if (!redisClient) {
-                redisClient = new Redis(serverConfig.REDIS_URL,{
-                    maxRetriesPerRequest:null,
+                redisClient = new Redis(serverConfig.REDIS_URL, {
+                    maxRetriesPerRequest: null,
                 });
 
-                redisClient.on("connect",()=>{
-                    console.log("Redis connected successfully");
+                redisClient.on("connect", () => {
+                    console.log(`Redis [${connectionName}] connected successfully`);
                 });
 
-                redisClient.on("error",(error)=>{
-                    console.log("Redis connection failed",error);
+                redisClient.on("error", (error) => {
+                    console.log(`Redis [${connectionName}] connection failed`, error);
                 });
             }
             return redisClient;
-        }
+        };
     } catch (error) {
-        console.log(`error connecting redis :`, error);
-
+        console.log(`Error creating Redis connection [${connectionName}]:`, error);
         throw error;
     }
 }
 
-
-export const getRedisConnection = connectToRedis();
-
-export function connectToRedisForCaching(){
-    try {
-        let cacheClient :Redis;
-
-        return ()=>{
-            if (!cacheClient) {
-                cacheClient = new Redis(serverConfig.REDIS_URL,{
-                    maxRetriesPerRequest:null,
-                });
-
-                cacheClient.on("connect",()=>{
-                    console.log("Redis Cache Client connected successfully");
-                });
-
-                cacheClient.on("error",(error)=>{
-                    console.log("Redis Cache Client connection failed",error);
-                });
-            }
-            return cacheClient;
-        }
-    } catch (error) {
-        console.log(`error connecting redis for caching :`, error);
-
-        throw error;
-    }
-}
-
-export const getRedisConnectionForCaching = connectToRedisForCaching();
+export const getRedisConnection = connectToRedis("Main");
+export const getRedisConnectionForCaching = connectToRedis("Cache");

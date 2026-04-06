@@ -11,7 +11,7 @@ export const authRateLimit = rateLimit({
   message: {
     status: 429,
     error: "Too Many Requests",
-    message: "Too many login or signup attempts from this IP, please try again after 15 minutes",
+    message: "Too many login or signup attempts from this IP, please try again after 15 minutes"
   },
   // Skip successful requests if needed, but for auth, we usually want to limit all attempts to prevent brute force
   skipSuccessfulRequests: false,
