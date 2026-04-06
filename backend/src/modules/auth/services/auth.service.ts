@@ -18,6 +18,8 @@ import {
 } from "../repositories/auth.repository.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
 
 
 
@@ -87,6 +89,18 @@ export const loginService = async (loginData: LoginInput) => {
 };
 
 export const meService = async (userId: number) => {
+  const cacheKey = CACHE_KEYS.USER_SESSION(userId);
+  const cacheClient = getRedisConnectionForCaching();
+
+  // Try Cache Hit
+  const cachedUser = await cacheClient.get(cacheKey);
+  if (cachedUser) {
+    console.log("🚀 Cache Hit: ", cacheKey);
+    return JSON.parse(cachedUser);
+  }
+
+  // Cache Miss
+  console.log("⚡ Cache Miss: ", cacheKey);
   const user = await findUserById(userId);
 
   if (!user) {
@@ -96,6 +110,9 @@ export const meService = async (userId: number) => {
   if (user.deletedAt) {
     throw new ForbiddenError("Account is deactivated");
   }
+
+  // Set Cache with 10-minute TTL (600 seconds)
+  await cacheClient.set(cacheKey, JSON.stringify(user), "EX", 600);
 
   return user;
 };
@@ -125,6 +142,12 @@ export const changePasswordService = async (userId: number, data: ChangePassword
   // will Handle idempotency using Idempotency-Key if required in future
 
   await updateUserPassword(userId, hashedPassword);
+
+  // Cache Invalidation
+  const cacheClient = getRedisConnectionForCaching();
+  const cacheKey = CACHE_KEYS.USER_SESSION(userId);
+  await cacheClient.del(cacheKey);
+  console.log("🧹 Cache Invalidated: ", cacheKey);
 
   return true;
 }
@@ -161,6 +184,12 @@ export const resetPasswordService = async (data: ResetPasswordInput) => {
   const hashedPassword = await bcrypt.hash(data.newPassword, 10);
 
   await updateUserPassword(user.id, hashedPassword);
+
+  // Cache Invalidation
+  const cacheClient = getRedisConnectionForCaching();
+  const cacheKey = CACHE_KEYS.USER_SESSION(user.id);
+  await cacheClient.del(cacheKey);
+  console.log("🧹 Cache Invalidated: ", cacheKey);
 
   // delete otp from redis
 

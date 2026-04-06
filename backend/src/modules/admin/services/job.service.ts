@@ -5,6 +5,7 @@ import type { JobCreateInput } from "../../../prisma/generated/prisma/models/Job
 import type { NotificationTypes } from "../../../types/admin/notification.js";
 import { addBulkEmailsToQueue } from "../../../queues/notification.queue.js";
 
+
 export const createJobService = async (
     jobData: CreateJobInput) => {
     const job = await createJob(jobData as JobCreateInput)

@@ -1,14 +1,32 @@
 import type { CreateProfileInput, UpdateProfileInput } from "../../../types/students/profile.js";
 import { createProfileWithTransaction, findProfileByUserId, getFullStudentData, updateProfileWithTransaction } from "../repositories/student.repository.js";
 import { BadRequestError, ConflictError, NotFoundError } from "../../../utils/errors/httpErrors.js";
+import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
 
 
 // Fetch the authenticated student's full profile for the UI.
 export const getStudentProfileService = async (userId: number) => {
+    const cacheKey = CACHE_KEYS.STUDENT_PROFILE(userId);
+    const cacheClient = getRedisConnectionForCaching();
+
+    // Try Cache Hit
+    const cachedProfile = await cacheClient.get(cacheKey);
+    if (cachedProfile) {
+        console.log("🚀 Cache Hit: ", cacheKey);
+        return JSON.parse(cachedProfile);
+    }
+
+    // Cache Miss
+    console.log("⚡ Cache Miss: ", cacheKey);
     const fullData = await getFullStudentData(userId);
     if (!fullData?.profile) {
         throw new NotFoundError("Profile not found. Please create one.");
     }
+
+    // Set Cache with 10-minute TTL
+    await cacheClient.set(cacheKey, JSON.stringify(fullData), "EX", 600);
+
     return fullData;
 };
 
@@ -30,11 +48,24 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
     const { isCompleted, processedData } = await prepareProfileData(userId, mergedData as any);
 
     // Persistence
-    return await updateProfileWithTransaction(
+    const result = await updateProfileWithTransaction(
         userId,
         processedData,
         isCompleted
     );
+
+    // Cache Invalidation (Session & Profile)
+    const cacheClient = getRedisConnectionForCaching();
+    const sessionKey = CACHE_KEYS.USER_SESSION(userId);
+    const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
+    
+    await Promise.all([
+        cacheClient.del(sessionKey),
+        cacheClient.del(profileKey)
+    ]);
+    console.log("🧹 Cache Invalidated: ", { sessionKey, profileKey });
+
+    return result;
 };
 
 export const createStudentProfileService = async (
@@ -56,7 +87,20 @@ export const createStudentProfileService = async (
     }
 
     // persistence via Transaction
-    return await createProfileWithTransaction(userId, processedData, isCompleted);
+    const result = await createProfileWithTransaction(userId, processedData, isCompleted);
+
+    // Cache Invalidation (Session & Profile)
+    const cacheClient = getRedisConnectionForCaching();
+    const sessionKey = CACHE_KEYS.USER_SESSION(userId);
+    const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
+    
+    await Promise.all([
+        cacheClient.del(sessionKey),
+        cacheClient.del(profileKey)
+    ]);
+    console.log("🧹 Cache Invalidated: ", { sessionKey, profileKey });
+
+    return result;
 }
 
 
