@@ -22,7 +22,7 @@ const coreSchema = z.object({
     message: "Invalid branch",
   }),
   rollNo: z.string().min(1, "Roll number is required"),
-  astuRollNo: z.string().min(1, "ASTU roll number is required"),
+  astuRollNo: z.string().optional(), // Now populated via verification worker
   dob: dateString,
   phoneNumber: z
     .string()
@@ -77,7 +77,6 @@ const additionalDetailSchema = z.object({
 
 export const createProfileSchema = z.object({
   core: coreSchema,
-  semesterResults: z.array(semesterResultSchema).default([]),
   socialLinks: z.array(socialLinkSchema).optional(),
   experiences: z.array(experienceSchema).optional(),
   projects: z.array(projectSchema).optional(),
@@ -88,7 +87,6 @@ export const createProfileSchema = z.object({
 // Schema for partial updates ensures that individual fields can be updated without providing the full object
 export const updateProfileSchema = z.object({
   core: coreSchema.partial(),
-  semesterResults: z.array(semesterResultSchema).optional(),
   socialLinks: z.array(socialLinkSchema).optional(),
   experiences: z.array(experienceSchema).optional(),
   projects: z.array(projectSchema).optional(),

@@ -19,8 +19,8 @@ export const createProfileWithTransaction = async(
       // sync relational data of students (socialLinks , projects , skills , experiences)
       await syncRelationalData(tx, profileId, profileData);
 
-      // sync semester results (linked to userId)
-      await syncSemesterResults(tx, userId, profileData.semesterResults);
+      // SGPAs/Semester Results are NO LONGER synced at creation. 
+      // They are populated via the Verification Worker after document extraction.
 
       //Update User's Profile Completion Flag
       await tx.user.update({
@@ -72,7 +72,7 @@ export const updateProfileWithTransaction = async (
     if (profileData.projects) await syncRelationalData(tx, profileId, { projects: profileData.projects });
     if (profileData.skills) await syncRelationalData(tx, profileId, { skills: profileData.skills });
     
-    if (profileData.semesterResults) await syncSemesterResults(tx, userId, profileData.semesterResults);
+    // Academic results are managed exclusively by the verification worker.
 
     // 3. Update User's Profile Completion Flag
     await tx.user.update({

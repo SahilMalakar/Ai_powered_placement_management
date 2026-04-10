@@ -65,3 +65,55 @@ export const updateVerificationStatus = async (
     }
   });
 };
+
+/**
+ * Transactionally saves verified academic data extracted from documents.
+ * Updates StudentProfile, SemesterResults, and User.isProfileCompleted.
+ */
+export const saveVerifiedAcademicData = async (
+  userId: number,
+  data: {
+    astuRollNo: string;
+    cgpa: number;
+    semesters: { semester: number; sgpa: number }[];
+    backlog: boolean;
+    backlogSubjects: string[];
+    verificationReason: string;
+  }
+) => {
+  return await prisma.$transaction(async (tx) => {
+    // 1. Update Student Profile with extracted academic data
+    const profile = await tx.studentProfile.update({
+      where: { userId },
+      data: {
+        astuRollNo: data.astuRollNo,
+        cgpa: data.cgpa,
+        backlog: data.backlog,
+        backlogSubjects: data.backlogSubjects,
+        verificationStatus: VerificationStatus.VERIFIED,
+        verificationReason: data.verificationReason,
+      },
+    });
+
+    // 2. Sync Semester Results (Overwrite with verified data)
+    await tx.semesterResult.deleteMany({
+      where: { userId },
+    });
+
+    await tx.semesterResult.createMany({
+      data: data.semesters.map((s) => ({
+        userId,
+        semester: s.semester,
+        sgpa: s.sgpa,
+      })),
+    });
+
+    // 3. Mark User Profile as Completed (since strictly dependent on VERIFIED status)
+    await tx.user.update({
+      where: { id: userId },
+      data: { isProfileCompleted: true },
+    });
+
+    return profile;
+  });
+};

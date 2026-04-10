@@ -25,18 +25,11 @@ export const initiateVerificationService = async (userId: number) => {
     throw new ConflictError(`Verification is already ${profile.verificationStatus.toLowerCase()}.`);
   }
 
-  // 3. Document Completeness Check
-  const [sgpaDocsCount, sgpaResultsCount] = await Promise.all([
-    getSgpaDocumentsCount(userId),
-    getSemesterResultsCount(userId)
-  ]);
+  // 3. Document Availability Check
+  const sgpaDocsCount = await getSgpaDocumentsCount(userId);
 
-  if (sgpaResultsCount === 0) {
-    throw new BadRequestError("No SGPA results found in profile to verify.");
-  }
-
-  if (sgpaDocsCount !== sgpaResultsCount) {
-    throw new BadRequestError(`Document completeness failed: You have ${sgpaResultsCount} semesters entered but only uploaded ${sgpaDocsCount} valid marksheets.`);
+  if (sgpaDocsCount === 0) {
+    throw new BadRequestError("No SGPA marksheets found. Please upload at least one marksheet to initiate verification.");
   }
 
   // 4. Update status to PROCESSING using verification repository

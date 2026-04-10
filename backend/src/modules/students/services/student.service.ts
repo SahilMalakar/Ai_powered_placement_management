@@ -50,13 +50,17 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
         ...coreExisting
     } = existing.profile as any;
 
-    // Process new CGPA and Completion Status using cleaned core data
+    // Process Completion Status using cleaned core data (CGPA/SGPAs ignored from input)
     const mergedData = {
         core: { ...coreExisting, ...updateData.core },
-        semesterResults: updateData.semesterResults || (existing.semesters as any[])
+        // academic fields are specifically excluded from updateData
     };
 
-    const { isCompleted, processedData } = await prepareProfileData(userId, mergedData as any);
+    const { isCompleted, processedData } = await prepareProfileData(
+        userId, 
+        mergedData as any, 
+        existing.profile.verificationStatus
+    );
 
     // Persistence
     const result = await updateProfileWithTransaction(
@@ -89,8 +93,12 @@ export const createStudentProfileService = async (
         throw new ConflictError("Profile already exists use update instead");
     }
 
-    // Process data (CGPA calculation & Completion status)
-    const { isCompleted, processedData } = await prepareProfileData(userId, studentData);
+    // Process data (Completion status) - New profiles are NOT_VERIFIED by default
+    const { isCompleted, processedData } = await prepareProfileData(
+        userId, 
+        studentData, 
+        VerificationStatus.NOT_VERIFIED
+    );
 
     // validate backlog logic 
     if (processedData.core.backlog === true && (!processedData.core.backlogSubjects || processedData.core.backlogSubjects.length === 0)) {
@@ -117,51 +125,38 @@ export const createStudentProfileService = async (
 
 async function prepareProfileData(
     userId: number,
-    studentData: CreateProfileInput
+    studentData: CreateProfileInput,
+    currentStatus: VerificationStatus
 ) {
-    const { semesterResults, ...allOtherData } = studentData;
-
-    // Calculate CGPA from available semester results (SGPAs)
-    let calculatedCgpa = null;
-
-    if (semesterResults?.length) {
-        const sum = semesterResults.reduce(
-            (acc: number, curr) => acc + curr.sgpa,
-            0
-        );
-
-        calculatedCgpa = parseFloat(
-            (sum / semesterResults.length).toFixed(2)
-        );
-    }
+    const { ...allOtherData } = studentData;
 
     const coreFields = {
         ...allOtherData.core,
-        cgpa: calculatedCgpa
+        // Academic fields are READ-ONLY and populated via verification worker
     };
 
-    // madatory field checks for isProfileCompleted
-    const manadatoryFields = [
+    // mandatory field checks for isProfileCompleted
+    const mandatoryFields = [
         "fullName",
         "branch",
         "rollNo",
-        "astuRollNo",
         "dob",
         "phoneNumber",
-        "cgpa",
         "backlog"
     ];
 
-    // return false if any condition fails
-    const isCompleted = manadatoryFields.every((field) => {
+    // Check basic field completion
+    const checklistMatched = mandatoryFields.every((field) => {
         const value = coreFields[field as keyof typeof coreFields];
-        // Allow boolean 'false' as a valid value (important for 'backlog' field)
         return value !== null && value !== undefined && value !== "";
     });
 
+    // A profile is ONLY complete if basic fields are filled AND verification is successful
+    const isCompleted = checklistMatched && currentStatus === VerificationStatus.VERIFIED;
+
     const processedData = {
         core: coreFields,
-        semesterResults,
+        // We do NOT take semesterResults here; they come from Verification worker
         socialLinks: allOtherData.socialLinks,
         experiences: allOtherData.experiences,
         projects: allOtherData.projects,

@@ -4,8 +4,8 @@ import { VERIFICATION_QUEUE_NAME, type VerificationJobPayload } from "../queues/
 import { findProfileByUserId } from "../modules/students/repositories/student.repository.js";
 import { 
   getStudentSgpaDocuments, 
-  getSemesterResults, 
-  updateVerificationStatus 
+  updateVerificationStatus,
+  saveVerifiedAcademicData
 } from "../modules/students/repositories/verification.repository.js";
 import { extractTextFromPdfBuffer } from "../utils/fileHandler/pdfParser.js";
 import { VerificationStatus } from "../prisma/generated/prisma/enums.js";
@@ -30,77 +30,103 @@ export const initializeVerificationWorker = async () => {
       console.log(`[Verification Worker] Processing user ${userId}...`);
 
       try {
-        // 1. Fetch data from repositories (Ensures layered architecture)
-        const [profile, sgpaDocs, dbSgpas] = await Promise.all([
+        // 1. Fetch source documents
+        const [profile, sgpaDocs] = await Promise.all([
           findProfileByUserId(userId),
-          getStudentSgpaDocuments(userId),
-          getSemesterResults(userId)
+          getStudentSgpaDocuments(userId)
         ]);
 
         if (!profile) throw new Error("Student profile not found");
         
         let isOverallCorrect = true;
         const mismatchDetails: string[] = [];
-
-        // 2. Map SGPAs by semester for efficient lookup
-        const expectedSgpas = new Map(dbSgpas.map(s => [s.semester, s.sgpa]));
+        
+        // Data to be extracted and aggregated
+        const extractedSgpas: { semester: number; sgpa: number }[] = [];
+        let detectedAstuRollNo: string | null = null;
+        let detectedBacklog = false;
+        const detectedBacklogSubjects = new Set<string>();
 
         // 3. Process each marksheet PDF sequentially
         for (const doc of sgpaDocs) {
           if (!doc.url || doc.semester == null) continue;
 
           try {
-            // Download PDF buffer from Cloudinary URL
             const response = await fetch(doc.url);
-            if (!response.ok) throw new Error(`Download failed for semester ${doc.semester}`);
+            if (!response.ok) throw new Error(`Download failed for sem ${doc.semester}`);
             
             const buffer = Buffer.from(await response.arrayBuffer());
             const text = await extractTextFromPdfBuffer(buffer);
 
-            // Zod Validation & Extraction: Uses the transformer schema to pluck Roll No, Name, and SGPA
+            // Extraction using Zod transformer
             const zodResult = verificationRawTextSchema.safeParse(text);
 
             if (!zodResult.success) {
               isOverallCorrect = false;
-              mismatchDetails.push(`Sem ${doc.semester}: Unified layout extraction failed (Invalid document).`);
+              mismatchDetails.push(`Sem ${doc.semester}: Extraction failed.`);
               continue;
             }
 
             const { rollNo, name, sgpa } = zodResult.data;
 
-            // Comparison: Roll Number (Normalized match)
-            const expectedRoll = profile.astuRollNo.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (rollNo !== expectedRoll) {
-              isOverallCorrect = false;
-              mismatchDetails.push(`Sem ${doc.semester}: Roll No mismatch.`);
-            }
-
-            // Comparison: Name (Token-based match)
+            // Identity Match: Every doc must belong to the student
             if (!validateNameTokens(profile.fullName, name)) {
               isOverallCorrect = false;
-              mismatchDetails.push(`Sem ${doc.semester}: Name mismatch.`);
+              mismatchDetails.push(`Sem ${doc.semester}: Identity mismatch (extracted name: ${name}).`);
+              continue;
             }
 
-            // Comparison: SGPA (0.01 float tolerance)
-            const expectedSgpa = expectedSgpas.get(doc.semester);
-            if (expectedSgpa !== undefined && Math.abs(expectedSgpa - sgpa) > 0.01) {
+            // Consitency: Keep track of Roll Number
+            if (!detectedAstuRollNo) {
+              detectedAstuRollNo = rollNo;
+            } else if (detectedAstuRollNo !== rollNo) {
               isOverallCorrect = false;
-              mismatchDetails.push(`Sem ${doc.semester}: SGPA mismatch.`);
+              mismatchDetails.push(`Sem ${doc.semester}: Roll No inconsistency (${rollNo} vs ${detectedAstuRollNo}).`);
             }
+
+            // Backlog Detection Logic (Simplified: Check for 'F' grade per doc)
+            // TODO: Enhance this with specific subject extraction if needed
+            if (text.includes(" F ") || text.toLowerCase().includes("fail")) {
+              detectedBacklog = true;
+              // Extracting subject next to 'F' as a heuristic
+              const failMatch = text.match(/([A-Z0-9-]+)\s*F/g);
+              if (failMatch) failMatch.forEach(m => detectedBacklogSubjects.add(m.split(" ")[0]!));
+            }
+
+            // Add to aggregation
+            extractedSgpas.push({ semester: doc.semester, sgpa });
 
           } catch (error: any) {
             isOverallCorrect = false;
-            mismatchDetails.push(`Sem ${doc.semester}: Structural error or invalid file.`);
-            console.error(`[Worker Error] ${error.message}`);
+            mismatchDetails.push(`Sem ${doc.semester}: OCR/Structural error.`);
           }
         }
 
-        // 4. Update Final DB Status strictly (VERIFIED or FAILED only)
-        const finalStatus = isOverallCorrect ? VerificationStatus.VERIFIED : VerificationStatus.FAILED;
-        const finalReason = isOverallCorrect ? "Automated verification successful." : mismatchDetails.join(" ");
+        // 4. Final Processing & Persistence
+        if (isOverallCorrect && extractedSgpas.length > 0 && detectedAstuRollNo) {
+          // Calculate CGPA
+          const sum = extractedSgpas.reduce((acc, curr) => acc + curr.sgpa, 0);
+          const averageCgpa = parseFloat((sum / extractedSgpas.length).toFixed(2));
 
-        await updateVerificationStatus(userId, finalStatus, finalReason);
-        console.log(`[Verification Worker] Job completed for ${userId} -> Result: ${finalStatus}`);
+          // Save EVERYTHING to DB
+          await saveVerifiedAcademicData(userId, {
+            astuRollNo: detectedAstuRollNo,
+            cgpa: averageCgpa,
+            semesters: extractedSgpas,
+            backlog: detectedBacklog,
+            backlogSubjects: Array.from(detectedBacklogSubjects),
+            verificationReason: "Automated document extraction successful."
+          });
+
+          console.log(`[Verification Worker] Job completed for ${userId} -> Status: VERIFIED`);
+        } else {
+          const finalReason = mismatchDetails.length > 0 
+            ? mismatchDetails.join(" ") 
+            : "No valid academic data could be extracted.";
+            
+          await updateVerificationStatus(userId, VerificationStatus.FAILED, finalReason);
+          console.log(`[Verification Worker] Job FAILED for ${userId} -> Reason: ${finalReason}`);
+        }
 
       } catch (error: any) {
         console.error(`[Verification Worker] Fatal error for job ${job.id}:`, error.message);
