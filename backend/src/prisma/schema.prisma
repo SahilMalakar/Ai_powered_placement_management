@@ -147,6 +147,7 @@ model Document {
   userId    Int
   type      DocumentType
   url       String
+  publicId  String?
   semester  Int?
   createdAt DateTime     @default(now())
   deletedAt DateTime?

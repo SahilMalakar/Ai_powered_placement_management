@@ -34,11 +34,21 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
 };
 
 // Multer upload middleware configured for ATS resumes.
-// Limit: 5MB
+// Limit: 2MB
 export const atsUpload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB
+    fileSize: 2 * 1024 * 1024,
+  },
+});
+
+// Multer upload middleware for bulk student documents (Marksheets & Certificates)
+// Limit: 5MB per file
+export const documentUpload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
   },
 });
