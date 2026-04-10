@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
+import { requireStudent } from "../../../middlewares/rbac.middleware.js";
 import { documentUpload } from "../../../utils/fileHandler/multer.js";
 import { 
   uploadDocumentsController, 
@@ -12,7 +13,8 @@ const documentRouter: Router = Router();
 // Expects multipart/form-data with fields: sem1..sem8, cgpa, other.
 documentRouter.post(
   "/documents", 
-  authMiddleware, 
+  authMiddleware,
+  requireStudent,
   documentUpload.fields([
     { name: "sem1", maxCount: 1 },
     { name: "sem2", maxCount: 1 },
@@ -30,7 +32,8 @@ documentRouter.post(
 // Route to manually delete a document and its Cloudinary resource.
 documentRouter.delete(
   "/documents/:id", 
-  authMiddleware, 
+  authMiddleware,
+  requireStudent,
   deleteDocumentController
 );
 

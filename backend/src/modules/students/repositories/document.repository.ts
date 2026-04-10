@@ -53,10 +53,10 @@ export const upsertDocument = async (
   });
 };
 
-// Permanently removes a document record from the database.
+// Soft-deletes a document. Guard on deletedAt: null prevents double-delete race conditions.
 export const deleteDocumentRecord = async (id: number) => {
   return await prisma.document.update({
-    where: { id },
+    where: { id, deletedAt: null },
     data: { deletedAt: new Date() },
   });
 };

@@ -9,7 +9,7 @@ import { DocumentType } from "../../../prisma/generated/prisma/enums.js";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 import fs from "fs/promises";
 
-// Service to handle bulk uploads of different student documents (SGPA, CGPA, Certificates).
+// Service to handle bulk uploads of different student documents (SGPA, Certificates).
 export const uploadBulkDocumentsService = async (
   userId: number, 
   files: { [fieldname: string]: Express.Multer.File[] }
@@ -36,27 +36,42 @@ export const uploadBulkDocumentsService = async (
       continue; // Skip unknown fields
     }
 
-    // 1. Conflict Check: See if an existing doc needs replacing for Cloudinary cleanup
-    const existing = await findDocumentBySemester(userId, type, semester);
-    const oldPublicId = existing?.publicId;
+    // Track newly uploaded Cloudinary file for compensating delete on DB failure
+    let newPublicId: string | null = null;
 
-    // 2. Cloudinary Upload: Folder depends on the document type
-    const cloudRes = await uploadToCloudinary(file!.path, folder);
-    
-    // 3. Sync with DB: Update existing or create new
-    await upsertDocument(userId, type, cloudRes.secure_url, cloudRes.public_id, semester);
-    
-    // 4. Cleanup old file from Cloudinary (Asynchronous)
-    if (oldPublicId) {
-      deleteFromCloudinary(oldPublicId).catch((err) => 
-        console.error(`[Cloudinary Cleanup] Failed to delete ${oldPublicId}:`, err.message)
-      );
+    try {
+      // 1. Conflict Check: See if an existing doc needs replacing for Cloudinary cleanup
+      const existing = await findDocumentBySemester(userId, type, semester);
+      const oldPublicId = existing?.publicId;
+
+      // 2. Cloudinary Upload: Folder depends on the document type
+      const cloudRes = await uploadToCloudinary(file!.path, folder);
+      newPublicId = cloudRes.public_id;
+
+      // 3. Sync with DB: Update existing or create new
+      // IMPORTANT: If this throws, the catch block will delete the newly uploaded Cloudinary file
+      await upsertDocument(userId, type, cloudRes.secure_url, cloudRes.public_id, semester);
+
+      // 4. DB write confirmed — now safely cleanup the old Cloudinary file (Asynchronous)
+      if (oldPublicId) {
+        deleteFromCloudinary(oldPublicId).catch((err) => 
+          console.error(`[Cloudinary Cleanup] Failed to delete ${oldPublicId}:`, err.message)
+        );
+      }
+
+      uploadResults.push({ fieldname, status: "completed", url: cloudRes.secure_url });
+    } catch (err) {
+      // Compensating action: DB failed after Cloudinary upload succeeded → orphan prevention
+      if (newPublicId) {
+        deleteFromCloudinary(newPublicId).catch((e) =>
+          console.error(`[Cloudinary Compensation] Failed to remove orphaned file ${newPublicId}:`, e.message)
+        );
+      }
+      throw err; // Re-throw to return error response to the client
+    } finally {
+      // Always free up local disk space — runs on both success and failure
+      await fs.unlink(file!.path).catch(() => {});
     }
-    
-    // 5. Cleanup local temp file stored by Multer
-    await fs.unlink(file!.path).catch(() => {});
-    
-    uploadResults.push({ fieldname, status: "completed", url: cloudRes.secure_url });
   }
 
   return uploadResults;
