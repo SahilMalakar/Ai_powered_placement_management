@@ -4,6 +4,7 @@ import {
   updateVerificationStatus 
 } from "../repositories/verification.repository.js";
 import { findProfileByUserId } from "../repositories/student.repository.js";
+import { addVerificationJob } from "../../../queues/verification.queue.js";
 import { BadRequestError, ConflictError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
 
@@ -41,7 +42,8 @@ export const initiateVerificationService = async (userId: number) => {
   // 4. Update status to PROCESSING using verification repository
   const updatedProfile = await updateVerificationStatus(userId, VerificationStatus.PROCESSING);
 
-  // TODO: Dispatch BullMQ job (verificationQueue.add) here in Step 2
+  // Dispatch the background job to start PDF text extraction and Regex matching
+  await addVerificationJob(userId);
 
   return {
     status: updatedProfile.verificationStatus,

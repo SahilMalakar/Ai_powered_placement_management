@@ -6,6 +6,7 @@ import { sendEmailFromQueueViaWorker } from "./workers/notification.worker.js";
 import { initializeAtsWorker } from "./workers/ats.worker.js";
 import { initializeResumeWorker } from "./workers/resume.worker.js";
 import { initializeDocumentWorker } from "./workers/document.worker.js";
+import { initializeVerificationWorker } from "./workers/verification.worker.js";
 
 // Start the background notification worker
 try {
@@ -13,6 +14,7 @@ try {
   initializeAtsWorker();
   initializeResumeWorker();
   initializeDocumentWorker();
+  initializeVerificationWorker();
   console.log(`Successfully initialized background workers`);
 } catch (error) {
   console.log(error);
