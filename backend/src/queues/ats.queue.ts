@@ -22,7 +22,6 @@ export interface ATSJobPayload {
   userId: number;
   resumeText: string;
   jobDescription: string;
-  resumeUrl: string;
 }
 
 // Adds a new ATS analysis job to the queue.

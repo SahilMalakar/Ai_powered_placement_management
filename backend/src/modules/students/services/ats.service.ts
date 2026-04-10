@@ -1,4 +1,3 @@
-import { uploadToCloudinary, deleteFromCloudinary } from "../../../utils/fileHandler/cloudinary.js";
 import { extractTextFromPdf } from "../../../utils/fileHandler/pdfParser.js";
 import { extractTextFromDocx } from "../../../utils/fileHandler/docxParser.js";
 import { addAtsJobToQueue } from "../../../queues/ats.queue.js";
@@ -30,29 +29,17 @@ export const requestAtsAnalysisService = async (userId: number, filePath: string
     throw new BadRequestError("Could not extract text from the resume. Please ensure the file is not corrupted.");
   }
 
-  // Cloudinary Upload: Securely store the resume for reference
-  const uploadResult = await uploadToCloudinary(filePath);
-  const { secure_url, public_id } = uploadResult;
+  // En-queue for AI Analysis: Background processing via BullMQ
+  const job = await addAtsJobToQueue({
+    userId,
+    resumeText,
+    jobDescription,
+  });
 
-  try {
-    // En-queue for AI Analysis: Background processing via BullMQ
-    const job = await addAtsJobToQueue({
-      userId,
-      resumeText,
-      jobDescription,
-      resumeUrl: secure_url,
-    });
-
-    return {
-      message: "ATS analysis is being processed. It will appear in your history shortly.",
-      jobId: job.id,
-      resumeUrl: secure_url
-    };
-  } catch (error) {
-    // Rollback: Delete from Cloudinary if queueing fails to maintain consistency
-    await deleteFromCloudinary(public_id);
-    throw error;
-  }
+  return {
+    message: "ATS analysis is being processed. It will appear in your history shortly.",
+    jobId: job.id,
+  };
 };
 
 // Service to fetch the latest analysis result for a student.

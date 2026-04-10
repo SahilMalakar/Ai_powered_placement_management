@@ -2,11 +2,10 @@ import { prisma } from "../../../prisma/prisma.js";
 import type { ATSResultType } from "../../../types/students/ats.js";
 
 // Saves a new ATS analysis result to the database.
-export const createAtsResult = async (userId: number, resumeUrl: string, jobDescription: string, result: ATSResultType) => {
+export const createAtsResult = async (userId: number, jobDescription: string, result: ATSResultType) => {
   return await prisma.aTSResult.create({
     data: {
       userId,
-      resumeUrl,
       jobDescription,
       score: result.score,
       strengths: result.strengths,

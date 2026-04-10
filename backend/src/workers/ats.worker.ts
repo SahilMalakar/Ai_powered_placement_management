@@ -17,7 +17,7 @@ export const initializeAtsWorker = async () => {
     async (job: Job<ATSJobPayload>) => {
       console.log(`[ATS Worker] Processing job ${job.id} for user ${job.data.userId}...`);
 
-      const { userId, resumeText, jobDescription, resumeUrl } = job.data;
+      const { userId, resumeText, jobDescription } = job.data;
 
       try {
         // Build and invoke the LangChain analysis chain
@@ -28,7 +28,7 @@ export const initializeAtsWorker = async () => {
         });
 
         // Save the structured result to the database
-        await createAtsResult(userId, resumeUrl, jobDescription, result as any);
+        await createAtsResult(userId, jobDescription, result as any);
 
         console.log(`[ATS Worker] Successfully processed job ${job.id}`);
       } catch (error: any) {

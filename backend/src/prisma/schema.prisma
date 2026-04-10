@@ -224,7 +224,6 @@ model Resume {
 model ATSResult {
   id                 Int      @id @default(autoincrement())
   userId             Int
-  resumeUrl          String
   jobDescription     String?
   score              Float
   strengths          String[]
