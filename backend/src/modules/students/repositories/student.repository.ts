@@ -174,9 +174,9 @@ export const findProfileByUserId = (userId: number) => {
 };
 
 
-export const getFullStudentData = async (userId: number) => {
+export const getFullStudentData = async (userId: number, tx: any = prisma) => {
   // We fetch via the User model to get both StudentProfile and SemesterResults
-  return await prisma.user.findUnique({
+  return await tx.user.findUnique({
     where: { id: userId, deletedAt: null },
     select: {
       id: true,

@@ -188,14 +188,20 @@ model Application {
   id        Int               @id @default(autoincrement())
   userId    Int
   jobId     Int
+  resumeId  Int?              // Link to the resume used (Live Link philosophy)
   status    ApplicationStatus @default(APPLIED)
+  
+  // Academic Snapshot (Snapshot philosophy)
+  snapshot  Json              
+
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   deletedAt DateTime?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job     Job     @relation(fields: [jobId], references: [id])
+  resume  Resume? @relation(fields: [resumeId], references: [id])
 
   // Prevent duplicate applications
   @@unique([userId, jobId])
@@ -215,7 +221,8 @@ model Resume {
   deletedAt DateTime?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
 
   @@unique([userId, version])
   @@index([userId])

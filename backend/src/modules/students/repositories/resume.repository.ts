@@ -20,8 +20,8 @@ export const findResumesByUserId = async (userId: number) => {
 };
 
 // Fetches a resume by its unique ID.
-export const findResumeById = async (id: number) => {
-  return await prisma.resume.findFirst({
+export const findResumeById = async (id: number, tx: any = prisma) => {
+  return await tx.resume.findFirst({
     where: { id, deletedAt: null },
   });
 };
