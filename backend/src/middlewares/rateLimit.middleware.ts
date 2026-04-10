@@ -32,6 +32,7 @@ export const applicationRateLimiter = rateLimit({
     // We use User ID from the authMiddleware as the primary key
     return req.user?.userId?.toString() || req.ip;
   },
+  validate: { default: false },
   handler: (req, res, next) => {
     next(new ForbiddenError("Daily application limit reached. You can only apply to 5 jobs per day."));
   },
