@@ -33,7 +33,10 @@ export const getStudentProfileService = async (userId: number) => {
 
 
 export const updateStudentProfile = async (userId: number, updateData: UpdateProfileInput) => {
-    // Ensure profile exists
+    // 1. Strict Academic Guard: Block manual entry of verified-only data
+    checkForRestrictedFields(updateData);
+
+    // 2. Ensure profile exists
     const existing = await getFullStudentData(userId);
     if (!existing?.profile) {
         throw new NotFoundError("Profile not found. Use POST /profile to create it first.");
@@ -57,8 +60,8 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
     };
 
     const { isCompleted, processedData } = await prepareProfileData(
-        userId, 
-        mergedData as any, 
+        userId,
+        mergedData as any,
         existing.profile.verificationStatus
     );
 
@@ -86,8 +89,11 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
 export const createStudentProfileService = async (
     userId: number,
     studentData: CreateProfileInput) => {
+    
+    // 1. Strict Academic Guard: Block manual entry of verified-only data
+    checkForRestrictedFields(studentData);
 
-    // prevent duplicate profiles
+    // 2. Prevent duplicate profiles
     const existing = await findProfileByUserId(userId);
     if (existing) {
         throw new ConflictError("Profile already exists use update instead");
@@ -95,15 +101,10 @@ export const createStudentProfileService = async (
 
     // Process data (Completion status) - New profiles are NOT_VERIFIED by default
     const { isCompleted, processedData } = await prepareProfileData(
-        userId, 
-        studentData, 
+        userId,
+        studentData,
         VerificationStatus.NOT_VERIFIED
     );
-
-    // validate backlog logic 
-    if (processedData.core.backlog === true && (!processedData.core.backlogSubjects || processedData.core.backlogSubjects.length === 0)) {
-        throw new BadRequestError("Backlog subjects are required when backlog is true");
-    }
 
     // persistence via Transaction
     const result = await createProfileWithTransaction(userId, processedData, isCompleted);
@@ -141,8 +142,7 @@ async function prepareProfileData(
         "branch",
         "rollNo",
         "dob",
-        "phoneNumber",
-        "backlog"
+        "phoneNumber"
     ];
 
     // Check basic field completion
@@ -165,4 +165,20 @@ async function prepareProfileData(
     };
 
     return { isCompleted, processedData };
+}
+
+/**
+ * Helper to identify and block restricted academic fields in student requests.
+ */
+function checkForRestrictedFields(data: CreateProfileInput | UpdateProfileInput) {
+    const core = data.core;
+    const restrictedFound = 
+        (core && ('astuRollNo' in core || 'cgpa' in core || 'backlog' in core || 'backlogSubjects' in core)) ||
+        (data as any).semesterResults;
+
+    if (restrictedFound) {
+        throw new BadRequestError(
+            "Academic data (SGPAs, CGPA, ASTU Roll No, Backlog Status) is protected and can only be updated via the Document Verification process."
+        );
+    }
 }

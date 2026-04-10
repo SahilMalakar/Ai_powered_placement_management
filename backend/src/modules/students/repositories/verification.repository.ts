@@ -117,3 +117,23 @@ export const saveVerifiedAcademicData = async (
     return profile;
   });
 };
+
+/**
+ * Atomically transitions a profile to PROCESSING status.
+ * Returns true if the transition was successful, false otherwise.
+ */
+export const transitionToProcessing = async (userId: number): Promise<boolean> => {
+  const result = await prisma.studentProfile.updateMany({
+    where: {
+      userId,
+      verificationStatus: {
+        notIn: [VerificationStatus.PROCESSING, VerificationStatus.VERIFIED],
+      },
+    },
+    data: {
+      verificationStatus: VerificationStatus.PROCESSING,
+    },
+  });
+
+  return result.count > 0;
+};

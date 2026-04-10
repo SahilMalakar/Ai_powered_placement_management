@@ -1,7 +1,7 @@
 import { 
-  getSgpaDocumentsCount, 
-  getSemesterResultsCount, 
-  updateVerificationStatus 
+  getSgpaDocumentsCount,  
+  updateVerificationStatus,
+  transitionToProcessing
 } from "../repositories/verification.repository.js";
 import { findProfileByUserId } from "../repositories/student.repository.js";
 import { addVerificationJob } from "../../../queues/verification.queue.js";
@@ -13,27 +13,25 @@ import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
  * Performs idempotency and completeness checks before marking as PROCESSING.
  */
 export const initiateVerificationService = async (userId: number) => {
-  // 1. Fetch Profile using student repository
+  // 1. Check if user profile exists
   const profile = await findProfileByUserId(userId);
+  if (!profile) throw new NotFoundError("Student profile not found.");
 
-  if (!profile) {
-    throw new NotFoundError("Student profile not found.");
-  }
+  // 2 & 4. Atomic Idempotency & Status Update (via Repository)
+  const success = await transitionToProcessing(userId);
 
-  // 2. Idempotency Check
-  if (profile.verificationStatus === VerificationStatus.PROCESSING || profile.verificationStatus === VerificationStatus.VERIFIED) {
-    throw new ConflictError(`Verification is already ${profile.verificationStatus.toLowerCase()}.`);
+  if (!success) {
+    throw new ConflictError("Verification is already processing or has been completed.");
   }
 
   // 3. Document Availability Check
   const sgpaDocsCount = await getSgpaDocumentsCount(userId);
 
   if (sgpaDocsCount === 0) {
+    // Rollback if no docs (though status block ensures we are safe)
+    await updateVerificationStatus(userId, VerificationStatus.NOT_VERIFIED);
     throw new BadRequestError("No SGPA marksheets found. Please upload at least one marksheet to initiate verification.");
   }
-
-  // 4. Update status to PROCESSING using verification repository
-  const updatedProfile = await updateVerificationStatus(userId, VerificationStatus.PROCESSING);
 
   try {
     // Dispatch the background job to start PDF text extraction and Regex matching
@@ -45,13 +43,7 @@ export const initiateVerificationService = async (userId: number) => {
   }
 
   return {
-    status: updatedProfile.verificationStatus,
+    status: VerificationStatus.PROCESSING,
     message: "Verification initiated successfully. Documents are in processing queue."
   };
 };
-
-/**
- * Helper to validate text extraction results against database (Regex-based).
- * This will be moved/used by the worker in later steps.
- */
-// export const validateExtractionContent = ... (Planned for Step 3)
