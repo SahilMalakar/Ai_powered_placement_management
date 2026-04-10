@@ -85,7 +85,16 @@ export const createProfileSchema = z.object({
   additionalDetails: z.array(additionalDetailSchema).optional(),
 });
 
-export const updateProfileSchema = createProfileSchema.partial();
+// Schema for partial updates ensures that individual fields can be updated without providing the full object
+export const updateProfileSchema = z.object({
+  core: coreSchema.partial(),
+  semesterResults: z.array(semesterResultSchema).optional(),
+  socialLinks: z.array(socialLinkSchema).optional(),
+  experiences: z.array(experienceSchema).optional(),
+  projects: z.array(projectSchema).optional(),
+  skills: z.array(skillSchema).optional(),
+  additionalDetails: z.array(additionalDetailSchema).optional(),
+}).partial();
 
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

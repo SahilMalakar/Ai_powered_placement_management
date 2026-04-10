@@ -1,8 +1,9 @@
 import type { CreateProfileInput, UpdateProfileInput } from "../../../types/students/profile.js";
 import { createProfileWithTransaction, findProfileByUserId, getFullStudentData, updateProfileWithTransaction } from "../repositories/student.repository.js";
-import { BadRequestError, ConflictError, NotFoundError } from "../../../utils/errors/httpErrors.js";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
 import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
+import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
 
 
 // Fetch the authenticated student's full profile for the UI.
@@ -38,10 +39,20 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
         throw new NotFoundError("Profile not found. Use POST /profile to create it first.");
     }
 
-    // Process new CGPA and Completion Status
-    // Merge existing data with new data for calculation
+    // Lock Guard: Block updates if verification is processing
+    if (existing.profile.verificationStatus === VerificationStatus.PROCESSING) {
+        throw new ForbiddenError("Profile cannot be updated while verification is in progress.");
+    }
+
+    // Strip relational data from existing profile to prevent Prisma validation errors during core update
+    const {
+        socialLinks, experiences, projects, skills, additionalDetails,
+        ...coreExisting
+    } = existing.profile as any;
+
+    // Process new CGPA and Completion Status using cleaned core data
     const mergedData = {
-        core: { ...existing.profile, ...updateData.core },
+        core: { ...coreExisting, ...updateData.core },
         semesterResults: updateData.semesterResults || (existing.semesters as any[])
     };
 
@@ -58,7 +69,7 @@ export const updateStudentProfile = async (userId: number, updateData: UpdatePro
     const cacheClient = getRedisConnectionForCaching();
     const sessionKey = CACHE_KEYS.USER_SESSION(userId);
     const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
-    
+
     await Promise.all([
         cacheClient.del(sessionKey),
         cacheClient.del(profileKey)
@@ -93,7 +104,7 @@ export const createStudentProfileService = async (
     const cacheClient = getRedisConnectionForCaching();
     const sessionKey = CACHE_KEYS.USER_SESSION(userId);
     const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
-    
+
     await Promise.all([
         cacheClient.del(sessionKey),
         cacheClient.del(profileKey)

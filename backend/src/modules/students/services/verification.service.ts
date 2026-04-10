@@ -42,8 +42,14 @@ export const initiateVerificationService = async (userId: number) => {
   // 4. Update status to PROCESSING using verification repository
   const updatedProfile = await updateVerificationStatus(userId, VerificationStatus.PROCESSING);
 
-  // Dispatch the background job to start PDF text extraction and Regex matching
-  await addVerificationJob(userId);
+  try {
+    // Dispatch the background job to start PDF text extraction and Regex matching
+    await addVerificationJob(userId);
+  } catch (error) {
+    // Rollback status if queueing fails to prevent student from being "stuck"
+    await updateVerificationStatus(userId, profile.verificationStatus);
+    throw error;
+  }
 
   return {
     status: updatedProfile.verificationStatus,
