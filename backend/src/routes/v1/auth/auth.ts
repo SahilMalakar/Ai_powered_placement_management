@@ -3,7 +3,7 @@ import { validateRequest } from "../../../middlewares/validate.middlware.js";
 import {  changePasswordSchma, forgetPasswordSchema, loginSchema, resetPasswordSchema, signupSchema } from "../../../types/auth.js";
 import { changePasswordController, forgetPasswordController, loginController, logoutController, meController, refreshTokenController, resetPasswordController, signupController } from "../../../modules/auth/controllers/auth.controller.js";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
-import { authRateLimit } from "../../../configs/auth.rateLimit.js";
+import { authRateLimit } from "../../../middlewares/rateLimit.middleware.js";
 
 const authRouter: Router = Router();
 
