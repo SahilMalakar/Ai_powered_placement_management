@@ -5,12 +5,14 @@ import { InternalServerError } from "./utils/errors/httpErrors.js";
 import { sendEmailFromQueueViaWorker } from "./workers/notification.worker.js";
 import { initializeAtsWorker } from "./workers/ats.worker.js";
 import { initializeResumeWorker } from "./workers/resume.worker.js";
+import { initializeDocumentWorker } from "./workers/document.worker.js";
 
 // Start the background notification worker
 try {
   sendEmailFromQueueViaWorker();
   initializeAtsWorker();
   initializeResumeWorker();
+  initializeDocumentWorker();
   console.log(`Successfully initialized background workers`);
 } catch (error) {
   console.log(error);

@@ -25,8 +25,8 @@ export const uploadDocumentsController = asyncHandler(async (req: Request, res: 
   return sendSuccess(
     res, 
     results, 
-    "Documents processed and stored successfully.", 
-    HTTP_STATUS.CREATED
+    "Documents queued for processing. They will be available shortly.", 
+    HTTP_STATUS.ACCEPTED  // 202: Request accepted, processing in background
   );
 });
 
