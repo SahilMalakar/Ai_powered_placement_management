@@ -31,3 +31,8 @@ jobs:
           file: backend/docker/Dockerfile
           push: true
           tags: cosmicleo1/ai-placement-backend:latest
+
+  deploy:
+    needs: build-and-push
+    uses: ./.github/workflows/deploy-ec2.yml
+    secrets: inherit # Pass all secrets (SSH keys, etc.) to the deployment workflow
