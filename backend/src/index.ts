@@ -23,7 +23,6 @@ try {
 
 app.use(errorMiddleware);
 
-// testing ci
 app.listen(serverConfig.PORT, () => {
     console.log(`Server is running at http://localhost:${serverConfig.PORT}`);
 });
