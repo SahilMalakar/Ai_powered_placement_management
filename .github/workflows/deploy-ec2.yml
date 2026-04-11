@@ -33,14 +33,7 @@ jobs:
             mkdir -p ~/app
             cd ~/app
 
-            # Stop old containers (ignore error if none exist)
-            sudo docker compose down || true
-
-            # Pull latest image
-            sudo docker compose -f docker-compose.prod.yml pull
-
-            # Start containers
-            sudo docker compose -f docker-compose.prod.yml up -d
-
-            # Optional: show logs (debugging)
-            sudo docker compose logs --tail=50
+            sudo docker-compose down || true
+            sudo docker-compose -f docker-compose.prod.yml pull
+            sudo docker-compose -f docker-compose.prod.yml up -d
+            sudo docker-compose logs --tail=50
