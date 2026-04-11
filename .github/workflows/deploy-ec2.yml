@@ -36,4 +36,4 @@ jobs:
             sudo docker-compose -f docker-compose.prod.yml down || true
             sudo docker-compose -f docker-compose.prod.yml pull
             sudo docker-compose -f docker-compose.prod.yml up -d
-            sudo docker-compose logs --tail=50
+            sudo docker-compose -f docker-compose.prod.yml logs --tail=50
