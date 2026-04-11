@@ -1,45 +1,49 @@
-import { prisma } from "../../../prisma/prisma.js";
-import type { ATSResultType } from "../../../types/students/ats.js";
+import { prisma } from '../../../prisma/prisma.js';
+import type { ATSResultType } from '../../../types/students/ats.js';
 
 // Saves a new ATS analysis result to the database.
-export const createAtsResult = async (userId: number, jobDescription: string, result: ATSResultType) => {
-  return await prisma.aTSResult.create({
-    data: {
-      userId,
-      jobDescription,
-      score: result.score,
-      strengths: result.strengths,
-      weaknesses: result.weaknesses,
-      suggestions: result.suggestions,
-    },
-  });
+export const createAtsResult = async (
+    userId: number,
+    jobDescription: string,
+    result: ATSResultType
+) => {
+    return await prisma.aTSResult.create({
+        data: {
+            userId,
+            jobDescription,
+            score: result.score,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            suggestions: result.suggestions,
+        },
+    });
 };
 
 // Counts the number of ATS analyses a user has done today.
 export const countAtsAnalysesToday = async (userId: number) => {
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
 
-  return await prisma.aTSResult.count({
-    where: {
-      userId,
-      createdAt: {
-        gte: startOfDay,
-      },
-    },
-  });
+    return await prisma.aTSResult.count({
+        where: {
+            userId,
+            createdAt: {
+                gte: startOfDay,
+            },
+        },
+    });
 };
 
 // Fetches the latest ATS analysis result for a specific user.
 export const findLatestAtsResultByUserId = async (userId: number) => {
-  return await prisma.aTSResult.findFirst({
-    where: { userId, deletedAt: null },
-    select: {
-      score: true,
-      strengths: true,
-      weaknesses: true,
-      suggestions: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+    return await prisma.aTSResult.findFirst({
+        where: { userId, deletedAt: null },
+        select: {
+            score: true,
+            strengths: true,
+            weaknesses: true,
+            suggestions: true,
+        },
+        orderBy: { createdAt: 'desc' },
+    });
 };

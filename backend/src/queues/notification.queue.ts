@@ -1,57 +1,61 @@
-import { Queue } from "bullmq";
-import { getRedisConnection } from "../configs/redis.config.js";
-import { transporter } from "../configs/nodeMailer.config.js";
-import { serverConfig } from "../configs/index.js";
-import { InternalServerError } from "../utils/errors/httpErrors.js";
-import type { NotificationTypes } from "../types/admin/notification.js";
+import { Queue } from 'bullmq';
+import { getRedisConnection } from '../configs/redis.config.js';
+import { transporter } from '../configs/nodeMailer.config.js';
+import { serverConfig } from '../configs/index.js';
+import { InternalServerError } from '../utils/errors/httpErrors.js';
+import type { NotificationTypes } from '../types/admin/notification.js';
 
-export const notifcationQueue = "notificationQueue"
-export const notificationQueuePayload = "notificationQueuePayload"
+export const notifcationQueue = 'notificationQueue';
+export const notificationQueuePayload = 'notificationQueuePayload';
 
 // initialize the queue instance
 export const notificationQueue = new Queue(notifcationQueue, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connection: getRedisConnection() as any,
-    defaultJobOptions:{
+    defaultJobOptions: {
         attempts: 3,
         backoff: {
-            type: "exponential",
-            delay: 5000
-        }
-    }
+            type: 'exponential',
+            delay: 5000,
+        },
+    },
 });
-
 
 // transport function for sending the email
 export async function sendNotification(
-    to:string,
-    subject:string,
-    html_body:string
+    to: string,
+    subject: string,
+    html_body: string
 ) {
     try {
         await transporter.sendMail({
-            from:serverConfig.MAIL_USER,
+            from: serverConfig.MAIL_USER,
             to,
             subject,
-            html:html_body
-        })
+            html: html_body,
+        });
     } catch (error) {
-        console.log("Error while sending notification",error);
+        console.log('Error while sending notification', error);
 
-        throw new InternalServerError("Failed to send email")
+        throw new InternalServerError('Failed to send email');
     }
 }
 
-export const addBulkEmailsToQueue = async(notifications: NotificationTypes[]) => {
+export const addBulkEmailsToQueue = async (
+    notifications: NotificationTypes[]
+) => {
     try {
-        const jobs = notifications.map(notification => ({
+        const jobs = notifications.map((notification) => ({
             name: notifcationQueue,
-            data: notification
+            data: notification,
         }));
-        
+
         await notificationQueue.addBulk(jobs);
-        console.log(`Successfully added ${notifications.length} emails to bulk queue`);
+        console.log(
+            `Successfully added ${notifications.length} emails to bulk queue`
+        );
     } catch (error) {
-        console.log("Error while adding bulk emails to queue", error);
-        throw new InternalServerError("Failed to add bulk emails to queue");
+        console.log('Error while adding bulk emails to queue', error);
+        throw new InternalServerError('Failed to add bulk emails to queue');
     }
-}
+};

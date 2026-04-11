@@ -1,17 +1,56 @@
-import type { ResumeJson } from "../../types/students/resume.js";
+import type { ResumeJson } from '../../types/students/resume.js';
 
 /**
  * Utility to convert markdown bold (**text**) to HTML strong tags.
  */
 const formatMarkdown = (text: string | undefined): string => {
-  if (!text) return "";
-  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    if (!text) return '';
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+};
+
+type PersonalLink = { platform: string; url: string };
+type SkillGroup = { category: string; items: string[] };
+type Experience = {
+    role: string;
+    company: string;
+    location?: string | undefined;
+    startDate: string;
+    endDate?: string | undefined;
+    description: string[];
+    toolsUsed?: string | undefined;
+};
+type Project = {
+    title: string;
+    description: string[];
+    keyTools?: string | undefined;
+    links?: { label: string; url: string }[] | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+};
+type Education = {
+    university: string;
+    degree: string;
+    location?: string | undefined;
+    graduationDate?: string | undefined;
+    cgpa?: string | undefined;
+};
+type Achievement = {
+    title: string;
+    description?: string | undefined;
+    date?: string | undefined;
 };
 
 export const generateResumeHtml = (data: ResumeJson): string => {
-  const { personalInfo, experience, projects, skills, education, achievements } = data;
+    const {
+        personalInfo,
+        experience,
+        projects,
+        skills,
+        education,
+        achievements,
+    } = data;
 
-  return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,38 +181,61 @@ export const generateResumeHtml = (data: ResumeJson): string => {
         <div class="contact-info">
             ${personalInfo.phoneNumber ? `<span>${personalInfo.phoneNumber}</span> <span class="separator">|</span> ` : ''}
             ${personalInfo.email ? `<a href="mailto:${personalInfo.email}">${personalInfo.email}</a> <span class="separator">|</span> ` : ''}
-            ${personalInfo.links && personalInfo.links.length > 0 
-                ? personalInfo.links.map((link: any) => `<a href="${link.url}">${link.url.replace('https://', '').replace('http://', '').replace('www.', '')}</a>`).join(' <span class="separator">|</span> ') 
-                : ''}
+            ${
+                personalInfo.links && personalInfo.links.length > 0
+                    ? personalInfo.links
+                          .map(
+                              (link: PersonalLink) =>
+                                  `<a href="${link.url}">${link.url.replace('https://', '').replace('http://', '').replace('www.', '')}</a>`
+                          )
+                          .join(' <span class="separator">|</span> ')
+                    : ''
+            }
             ${personalInfo.location ? ` <span class="separator">|</span> <span>${personalInfo.location}</span>` : ''}
         </div>
     </header>
 
-    ${personalInfo.summary ? `
+    ${
+        personalInfo.summary
+            ? `
     <div class="section">
         <h2 class="section-title">Summary</h2>
         <div class="summary-text">${personalInfo.summary}</div>
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
-    ${skills && skills.length > 0 ? `
+    ${
+        skills && skills.length > 0
+            ? `
     <div class="section">
         <h2 class="section-title">Technical Skills</h2>
         <div class="skills-container">
-            ${skills.map((skill: any) => `
+            ${skills
+                .map(
+                    (skill: SkillGroup) => `
             <div class="skill-group">
                 <span class="skill-category">${skill.category}:</span>
                 <span>${skill.items.join(', ')}</span>
             </div>
-            `).join('')}
+            `
+                )
+                .join('')}
         </div>
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
-    ${experience && experience.length > 0 ? `
+    ${
+        experience && experience.length > 0
+            ? `
     <div class="section">
         <h2 class="section-title">Work Experience</h2>
-        ${experience.map((exp: any) => `
+        ${experience
+            .map(
+                (exp: Experience) => `
         <div class="item">
             <div class="d-flex">
                 <span class="item-title">${exp.role}</span>
@@ -184,38 +246,54 @@ export const generateResumeHtml = (data: ResumeJson): string => {
                 <span class="item-date">${exp.location || ''}</span>
             </div>
             <ul>
-                ${exp.description.map((desc: any) => `<li>${formatMarkdown(desc)}</li>`).join('')}
+                ${exp.description.map((desc: string) => `<li>${formatMarkdown(desc)}</li>`).join('')}
             </ul>
         </div>
-        `).join('')}
+        `
+            )
+            .join('')}
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
-    ${projects && projects.length > 0 ? `
+    ${
+        projects && projects.length > 0
+            ? `
     <div class="section">
         <h2 class="section-title">Projects</h2>
-        ${projects.map((proj: any) => `
+        ${projects
+            .map(
+                (proj: Project) => `
         <div class="item">
             <div class="d-flex">
                 <span>
                     <span class="item-title">${proj.title}</span> 
-                    ${proj.links && proj.links.length > 0 ? ` | ${proj.links.map((l: any) => `<a href="${l.url}">${l.label}</a>`).join(', ')}` : ''}
+                    ${proj.links && proj.links.length > 0 ? ` | ${proj.links.map((l: { label: string; url: string }) => `<a href="${l.url}">${l.label}</a>`).join(', ')}` : ''}
                 </span>
                 <span class="item-date">${proj.startDate ? `${proj.startDate} – ${proj.endDate || 'Present'}` : ''}</span>
             </div>
             ${proj.keyTools ? `<div style="font-style: italic; font-size: 9.5pt; margin-bottom: 2px;">Technologies: ${proj.keyTools}</div>` : ''}
             <ul>
-                ${proj.description.map((desc: any) => `<li>${formatMarkdown(desc)}</li>`).join('')}
+                ${proj.description.map((desc: string) => `<li>${formatMarkdown(desc)}</li>`).join('')}
             </ul>
         </div>
-        `).join('')}
+        `
+            )
+            .join('')}
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
-    ${education && education.length > 0 ? `
+    ${
+        education && education.length > 0
+            ? `
     <div class="section">
         <h2 class="section-title">Education</h2>
-        ${education.map((edu: any) => `
+        ${education
+            .map(
+                (edu: Education) => `
         <div class="item">
             <div class="d-flex">
                 <span class="item-title">${edu.university}</span>
@@ -226,20 +304,32 @@ export const generateResumeHtml = (data: ResumeJson): string => {
                 <span class="item-date">${edu.graduationDate || ''}</span>
             </div>
         </div>
-        `).join('')}
+        `
+            )
+            .join('')}
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
-    ${achievements && achievements.length > 0 ? `
+    ${
+        achievements && achievements.length > 0
+            ? `
     <div class="section">
         <h2 class="section-title">Additional Details</h2>
         <ul>
-        ${achievements.map((ach: any) => `
+        ${achievements
+            .map(
+                (ach: Achievement) => `
             <li><strong>${ach.title}</strong>${ach.date ? ` (${ach.date})` : ''}${ach.description ? `: ${formatMarkdown(ach.description)}` : ''}</li>
-        `).join('')}
+        `
+            )
+            .join('')}
         </ul>
     </div>
-    ` : ''}
+    `
+            : ''
+    }
 
 </body>
 </html>

@@ -1,7 +1,7 @@
-import { PromptTemplate } from "@langchain/core/prompts";
+import { PromptTemplate } from '@langchain/core/prompts';
 
 /**
- * Stage 1: Fact Extraction and Audit Prompt. 
+ * Stage 1: Fact Extraction and Audit Prompt.
  */
 export const AUDIT_PROMPT = PromptTemplate.fromTemplate(`
   You are a professional technical auditor. Analyze this student's profile data.

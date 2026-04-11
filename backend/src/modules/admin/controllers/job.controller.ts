@@ -1,12 +1,18 @@
-import { sendSuccess } from "../../../utils/ApiResonse.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
-import { UnauthorizedError } from "../../../utils/errors/httpErrors.js";
-import { HTTP_STATUS } from "../../../utils/httpStatus.js";
-import { createJobService, updateJobByIdService, activateJobService, deactivateJobService, getAllJobsService } from "../services/job.service.js";
+import { sendSuccess } from '../../../utils/ApiResonse.js';
+import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { UnauthorizedError } from '../../../utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+import {
+    createJobService,
+    updateJobByIdService,
+    activateJobService,
+    deactivateJobService,
+    getAllJobsService,
+} from '../services/job.service.js';
 
-export const createJobController = asyncHandler(async(req,res)=>{
+export const createJobController = asyncHandler(async (req, res) => {
     if (!req.user) {
-        throw new UnauthorizedError("Unauthorized")
+        throw new UnauthorizedError('Unauthorized');
     }
 
     // Securely inject the logged-in admin's ID
@@ -14,23 +20,23 @@ export const createJobController = asyncHandler(async(req,res)=>{
         ...req.body,
         createdBy: {
             connect: {
-                id: req.user.userId
-            }
-        }
-    }
+                id: req.user.userId,
+            },
+        },
+    };
 
     const job = await createJobService(jobPayload);
     return sendSuccess(
         res,
         job,
-        "Job created successfully",
+        'Job created successfully',
         HTTP_STATUS.CREATED
     );
-})
+});
 
-export const updateJobByIdController = asyncHandler(async(req,res)=>{
+export const updateJobByIdController = asyncHandler(async (req, res) => {
     if (!req.user) {
-        throw new UnauthorizedError("Unauthorized")
+        throw new UnauthorizedError('Unauthorized');
     }
     // Get the validated data from the body
     const jobData = req.body;
@@ -39,23 +45,18 @@ export const updateJobByIdController = asyncHandler(async(req,res)=>{
         ...jobData,
         createdBy: {
             connect: {
-                id: req.user.userId
-            }
-        }
-    }
+                id: req.user.userId,
+            },
+        },
+    };
 
-    const job = await updateJobByIdService(Number(req.params.id),jobPayload);
-    return sendSuccess(
-        res,
-        job,
-        "Job updated successfully",
-        HTTP_STATUS.OK
-    );
-})
+    const job = await updateJobByIdService(Number(req.params.id), jobPayload);
+    return sendSuccess(res, job, 'Job updated successfully', HTTP_STATUS.OK);
+});
 
-export const activateJobController = asyncHandler(async(req,res)=>{
+export const activateJobController = asyncHandler(async (req, res) => {
     if (!req.user) {
-        throw new UnauthorizedError("Unauthorized")
+        throw new UnauthorizedError('Unauthorized');
     }
 
     const jobId = Number(req.params.id);
@@ -64,14 +65,14 @@ export const activateJobController = asyncHandler(async(req,res)=>{
     return sendSuccess(
         res,
         job,
-        "Job activated and notifications dispatched to students successfully",
+        'Job activated and notifications dispatched to students successfully',
         HTTP_STATUS.OK
     );
-})
+});
 
-export const deactivateJobController = asyncHandler(async(req,res)=>{
+export const deactivateJobController = asyncHandler(async (req, res) => {
     if (!req.user) {
-        throw new UnauthorizedError("Unauthorized")
+        throw new UnauthorizedError('Unauthorized');
     }
 
     const jobId = Number(req.params.id);
@@ -80,21 +81,16 @@ export const deactivateJobController = asyncHandler(async(req,res)=>{
     return sendSuccess(
         res,
         job,
-        "Job deactivated successfully",
+        'Job deactivated successfully',
         HTTP_STATUS.OK
     );
-})
+});
 
-export const getAllJobsController = asyncHandler(async(req,res)=>{
+export const getAllJobsController = asyncHandler(async (req, res) => {
     if (!req.user) {
-        throw new UnauthorizedError("Unauthorized")
+        throw new UnauthorizedError('Unauthorized');
     }
 
     const jobs = await getAllJobsService();
-    return sendSuccess(
-        res,
-        jobs,
-        "Jobs fetched successfully",
-        HTTP_STATUS.OK
-    );
-})
+    return sendSuccess(res, jobs, 'Jobs fetched successfully', HTTP_STATUS.OK);
+});

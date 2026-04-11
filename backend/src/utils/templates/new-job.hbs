@@ -1,44 +1,97 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 20px; background-color: #f4f7f6; }
-        .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
-        .header { background-color: #0d9488; color: white; padding: 20px; text-align: center; }
-        .header h2 { margin: 0; }
-        .content { padding: 30px; }
-        .job-details { background-color: #f8fafc; padding: 20px; border-left: 4px solid #0d9488; margin: 20px 0; border-radius: 0 8px 8px 0;}
-        .btn { display: inline-block; background-color: #0d9488; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; margin-top: 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .footer { font-size: 13px; color: #64748b; text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>New Job Opportunity!</h2>
-        </div>
-        <div class="content">
-            <p>Hi <strong>{{studentName}}</strong>,</p>
-            <p>A new job placement opportunity has been made <strong>ACTIVE</strong> on the portal.</p>
-            
-            <div class="job-details">
-                <p style="margin-top: 0;"><strong>Company:</strong> {{companyName}}</p>
-                <p><strong>Role:</strong> {{jobTitle}}</p>
-                <p><strong>Apply By:</strong> {{deadline}}</p>
-                <p><strong>Quick Overview:</strong></p>
-                <p style="margin-bottom: 0; color: #475569;"><em>{{jobDescription}}</em></p>
+    <head>
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                color: #333;
+                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                background-color: #f4f7f6;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background: #ffffff;
+                padding: 0;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            .header {
+                background-color: #0d9488;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+            .header h2 {
+                margin: 0;
+            }
+            .content {
+                padding: 30px;
+            }
+            .job-details {
+                background-color: #f8fafc;
+                padding: 20px;
+                border-left: 4px solid #0d9488;
+                margin: 20px 0;
+                border-radius: 0 8px 8px 0;
+            }
+            .btn {
+                display: inline-block;
+                background-color: #0d9488;
+                color: white;
+                text-decoration: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: bold;
+                margin-top: 20px;
+                text-align: center;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            .footer {
+                font-size: 13px;
+                color: #64748b;
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h2>New Job Opportunity!</h2>
             </div>
+            <div class='content'>
+                <p>Hi <strong>{{studentName}}</strong>,</p>
+                <p>A new job placement opportunity has been made
+                    <strong>ACTIVE</strong>
+                    on the portal.</p>
 
-            <p>Ensure your profile and resume are up to date and verify if you meet the eligibility criteria.</p>
-            
-            <div style="text-align: center;">
-                <a href="{{dashboardLink}}" class="btn">View & Apply on Dashboard</a>
-            </div>
-            
-            <div class="footer">
-                <p>This is an automated message from the Placement Portal.</p>
+                <div class='job-details'>
+                    <p style='margin-top: 0;'><strong>Company:</strong>
+                        {{companyName}}</p>
+                    <p><strong>Role:</strong> {{jobTitle}}</p>
+                    <p><strong>Apply By:</strong> {{deadline}}</p>
+                    <p><strong>Quick Overview:</strong></p>
+                    <p style='margin-bottom: 0; color: #475569;'><em
+                        >{{jobDescription}}</em></p>
+                </div>
+
+                <p>Ensure your profile and resume are up to date and verify if
+                    you meet the eligibility criteria.</p>
+
+                <div style='text-align: center;'>
+                    <a href='{{dashboardLink}}' class='btn'>View & Apply on
+                        Dashboard</a>
+                </div>
+
+                <div class='footer'>
+                    <p>This is an automated message from the Placement Portal.</p>
+                </div>
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>

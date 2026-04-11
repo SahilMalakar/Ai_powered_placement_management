@@ -9,7 +9,7 @@ if (!fs.existsSync(distDir)) {
 }
 
 const files = fs.readdirSync(srcDir);
-files.forEach(file => {
+files.forEach((file) => {
     if (file.endsWith('.hbs')) {
         fs.copyFileSync(path.join(srcDir, file), path.join(distDir, file));
         console.log(`Copied ${file} to dist`);

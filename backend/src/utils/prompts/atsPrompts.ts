@@ -1,4 +1,4 @@
-import { PromptTemplate } from "@langchain/core/prompts";
+import { PromptTemplate } from '@langchain/core/prompts';
 
 // Prompt for ATS Analysis.
 // Takes a resume text and a job description.
