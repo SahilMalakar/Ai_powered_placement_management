@@ -33,7 +33,7 @@ jobs:
             mkdir -p ~/app
             cd ~/app
 
-            sudo docker-compose down || true
+            sudo docker-compose -f docker-compose.prod.yml down || true
             sudo docker-compose -f docker-compose.prod.yml pull
             sudo docker-compose -f docker-compose.prod.yml up -d
             sudo docker-compose logs --tail=50
