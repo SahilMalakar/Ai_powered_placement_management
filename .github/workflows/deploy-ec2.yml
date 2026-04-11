@@ -2,12 +2,12 @@ name: 2. Deploy to AWS EC2
 
 on:
   workflow_call:
-    # This allows the workflow to be called by docker-push.yml
 
 jobs:
   deploy-to-ec2:
     name: Deploy to AWS EC2
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +29,18 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # Ensure directory exists
+            mkdir -p ~/app
             cd ~/app
-            # Using the hyphenated version for maximum compatibility
-            sudo docker-compose -f docker-compose.prod.yml pull
-            sudo docker-compose -f docker-compose.prod.yml up -d
+
+            # Stop old containers (ignore error if none exist)
+            sudo docker compose down || true
+
+            # Pull latest image
+            sudo docker compose -f docker-compose.prod.yml pull
+
+            # Start containers
+            sudo docker compose -f docker-compose.prod.yml up -d
+
+            # Optional: show logs (debugging)
+            sudo docker compose logs --tail=50
