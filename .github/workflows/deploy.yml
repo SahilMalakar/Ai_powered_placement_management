@@ -3,9 +3,9 @@ name: Deploy to Docker Hub and EC2
 on:
   push:
     branches:
-      - dev
-      # - main
-      # - master
+      - main
+      - master
+      # - dev
 
 jobs:
   build-and-push:
