@@ -2,12 +2,12 @@ services:
   backend:
     container_name: tnp-backend-dev
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "4001:4001"
     env_file:
-      - .env
+      - ../.env
     # This guarantees 'host.docker.internal' will resolve perfectly
     extra_hosts:
       - "host.docker.internal:host-gateway"
