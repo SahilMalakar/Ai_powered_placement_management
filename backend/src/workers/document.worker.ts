@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, UnrecoverableError } from 'bullmq';
 import { getRedisConnection } from '../configs/redis.config.js';
 import {
     DOCUMENT_QUEUE_NAME,
@@ -67,9 +67,11 @@ export const initializeDocumentWorker = () => {
                     console.log(
                         `[Document Worker] ✅ ${fieldname} processed for user ${userId}`
                     );
-                } catch (err: unknown) {
+                } catch (err: any) {
                     const message =
                         err instanceof Error ? err.message : 'Unknown error';
+                    const isRateLimit = message.includes('429');
+
                     // Compensate: delete newly uploaded Cloudinary file if DB write fails
                     if (newPublicId) {
                         deleteFromCloudinary(newPublicId).catch((e) =>
@@ -83,7 +85,13 @@ export const initializeDocumentWorker = () => {
                         `[Document Worker] ❌ Failed to process ${fieldname}:`,
                         message
                     );
-                    throw err; // Trigger BullMQ retry
+
+                    if (isRateLimit) {
+                        console.warn(`[Document Worker] Rate limit reached. Marking job as permanently failed.`);
+                        throw new UnrecoverableError(`Rate limit reached: ${message}`);
+                    }
+
+                    throw err; // Trigger BullMQ retry for other errors
                 } finally {
                     // Always cleanup the local temp file from disk
                     await fs.unlink(filePath).catch(() => {});

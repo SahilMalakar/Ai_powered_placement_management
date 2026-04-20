@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, UnrecoverableError } from 'bullmq';
 import { getRedisConnection } from '../configs/redis.config.js';
 import {
     VERIFICATION_QUEUE_NAME,
@@ -47,7 +47,7 @@ export const initializeVerificationWorker = async () => {
                     getStudentSgpaDocuments(userId),
                 ]);
 
-                if (!profile) throw new Error('Student profile not found');
+                if (!profile) throw new UnrecoverableError('Student profile not found');
 
                 let isOverallCorrect = true;
                 const mismatchDetails: string[] = [];
@@ -206,12 +206,22 @@ export const initializeVerificationWorker = async () => {
                 console.log(
                     `[Verification Worker] Cache Invalidated for user ${userId}`
                 );
-            } catch (error: unknown) {
+            } catch (error: any) {
+                const message = error instanceof Error ? error.message : error;
+                const isRateLimit = message.includes('429');
+
                 console.error(
                     `[Verification Worker] Fatal error for job ${job.id}:`,
-                    error instanceof Error ? error.message : error
+                    message
                 );
+
+                if (isRateLimit) {
+                    console.warn(`[Verification Worker] Rate limit reached. Marking job as permanently failed.`);
+                    throw new UnrecoverableError(`Rate limit reached: ${message}`);
+                }
+                
                 // Job will retry automatically via BullMQ attempts
+                throw error;
             }
         },
         {

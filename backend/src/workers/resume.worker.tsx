@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, UnrecoverableError } from 'bullmq';
 import { getRedisConnection } from '../configs/redis.config.js';
 import {
     RESUME_QUEUE_NAME,
@@ -156,8 +156,7 @@ export const initializeResumeWorker = async () => {
 
                 if (isRateLimit) {
                     console.warn(`[Resume Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
-                    // We throw a specific error message or handle it so BullMQ doesn't hammer the API
-                    // In a production app, you might want to move it to a 'stalled' or 'delayed' state instead.
+                    throw new UnrecoverableError(`Rate limit reached: ${message}`);
                 }
 
                 throw new InternalServerError(`${type} failed: ${message}`);

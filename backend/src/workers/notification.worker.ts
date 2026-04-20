@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, UnrecoverableError } from 'bullmq';
 import type { NotificationTypes } from '../types/admin/notification.js';
 import { BadRequestError } from '../utils/errors/httpErrors.js';
 import { getRedisConnection } from '../configs/redis.config.js';
@@ -13,16 +13,28 @@ export const sendEmailFromQueueViaWorker = async () => {
         notifcationQueue,
         async (job: Job<NotificationTypes>) => {
             if (job.name !== notifcationQueue) {
-                throw new BadRequestError('Invalid job name');
+                throw new UnrecoverableError('Invalid job name');
             }
             const payload = job.data;
 
-            const emailContent = await readMailTemplate(
-                payload.templateId,
-                payload.params
-            );
+            try {
+                const emailContent = await readMailTemplate(
+                    payload.templateId,
+                    payload.params
+                );
 
-            await sendNotification(payload.to, payload.subject, emailContent);
+                await sendNotification(payload.to, payload.subject, emailContent);
+            } catch (err: any) {
+                const message = err?.message || 'Unknown error';
+                console.error(`[Notification Worker] Failed to send email to ${payload.to}:`, message);
+                
+                // If the error is deterministic (e.g. invalid template), don't retry
+                if (message.includes('template') || message.includes('400') || message.includes('429')) {
+                    throw new UnrecoverableError(`Deterministic failure: ${message}`);
+                }
+                
+                throw err;
+            }
         },
         {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,4 +1,4 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, UnrecoverableError } from 'bullmq';
 import { getRedisConnection } from '../configs/redis.config.js';
 import { ATS_QUEUE_NAME, type ATSJobPayload } from '../queues/ats.queue.js';
 import { llm } from '../configs/langchain.config.js';
@@ -48,6 +48,7 @@ export const initializeAtsWorker = async () => {
 
                 if (isRateLimit) {
                     console.warn(`[ATS Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
+                    throw new UnrecoverableError(`Rate limit reached: ${message}`);
                 }
 
                 throw new InternalServerError(
