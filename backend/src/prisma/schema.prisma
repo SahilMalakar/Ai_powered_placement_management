@@ -39,10 +39,10 @@ model StudentProfile {
 
   cgpa        Float?
   rollNo      String
-  astuRollNo  String
+  astuRollNo  String?
   dob         DateTime
-  backlog         Boolean
-  backlogSubjects String[] 
+  backlog         Boolean? @default(false)
+  backlogSubjects String[] @default([])
 
   
   phoneNumber String?  

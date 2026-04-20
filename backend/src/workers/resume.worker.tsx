@@ -9,8 +9,10 @@ import {
     findResumeById,
     updateResumePdfUrl,
 } from '../modules/students/repositories/resume.repository.js';
-import { uploadToCloudinary } from '../utils/fileHandler/cloudinary.js';
-import { generateResumeHtml } from '../utils/templates/resumeTemplate.js';
+import { uploadBufferToCloudinary } from '../utils/fileHandler/cloudinary.js';
+import { ResumeTemplate } from '../utils/templates/resumeTemplate.js';
+import { renderToBuffer } from '@react-pdf/renderer';
+import React from 'react';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { llm } from '../configs/langchain.config.js';
 import {
@@ -22,9 +24,6 @@ import {
     GENERATION_PROMPT,
     ROLE_IDENTIFICATION_PROMPT,
 } from '../utils/prompts/resumePrompts.js';
-import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
 import { InternalServerError } from '../utils/errors/httpErrors.js';
 
 // AI-Driven Resume Generation Chain (Audit -> Identity Role -> Generate)
@@ -41,7 +40,6 @@ const resumeGenerationChain = RunnableSequence.from([
             });
             return res.content;
         },
-        // Pass along raw inputs
         branch: (input: ResumeGenerationInput) => input.branch,
         profileData: (input: ResumeGenerationInput) =>
             JSON.stringify(input.profileData),
@@ -57,12 +55,11 @@ const resumeGenerationChain = RunnableSequence.from([
             });
             return res.content;
         },
-        // Pass along previous audit and full context
         auditedFacts: (input: Record<string, unknown>) => input.auditedFacts,
         branch: (input: Record<string, unknown>) => input.branch,
         profileData: (input: Record<string, unknown>) => input.profileData,
     },
-    // Stage 3: High-Impact Fresher Generation (Directly to Structured Output)
+    // Stage 3: High-Impact Generation (Directly to Structured Output)
     GENERATION_PROMPT,
     structuredLlm,
 ]);
@@ -91,7 +88,15 @@ export const initializeResumeWorker = async () => {
                         branch: branch as string,
                     });
 
-                    // 2. Persistence: Update the existing placeholder record
+                    // 2. Persistence: Ensure the record still exists before updating
+                    const resumeExists = await findResumeById(resumeId);
+                    if (!resumeExists) {
+                        console.warn(
+                            `[Resume Worker] Resume record ${resumeId} was deleted. Skipping persistence.`
+                        );
+                        return;
+                    }
+
                     await updateResumeJson(resumeId, generatedResume);
 
                     console.log(
@@ -108,84 +113,60 @@ export const initializeResumeWorker = async () => {
                             `Resume with ID ${resumeId} not found.`
                         );
 
-                    // 2. Generate HTML from Template
+                    // 2. Validate resume data before rendering
+                    const jsonData = resume.jsonData as Record<string, unknown>;
+                    const validation = resumeJsonSchema.safeParse(jsonData);
 
-                    const htmlContent = generateResumeHtml(
-                        resume.jsonData as any
+                    if (!validation.success) {
+                        const issues = validation.error.issues
+                            .map((i) => `${i.path.join('.')}: ${i.message}`)
+                            .join('; ');
+                        throw new Error(
+                            `Resume data is incomplete or invalid. AI generation may still be in progress. Details: ${issues}`
+                        );
+                    }
+
+                    // 3. Render PDF to Buffer using @react-pdf/renderer
+                    const pdfBuffer = await renderToBuffer(
+                        <ResumeTemplate data={validation.data} />
                     );
 
-                    // 3. Launch Puppeteer to capture PDF
-                    const browser = await puppeteer.launch({
-                        headless: true,
-                        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-                    });
+                    // 4. Upload Buffer directly to Cloudinary
+                    const uploadResult = await uploadBufferToCloudinary(
+                        pdfBuffer,
+                        'exported_resumes',
+                        'image' // Changed from 'raw' to 'image' for proper PDF handling
+                    );
 
-                    try {
-                        const page = await browser.newPage();
-                        await page.setContent(htmlContent, {
-                            waitUntil: 'networkidle0',
-                        });
-                        const pdfBuffer = await page.pdf({
-                            format: 'A4',
-                            printBackground: true,
-                            margin: {
-                                top: '0',
-                                bottom: '0',
-                                left: '0',
-                                right: '0',
-                            },
-                        });
+                    // 5. Update Database with PDF URL
+                    await updateResumePdfUrl(resumeId, uploadResult.secure_url);
 
-                        // 4. Temporarily save to local disk for Cloudinary upload utility
-                        const tempDir = path.join(process.cwd(), 'public/temp');
-                        if (!(await fs.access(tempDir).catch(() => false))) {
-                            await fs.mkdir(tempDir, {
-                                recursive: true,
-                            });
-                        }
-                        const tempPath = path.join(
-                            tempDir,
-                            `resume-${resumeId}-${Date.now()}.pdf`
-                        );
-                        await fs.writeFile(tempPath, Buffer.from(pdfBuffer));
-
-                        // 5. Upload to Cloudinary (using 'raw' for PDFs is more reliable than 'auto' or 'image' delivery)
-                        const uploadResult = await uploadToCloudinary(
-                            tempPath,
-                            'exported_resumes',
-                            'raw'
-                        );
-
-                        // 6. Update Database with PDF URL
-                        await updateResumePdfUrl(
-                            resumeId,
-                            uploadResult.secure_url
-                        );
-
-                        // 7. Cleanup temp file
-                        await fs.unlink(tempPath).catch(() => {});
-
-                        console.log(
-                            `[Resume Worker] Successfully exported PDF for resume ${resumeId}`
-                        );
-                    } finally {
-                        await browser.close();
-                    }
+                    console.log(
+                        `[Resume Worker] Successfully exported PDF for resume ${resumeId}`
+                    );
                 }
-            } catch (error: unknown) {
-                const message =
-                    error instanceof Error ? error.message : 'Unknown error';
+            } catch (error: any) {
+                const message = error?.message || 'Unknown error';
+                const isRateLimit = message.includes('429');
+
                 console.error(
                     `[Resume Worker] Failed to process ${type} job ${job.id}:`,
                     message
                 );
+
+                if (isRateLimit) {
+                    console.warn(`[Resume Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
+                    // We throw a specific error message or handle it so BullMQ doesn't hammer the API
+                    // In a production app, you might want to move it to a 'stalled' or 'delayed' state instead.
+                }
+
                 throw new InternalServerError(`${type} failed: ${message}`);
             }
         },
         {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             connection: getRedisConnection() as any,
-            concurrency: 2, // Allow 2 generation/exports in parallel
+            concurrency: 2,
         }
     );
 

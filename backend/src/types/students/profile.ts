@@ -10,7 +10,6 @@ const dateString = z
 
 // Helper for optional URLs that might be empty strings
 const optionalUrlSchema = z
-    .string()
     .url('Invalid URL')
     .or(z.literal(''))
     .optional()
@@ -22,15 +21,17 @@ const coreSchema = z.object({
         message: 'Invalid branch',
     }),
     rollNo: z.string().min(1, 'Roll number is required'),
-    astuRollNo: z.string().optional(), // Now populated via verification worker
     dob: dateString,
     phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
-    backlog: z.boolean(),
-    backlogSubjects: z.array(z.string()).default([]),
     summary: z.string().optional(),
     university: z.string().optional(),
     degree: z.string().optional(),
     graduationYear: z.number().int().optional(),
+    // Restricted fields (added here only to trigger service-level errors)
+    backlog: z.any().optional(),
+    backlogSubjects: z.any().optional(),
+    astuRollNo: z.any().optional(),
+    verificationStatus: z.any().optional(),
 });
 
 export const semesterResultSchema = z.object({
@@ -49,7 +50,8 @@ const experienceSchema = z.object({
     location: z.string().optional(),
     startDate: dateString,
     endDate: dateString.optional(),
-    description: z.array(z.string()), // Updated to array of bullets
+    description: z.array(z.string()),
+    toolsUsed: z.string().optional(),
 });
 
 const projectSchema = z.object({
@@ -80,6 +82,7 @@ export const createProfileSchema = z.object({
     projects: z.array(projectSchema).optional(),
     skills: z.array(skillSchema).optional(),
     additionalDetails: z.array(additionalDetailSchema).optional(),
+    semesterResults: z.array(semesterResultSchema).optional(),
 });
 
 // Schema for partial updates ensures that individual fields can be updated without providing the full object
@@ -91,6 +94,7 @@ export const updateProfileSchema = z
         projects: z.array(projectSchema).optional(),
         skills: z.array(skillSchema).optional(),
         additionalDetails: z.array(additionalDetailSchema).optional(),
+        semesterResults: z.array(z.any()).optional(),
     })
     .partial();
 

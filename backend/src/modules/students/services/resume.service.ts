@@ -9,6 +9,7 @@ import {
     getLatestResumeVersion,
 } from '../repositories/resume.repository.js';
 import { addResumeJobToQueue } from '../../../queues/resume.queue.js';
+import { resumeJsonSchema } from '../../../types/students/resume.js';
 import {
     BadRequestError,
     NotFoundError,
@@ -34,7 +35,28 @@ export const generateResumeService = async (userId: number) => {
         );
     }
 
-    // 3. Create a placeholder resume record immediately to get the resumeId
+    // 3. Validation Guard: Ensure mandatory sections are populated for a professional resume
+    const profile = fullProfile.profile;
+    const missingSections: string[] = [];
+
+    if (!profile.skills || profile.skills.length === 0)
+        missingSections.push('Technical Skills');
+    if (!profile.projects || profile.projects.length === 0)
+        missingSections.push('Projects');
+
+    // Check education via profile or semester results
+    const hasEducation =
+        (profile as any).education?.length > 0 ||
+        (fullProfile as any).semesters?.length > 0;
+    if (!hasEducation) missingSections.push('Education');
+
+    if (missingSections.length > 0) {
+        throw new BadRequestError(
+            `Incomplete Profile: Please add the following sections before generating a resume: ${missingSections.join(', ')}`
+        );
+    }
+
+    // 4. Create a placeholder resume record immediately to get the resumeId
     const latestVersion = await getLatestResumeVersion(userId);
     const newVersion = latestVersion + 1;
     const resume = await createResumeRecord(userId, newVersion, {}); // Empty JSON initially
@@ -80,7 +102,17 @@ export const updateResumeService = async (
     if (!existing || existing.userId !== userId) {
         throw new NotFoundError('Resume not found or unauthorized access.');
     }
-    return await updateResumeJson(id, jsonData);
+
+    // Validate incoming data against the resume schema
+    const validation = resumeJsonSchema.safeParse(jsonData);
+    if (!validation.success) {
+        const issues = validation.error.issues
+            .map((e) => `${e.path.join('.')}: ${e.message}`)
+            .join(', ');
+        throw new BadRequestError(`Invalid resume data: ${issues}`);
+    }
+
+    return await updateResumeJson(id, validation.data);
 };
 
 // Initiates PDF export for a resume (Asynchronous via BullMQ).

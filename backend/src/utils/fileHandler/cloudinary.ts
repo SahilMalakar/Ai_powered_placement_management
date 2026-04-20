@@ -23,6 +23,49 @@ export const uploadToCloudinary = async (
     }
 };
 
+/**
+ * Uploads a buffer directly to Cloudinary using a stream.
+ * satisfy the "Remove local disk save logic" requirement.
+ */
+import { Readable } from 'node:stream';
+import { type UploadApiResponse } from 'cloudinary';
+
+export const uploadBufferToCloudinary = (
+    buffer: Buffer,
+    folder: string = 'ats_resumes',
+    resourceType: 'auto' | 'image' | 'raw' | 'video' = 'auto'
+): Promise<UploadApiResponse> => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: resourceType,
+                access_mode: 'public',
+            },
+            (error, result) => {
+                if (error) {
+                    return reject(
+                        new Error(
+                            `Cloudinary buffer upload failed: ${error.message}`
+                        )
+                    );
+                }
+                if (!result) {
+                    return reject(
+                        new Error('Cloudinary buffer upload failed: No result')
+                    );
+                }
+                resolve(result);
+            }
+        );
+
+        const stream = new Readable();
+        stream.push(buffer);
+        stream.push(null);
+        stream.pipe(uploadStream);
+    });
+};
+
 // Deletes a resource from Cloudinary using its public ID.
 export const deleteFromCloudinary = async (publicId: string) => {
     try {

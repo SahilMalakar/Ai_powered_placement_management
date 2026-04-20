@@ -37,13 +37,19 @@ export const initializeAtsWorker = async () => {
                 console.log(
                     `[ATS Worker] Successfully processed job ${job.id}`
                 );
-            } catch (error: unknown) {
-                const message =
-                    error instanceof Error ? error.message : 'Unknown error';
+            } catch (error: any) {
+                const message = error?.message || 'Unknown error';
+                const isRateLimit = message.includes('429');
+
                 console.error(
                     `[ATS Worker] Failed to process job ${job.id}:`,
                     message
                 );
+
+                if (isRateLimit) {
+                    console.warn(`[ATS Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
+                }
+
                 throw new InternalServerError(
                     `ATS Analysis failed: ${message}`
                 );

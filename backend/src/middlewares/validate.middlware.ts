@@ -3,7 +3,10 @@ import type { ZodType } from 'zod';
 import { ValidationError } from '../utils/errors/AppError.js';
 
 const formatZodError = (issues: any[]) => {
-    const message = issues.map((e) => e.message).join(', ');
+    // Prepend the field path to the message for easier debugging
+    const message = issues
+        .map((e) => `${e.path.join('.')}: ${e.message}`)
+        .join(', ');
 
     const fields = issues.map((e) => e.path.join('.'));
 

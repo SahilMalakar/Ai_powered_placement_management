@@ -23,6 +23,7 @@
         "@langchain/groq": "^1.1.5",
         "@prisma/adapter-pg": "^7.5.0",
         "@prisma/client": "^7.5.0",
+        "@react-pdf/renderer": "^4.5.1",
         "autocannon": "^8.0.0",
         "bcrypt": "^6.0.0",
         "bullmq": "^5.71.1",
@@ -41,7 +42,7 @@
         "nodemailer": "^8.0.4",
         "pdf-parse": "^2.4.5",
         "pg": "^8.20.0",
-        "puppeteer": "^24.40.0",
+        "react": "^19.2.5",
         "zod": "^4.3.6"
     },
     "devDependencies": {
@@ -56,6 +57,7 @@
         "@types/nodemailer": "^7.0.11",
         "@types/pdf-parse": "^1.1.5",
         "@types/pg": "^8.20.0",
+        "@types/react": "^19.2.14",
         "eslint": "^10.2.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
