@@ -1,4 +1,6 @@
+import { VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
 import { prisma } from '../../../prisma/prisma.js';
+import { ForbiddenError } from '../../../utils/errors/httpErrors.js';
 
 export const createProfileWithTransaction = async (
     userId: number,
@@ -52,7 +54,21 @@ export const updateProfileWithTransaction = async (
     isCompleted: boolean
 ) => {
     return await prisma.$transaction(async (tx) => {
-        // 1. Update Core Profile
+        // 1. Transactional Guard: Block updates if verification is processing
+        const currentProfile = await tx.studentProfile.findUnique({
+            where: { userId },
+            select: { verificationStatus: true },
+        });
+
+        if (
+            currentProfile?.verificationStatus === VerificationStatus.PROCESSING
+        ) {
+            throw new ForbiddenError(
+                'Profile cannot be updated while verification is in progress.'
+            );
+        }
+
+        // 2. Update Core Profile
         const updateData: any = {
             ...profileData.core,
         };
@@ -65,21 +81,25 @@ export const updateProfileWithTransaction = async (
         const profileId = profile.id;
 
         // 2. Sync Relational Data (if provided in partial update)
-        if (profileData.socialLinks)
+        if (profileData.socialLinks !== undefined)
             await syncRelationalData(tx, profileId, {
                 socialLinks: profileData.socialLinks,
             });
-        if (profileData.experiences)
+        if (profileData.experiences !== undefined)
             await syncRelationalData(tx, profileId, {
                 experiences: profileData.experiences,
             });
-        if (profileData.projects)
+        if (profileData.projects !== undefined)
             await syncRelationalData(tx, profileId, {
                 projects: profileData.projects,
             });
-        if (profileData.skills)
+        if (profileData.skills !== undefined)
             await syncRelationalData(tx, profileId, {
                 skills: profileData.skills,
+            });
+        if (profileData.additionalDetails !== undefined)
+            await syncRelationalData(tx, profileId, {
+                additionalDetails: profileData.additionalDetails,
             });
 
         // Academic results are managed exclusively by the verification worker.

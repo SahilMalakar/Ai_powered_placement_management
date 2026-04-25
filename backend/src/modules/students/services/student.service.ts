@@ -47,8 +47,9 @@ export const updateStudentProfile = async (
     userId: number,
     updateData: UpdateProfileInput
 ) => {
+    console.log('updateData', updateData);
     // 1. Strict Academic Guard: Block manual entry of verified-only data
-    checkForRestrictedFields(updateData);
+    await checkForRestrictedFields(updateData);
 
     // 2. Ensure profile exists
     const existing = await getFullStudentData(userId);
@@ -66,18 +67,32 @@ export const updateStudentProfile = async (
     }
 
     const {
-        socialLinks: _socialLinks,
-        experiences: _experiences,
-        projects: _projects,
-        skills: _skills,
-        additionalDetails: _additionalDetails,
+        socialLinks,
+        experiences,
+        projects,
+        skills,
+        additionalDetails,
+        id: _id,
+        userId: _userId,
+        verificationStatus: _status,
+        verificationReason: _reason,
+        createdAt: _createdAt,
+        updatedAt: _updatedAt,
+        deletedAt: _deletedAt,
         ...coreExisting
-    } = existing.profile as Record<string, unknown>;
+    } = existing.profile as Record<string, any>;
 
-    // Process Completion Status using cleaned core data (CGPA/SGPAs ignored from input)
+    // Process Completion Status using cleaned core data
     const mergedData = {
+        // Preserve existing arrays if they aren't being updated in this request
+        socialLinks: updateData.socialLinks ?? cleanRelation(socialLinks),
+        experiences: updateData.experiences ?? cleanRelation(experiences),
+        projects: updateData.projects ?? cleanRelation(projects),
+        skills: updateData.skills ?? cleanRelation(skills),
+        additionalDetails:
+            updateData.additionalDetails ?? cleanRelation(additionalDetails),
+
         core: { ...coreExisting, ...updateData.core },
-        // academic fields are specifically excluded from updateData
     };
 
     const { isCompleted, processedData } = await prepareProfileData(
@@ -87,22 +102,27 @@ export const updateStudentProfile = async (
     );
 
     // Persistence
+    console.log('processedData', processedData);
     const result = await updateProfileWithTransaction(
         userId,
         processedData,
         isCompleted
     );
 
-    // Cache Invalidation (Session & Profile)
-    const cacheClient = getRedisConnectionForCaching();
-    const sessionKey = CACHE_KEYS.USER_SESSION(userId);
-    const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
+    // Cache Invalidation (Session & Profile) - Best Effort
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const sessionKey = CACHE_KEYS.USER_SESSION(userId);
+        const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
 
-    await Promise.all([
-        cacheClient.del(sessionKey),
-        cacheClient.del(profileKey),
-    ]);
-    console.log('🧹 Cache Invalidated: ', { sessionKey, profileKey });
+        await Promise.all([
+            cacheClient.del(sessionKey),
+            cacheClient.del(profileKey),
+        ]);
+        console.log('🧹 Cache Invalidated: ', { sessionKey, profileKey });
+    } catch (error) {
+        console.error('❌ Cache Invalidation Failed:', error);
+    }
 
     return result;
 };
@@ -111,8 +131,9 @@ export const createStudentProfileService = async (
     userId: number,
     studentData: CreateProfileInput
 ) => {
+    console.log('studentData', studentData);
     // 1. Strict Academic Guard: Block manual entry of verified-only data
-    checkForRestrictedFields(studentData);
+    await checkForRestrictedFields(studentData);
 
     // 2. Prevent duplicate profiles
     const existing = await findProfileByUserId(userId);
@@ -134,16 +155,20 @@ export const createStudentProfileService = async (
         isCompleted
     );
 
-    // Cache Invalidation (Session & Profile)
-    const cacheClient = getRedisConnectionForCaching();
-    const sessionKey = CACHE_KEYS.USER_SESSION(userId);
-    const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
+    // Cache Invalidation (Session & Profile) - Best Effort
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const sessionKey = CACHE_KEYS.USER_SESSION(userId);
+        const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
 
-    await Promise.all([
-        cacheClient.del(sessionKey),
-        cacheClient.del(profileKey),
-    ]);
-    console.log('🧹 Cache Invalidated: ', { sessionKey, profileKey });
+        await Promise.all([
+            cacheClient.del(sessionKey),
+            cacheClient.del(profileKey),
+        ]);
+        console.log('🧹 Cache Invalidated: ', { sessionKey, profileKey });
+    } catch (error) {
+        console.error('❌ Cache Invalidation Failed:', error);
+    }
 
     return result;
 };
@@ -195,7 +220,7 @@ async function prepareProfileData(
 /**
  * Helper to identify and block restricted academic fields in student requests.
  */
-function checkForRestrictedFields(
+async function checkForRestrictedFields(
     data: CreateProfileInput | UpdateProfileInput
 ) {
     const core = data.core;
@@ -204,7 +229,9 @@ function checkForRestrictedFields(
             ('astuRollNo' in core ||
                 'cgpa' in core ||
                 'backlog' in core ||
-                'backlogSubjects' in core)) ||
+                'backlogSubjects' in core ||
+                'verificationStatus' in core ||
+                'verificationReason' in core)) ||
         (data as Record<string, unknown>).semesterResults;
 
     if (restrictedFound) {
@@ -212,4 +239,14 @@ function checkForRestrictedFields(
             'Academic data (SGPAs, CGPA, ASTU Roll No, Backlog Status) is protected and can only be updated via the Document Verification process.'
         );
     }
+}
+
+/**
+ * Strips database-specific fields (id, profileId) from existing relational data
+ * to ensure safe re-insertion during updates.
+ */
+function cleanRelation(items: any) {
+    return Array.isArray(items)
+        ? items.map(({ id, profileId, ...rest }: any) => rest)
+        : [];
 }

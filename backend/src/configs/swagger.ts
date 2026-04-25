@@ -6,12 +6,12 @@ const options: swaggerJsdoc.Options = {
         info: {
             title: 'TNP Placement Management API',
             version: '1.0.0',
-            description: 'API documentation for the AI-powered Placement Management System. Supports both JWT Bearer tokens and Cookie-based authentication.',
+            description: 'API documentation for the TNP Placement Management System.',
         },
         servers: [
             {
                 url: 'http://localhost:4001',
-                description: 'Development server',
+                description: 'API Documentation for the TNP Placement Management System',
             },
         ],
         components: {

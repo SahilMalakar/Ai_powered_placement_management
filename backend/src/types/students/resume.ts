@@ -28,8 +28,7 @@ export const resumeJsonSchema = z.object({
                 bullets: z.array(z.string()),
             })
         )
-        .nullable()
-        .optional(),
+        .nullable().default(null),
     projects: z.array(
         z.object({
             title: z.string(),
@@ -56,8 +55,7 @@ export const resumeJsonSchema = z.object({
                 date: z.string().nullable().optional(),
             })
         )
-        .nullable()
-        .optional(),
+        .nullable().default(null),
 });
 
 export type ResumeJson = z.infer<typeof resumeJsonSchema>;

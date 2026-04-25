@@ -62,6 +62,8 @@ export const generateResumeService = async (userId: number) => {
     const resume = await createResumeRecord(userId, newVersion, {}); // Empty JSON initially
 
     // 4. En-queue for background AI analysis
+    console.log(`[Resume Service] En-queueing GENERATE_RESUME for user ${userId}. Profile data keys:`, Object.keys(fullProfile));
+    
     const job = await addResumeJobToQueue({
         type: 'GENERATE_RESUME',
         userId,

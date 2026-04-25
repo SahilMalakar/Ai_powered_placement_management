@@ -33,10 +33,16 @@ const resumeGenerationChain = RunnableSequence.from([
         // Stage 1: Fact Audit
         auditedFacts: async (input: ResumeGenerationInput) => {
             const chain = AUDIT_PROMPT.pipe(llm);
+            console.log('--- [AI Resume Generation] Stage 1: Fact Audit Input ---');
+            console.dir({ profileData: input.profileData }, { depth: null });
+            
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const res = await (chain as any).invoke({
                 profileData: JSON.stringify(input.profileData),
             });
+            
+            console.log('--- [AI Resume Generation] Stage 1: Fact Audit Output ---');
+            console.log(res.content);
             return res.content;
         },
         branch: (input: ResumeGenerationInput) => input.branch,
@@ -47,11 +53,17 @@ const resumeGenerationChain = RunnableSequence.from([
         // Stage 2: Branch-Specific Role Identification
         identifiedRole: async (input: Record<string, unknown>) => {
             const chain = ROLE_IDENTIFICATION_PROMPT.pipe(llm);
+            console.log('--- [AI Resume Generation] Stage 2: Role Identification Input ---');
+            console.dir({ auditedFacts: input.auditedFacts, branch: input.branch }, { depth: null });
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const res = await (chain as any).invoke({
                 auditedFacts: input.auditedFacts,
                 branch: input.branch,
             });
+
+            console.log('--- [AI Resume Generation] Stage 2: Role Identification Output ---');
+            console.log(res.content);
             return res.content;
         },
         auditedFacts: (input: Record<string, unknown>) => input.auditedFacts,
@@ -59,8 +71,18 @@ const resumeGenerationChain = RunnableSequence.from([
         profileData: (input: Record<string, unknown>) => input.profileData,
     },
     // Stage 3: High-Impact Generation (Directly to Structured Output)
+    (input: any) => {
+        console.log('--- [AI Resume Generation] Stage 3: Final Merged Input to LLM ---');
+        console.dir(input, { depth: null });
+        return input;
+    },
     GENERATION_PROMPT,
     structuredLlm,
+    (output: any) => {
+        console.log('--- [AI Resume Generation] Stage 3: Final LLM Structured Output ---');
+        console.dir(output, { depth: null });
+        return output;
+    },
 ]);
 
 // Initialize the Resume Worker.
