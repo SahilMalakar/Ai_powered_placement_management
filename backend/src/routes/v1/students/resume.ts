@@ -117,6 +117,8 @@ resumeRouter.get(
  *                 properties:
  *                   email: { type: string, example: "john@example.com" }
  *                   phone: { type: string, example: "9876543210" }
+ *                   linkedin: { type: string, example: "https://linkedin.com/in/johndoe" }
+ *                   github: { type: string, example: "https://github.com/johndoe" }
  *               skills:
  *                 type: array
  *                 items:
@@ -124,6 +126,23 @@ resumeRouter.get(
  *                   properties:
  *                     category: { type: string, example: "Technical Skills" }
  *                     items: { type: array, items: { type: string }, example: ["Node.js", "React", "Prisma"] }
+ *               workExperience:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string, example: "Software Engineer Intern" }
+ *                     company: { type: string, example: "Google" }
+ *                     dateRange: { type: string, example: "Jun 2023 - Aug 2023" }
+ *                     bullets: { type: array, items: { type: string }, example: ["Optimized search latency", "Built dashboard"] }
+ *               projects:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string, example: "E-commerce Platform" }
+ *                     techStack: { type: array, items: { type: string }, example: ["React", "Stripe"] }
+ *                     bullets: { type: array, items: { type: string }, example: ["Integrated payment gateway"] }
  *               education:
  *                 type: array
  *                 items:
@@ -132,6 +151,13 @@ resumeRouter.get(
  *                     institution: { type: string, example: "ASTU" }
  *                     degree: { type: string, example: "B.Tech" }
  *                     dateRange: { type: string, example: "2020 - 2024" }
+ *               additionalDetails:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string, example: "Certifications" }
+ *                     description: { type: array, items: { type: string }, example: ["AWS Certified Developer"] }
  *     responses:
  *       200:
  *         description: Resume updated successfully

@@ -103,9 +103,20 @@ profileRouter.get(
  *                   properties:
  *                     category: { type: string, example: "Languages" }
  *                     skills: { type: array, items: { type: string }, example: ["JavaScript", "TypeScript"] }
+ *               additionalDetails:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string, example: "Open Source Contributor" }
+ *                     description: { type: array, items: { type: string }, example: ["Contributed to React core"] }
  *     responses:
  *       201:
  *         description: Profile created successfully
+ *       400:
+ *         description: Bad Request - Restricted academic fields provided
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
  */
 profileRouter.post(
     '/profile',
@@ -143,9 +154,41 @@ profileRouter.post(
  *                   properties:
  *                     platform: { type: string }
  *                     url: { type: string }
+ *               experiences:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     role: { type: string }
+ *                     company: { type: string }
+ *               projects:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string }
+ *                     keyTools: { type: string }
+ *               skills:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     category: { type: string }
+ *                     skills: { type: array, items: { type: string } }
+ *               additionalDetails:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string }
+ *                     description: { type: array, items: { type: string } }
  *     responses:
  *       200:
  *         description: Profile updated successfully
+ *       400:
+ *         description: Bad Request - Restricted academic fields provided
+ *       403:
+ *         description: Forbidden - Profile is locked during verification processing
  */
 profileRouter.patch(
     '/profile',
