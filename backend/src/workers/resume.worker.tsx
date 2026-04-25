@@ -12,7 +12,6 @@ import {
 import { uploadBufferToCloudinary } from '../utils/fileHandler/cloudinary.js';
 import { ResumeTemplate } from '../utils/templates/resumeTemplate.js';
 import { renderToBuffer } from '@react-pdf/renderer';
-import React from 'react';
 import { RunnableSequence } from '@langchain/core/runnables';
 import { llm } from '../configs/langchain.config.js';
 import {
@@ -166,6 +165,10 @@ export const initializeResumeWorker = async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             connection: getRedisConnection() as any,
             concurrency: 2,
+            lockDuration: 60000, // 60 seconds
+            lockRenewTime: 30000, // Renew lock every 30 seconds
+            stalledInterval: 30000,
+            maxStalledCount: 2,
         }
     );
 

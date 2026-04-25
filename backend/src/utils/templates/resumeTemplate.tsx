@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     Document,
     Page,
@@ -9,138 +8,129 @@ import {
 } from '@react-pdf/renderer';
 import { type ResumeJson } from '../../types/students/resume.js';
 
+/**
+ * Precision Template - Matches Sahil Malakar reference image exactly.
+ */
 const styles = StyleSheet.create({
     page: {
-        padding: 40,
-        fontFamily: 'Helvetica',
+        paddingVertical: 35,
+        paddingHorizontal: 45,
+        fontFamily: 'Times-Roman',
         fontSize: 10,
-        lineHeight: 1.4,
+        lineHeight: 1.15,
+        color: '#000',
     },
-    // Header
+    // Header Section (Safe Vertical Stack)
     header: {
-        marginBottom: 8,
-        textAlign: 'center',
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 12,
+        paddingBottom: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#000',
     },
     name: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 4,
-        fontFamily: 'Helvetica-Bold',
+        fontSize: 32,
+        fontFamily: 'Times-Bold',
+        textAlign: 'center',
+        lineHeight: 1.2,
+        marginBottom: 12, // Significant gap to prevent overlap
     },
     contactRow: {
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
         flexWrap: 'wrap',
-        gap: 6,
-        color: '#444',
         fontSize: 9,
+        color: '#000',
+        width: '100%',
+        gap: 4,
     },
     link: {
-        color: '#1a0dab',
+        color: '#000',
         textDecoration: 'none',
     },
     separator: {
-        color: '#999',
-        marginHorizontal: 2,
+        marginHorizontal: 3,
     },
-    // Section
+    // Section Headers
     section: {
         marginTop: 10,
         marginBottom: 2,
     },
     sectionTitle: {
         fontSize: 11,
-        fontFamily: 'Helvetica-Bold',
+        fontFamily: 'Times-Bold',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
-        borderBottomWidth: 0.75,
+        borderBottomWidth: 1,
         borderBottomColor: '#000',
-        paddingBottom: 2,
-        marginBottom: 6,
+        paddingBottom: 1,
+        marginBottom: 5,
     },
-    summary: {
+    summaryText: {
+        fontSize: 10,
         textAlign: 'justify',
-        lineHeight: 1.5,
     },
-    // Skills
-    skillRow: {
-        flexDirection: 'row',
-        marginBottom: 2,
-    },
-    skillCategory: {
-        fontFamily: 'Helvetica-Bold',
-        width: 140,
-    },
-    skillItems: {
-        flex: 1,
-    },
-    // Experience & Projects
-    entryBlock: {
-        marginBottom: 6,
-    },
-    entryHeaderRow: {
+    // Flexible Row for metadata
+    rowBetween: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'baseline',
     },
-    entryTitle: {
-        fontSize: 11,
-        fontFamily: 'Helvetica-Bold',
+    // Type helpers
+    bold: { fontFamily: 'Times-Bold' },
+    italic: { fontFamily: 'Times-Italic' },
+    
+    // Entry Layouts
+    entryBlock: {
+        marginBottom: 6,
     },
-    entrySubtitle: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 2,
-    },
-    subtitleText: {
-        fontFamily: 'Helvetica-Oblique',
-        color: '#333',
+    techRow: {
         fontSize: 9.5,
+        fontFamily: 'Times-Italic',
+        marginBottom: 2,
     },
     dateText: {
         fontSize: 9,
-        color: '#333',
+        fontFamily: 'Times-Roman',
+        color: '#555',
+    },
+    projectLink: {
+        fontSize: 9,
+        fontFamily: 'Times-Roman',
+        color: '#000',
+        textDecoration: 'underline',
+        marginLeft: 5,
+    },
+    // List Layout
+    listRow: {
+        flexDirection: 'row',
+        marginBottom: 1,
+        fontSize: 10,
+    },
+    listLabel: {
+        fontFamily: 'Times-Bold',
+        marginRight: 4,
     },
     // Bullets
-    bullet: {
-        marginLeft: 12,
+    bulletRow: {
         flexDirection: 'row',
-        marginBottom: 1.5,
+        marginLeft: 10,
+        marginBottom: 1,
     },
     bulletDot: {
         width: 10,
         fontSize: 10,
     },
-    bulletText: {
+    bulletContent: {
         flex: 1,
         textAlign: 'justify',
-    },
-    // Inline bold highlight
-    highlight: {
-        fontFamily: 'Helvetica-Bold',
-    },
-    // Education
-    eduRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'baseline',
-    },
-    eduDegree: {
-        fontFamily: 'Helvetica-Oblique',
-        color: '#333',
-    },
-    // Fallback page
-    fallbackPage: {
-        padding: 40,
-        fontFamily: 'Helvetica',
-        justifyContent: 'center',
-        alignItems: 'center',
+        fontSize: 10,
     },
 });
 
 /**
- * Handles inline **bold** markdown syntax within bullet text.
- * Wraps **text** segments in bold styling for high-impact keywords.
+ * Handles inline **bold** markdown within bullet text.
  */
 const FormattedText = ({ text }: { text: string }) => {
     if (!text) return null;
@@ -150,7 +140,7 @@ const FormattedText = ({ text }: { text: string }) => {
             {parts.map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <Text key={i} style={styles.highlight}>
+                        <Text key={i} style={styles.bold}>
                             {part.slice(2, -2)}
                         </Text>
                     );
@@ -162,110 +152,120 @@ const FormattedText = ({ text }: { text: string }) => {
 };
 
 export const ResumeTemplate = ({ data }: { data: ResumeJson }) => {
-    // Defensive guard: prevent React reconciler crash on incomplete data
-    if (!data?.personalInfo?.fullName) {
+    if (!data?.name) {
         return (
             <Document>
-                <Page size="A4" style={styles.fallbackPage}>
-                    <Text>Resume data is incomplete. Please generate or edit your resume first.</Text>
+                <Page size="A4" style={styles.page}>
+                    <Text>Resume data missing.</Text>
                 </Page>
             </Document>
         );
     }
 
-    const { personalInfo, experience, projects, skills, education, additionalDetails } = data;
+    const {
+        name,
+        contact,
+        summary,
+        skills,
+        workExperience,
+        projects,
+        education,
+        additionalDetails,
+    } = data;
+
+    const formatUrl = (url: string | null | undefined) => {
+        if (!url) return '';
+        return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+    };
 
     return (
-        <Document title={`${personalInfo.fullName} - Resume`}>
+        <Document title={`${name} - Resume`}>
             <Page size="A4" style={styles.page}>
-
                 {/* ── Header ── */}
                 <View style={styles.header}>
-                    <Text style={styles.name}>{personalInfo.fullName}</Text>
+                    <Text style={styles.name}>{name}</Text>
                     <View style={styles.contactRow}>
-                        {personalInfo.email && <Text>{personalInfo.email}</Text>}
-                        {personalInfo.phoneNumber && (
+                        {contact.phone && (
                             <>
+                                <Text>{contact.phone}</Text>
                                 <Text style={styles.separator}>|</Text>
-                                <Text>{personalInfo.phoneNumber}</Text>
                             </>
                         )}
-                        {personalInfo.location && (
+                        <Text>{contact.email}</Text>
+                        {contact.linkedin && (
                             <>
                                 <Text style={styles.separator}>|</Text>
-                                <Text>{personalInfo.location}</Text>
+                                <Link src={contact.linkedin} style={styles.link}>
+                                    {formatUrl(contact.linkedin)}
+                                </Link>
+                            </>
+                        )}
+                        {contact.github && (
+                            <>
+                                <Text style={styles.separator}>|</Text>
+                                <Link src={contact.github} style={styles.link}>
+                                    {formatUrl(contact.github)}
+                                </Link>
+                            </>
+                        )}
+                        {contact.leetcode && (
+                            <>
+                                <Text style={styles.separator}>|</Text>
+                                <Link src={contact.leetcode} style={styles.link}>
+                                    {formatUrl(contact.leetcode)}
+                                </Link>
+                            </>
+                        )}
+                        {contact.portfolio && (
+                            <>
+                                <Text style={styles.separator}>|</Text>
+                                <Link src={contact.portfolio} style={styles.link}>
+                                    {formatUrl(contact.portfolio)}
+                                </Link>
                             </>
                         )}
                     </View>
-                    {personalInfo.links && personalInfo.links.length > 0 && (
-                        <View style={[styles.contactRow, { marginTop: 2 }]}>
-                            {personalInfo.links.map((link, i) => (
-                                <React.Fragment key={i}>
-                                    {link.url ? (
-                                        <Link src={link.url} style={styles.link}>
-                                            {link.url.replace(/^https?:\/\/(www\.)?/, '')}
-                                        </Link>
-                                    ) : (
-                                        <Text>{link.platform}</Text>
-                                    )}
-                                    {i < (personalInfo.links?.length || 0) - 1 && (
-                                        <Text style={styles.separator}>|</Text>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </View>
-                    )}
                 </View>
 
                 {/* ── Summary ── */}
-                {personalInfo.summary && (
+                {summary && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Summary</Text>
-                        <Text style={styles.summary}>{personalInfo.summary}</Text>
+                        <Text style={styles.summaryText}>{summary}</Text>
                     </View>
                 )}
 
-                {/* ── Technical Skills ── */}
+                {/* ── Skills ── */}
                 {skills && skills.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Technical Skills</Text>
                         {skills.map((skill, i) => (
-                            <View key={i} style={styles.skillRow}>
-                                <Text style={styles.skillCategory}>{skill.category}:</Text>
-                                <Text style={styles.skillItems}>{skill.skills?.join(', ')}</Text>
+                            <View key={i} style={styles.listRow}>
+                                <Text style={styles.listLabel}>{skill.category}:</Text>
+                                <Text style={{ flex: 1 }}>{skill.items.join(', ')}</Text>
                             </View>
                         ))}
                     </View>
                 )}
 
                 {/* ── Work Experience ── */}
-                {experience && experience.length > 0 && (
+                {workExperience && workExperience.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Work Experience</Text>
-                        {experience.map((exp, i) => (
+                        {workExperience.map((exp, i) => (
                             <View key={i} style={styles.entryBlock} wrap={false}>
-                                {/* Row 1: Role — Dates */}
-                                <View style={styles.entryHeaderRow}>
-                                    <Text style={styles.entryTitle}>{exp.role}</Text>
-                                    <Text style={styles.dateText}>
-                                        {exp.startDate} – {exp.endDate || 'Present'}
-                                    </Text>
+                                <View style={styles.rowBetween}>
+                                    <Text style={styles.bold}>{exp.title}</Text>
+                                    <Text style={styles.dateText}>{exp.dateRange}</Text>
                                 </View>
-                                {/* Row 2: Company — Tools | Location */}
-                                <View style={styles.entrySubtitle}>
-                                    <Text style={styles.subtitleText}>
-                                        {exp.company}
-                                        {exp.toolsUsed ? ` — ${exp.toolsUsed}` : ''}
-                                    </Text>
-                                    {exp.location && (
-                                        <Text style={styles.subtitleText}>{exp.location}</Text>
-                                    )}
+                                <View style={styles.rowBetween}>
+                                    <Text style={styles.italic}>{exp.company}</Text>
+                                    <Text>{exp.location}</Text>
                                 </View>
-                                {/* Bullets */}
-                                {exp.description?.map((bullet, j) => (
-                                    <View key={j} style={styles.bullet}>
+                                {exp.bullets.map((bullet, j) => (
+                                    <View key={j} style={styles.bulletRow}>
                                         <Text style={styles.bulletDot}>•</Text>
-                                        <View style={styles.bulletText}>
+                                        <View style={styles.bulletContent}>
                                             <FormattedText text={bullet} />
                                         </View>
                                     </View>
@@ -279,35 +279,28 @@ export const ResumeTemplate = ({ data }: { data: ResumeJson }) => {
                 {projects && projects.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Projects</Text>
-                        {projects.map((project, i) => (
+                        {projects.map((proj, i) => (
                             <View key={i} style={styles.entryBlock} wrap={false}>
-                                {/* Row 1: Title | Links | Tech — Dates */}
-                                <View style={styles.entryHeaderRow}>
-                                    <Text style={styles.entryTitle}>
-                                        {project.title}
-                                        {project.links && project.links.length > 0 && (
-                                            <Text style={{ fontFamily: 'Helvetica', fontWeight: 'normal' }}>
-                                                {' | '}
-                                                {project.links.map((l) => l.label).join(' | ')}
-                                            </Text>
+                                <View style={styles.rowBetween}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                                        <Text style={styles.bold}>{proj.title}</Text>
+                                        {proj.githubUrl && (
+                                            <Link src={proj.githubUrl} style={styles.projectLink}>
+                                                Github
+                                            </Link>
                                         )}
-                                        {project.keyTools && (
-                                            <Text style={{ fontFamily: 'Helvetica-Oblique', fontWeight: 'normal', fontSize: 9.5 }}>
-                                                {' | '}{project.keyTools}
-                                            </Text>
-                                        )}
-                                    </Text>
-                                    <Text style={styles.dateText}>
-                                        {project.startDate
-                                            ? `${project.startDate}${project.endDate ? ` – ${project.endDate}` : ''}`
-                                            : ''}
-                                    </Text>
+                                    </View>
+                                    <Text style={styles.dateText}>{proj.dateRange}</Text>
                                 </View>
-                                {/* Bullets */}
-                                {project.description?.map((bullet, j) => (
-                                    <View key={j} style={styles.bullet}>
+                                {proj.techStack && proj.techStack.length > 0 && (
+                                    <Text style={styles.techRow}>
+                                        Technologies: {proj.techStack.join(', ')}
+                                    </Text>
+                                )}
+                                {proj.bullets.map((bullet, j) => (
+                                    <View key={j} style={styles.bulletRow}>
                                         <Text style={styles.bulletDot}>•</Text>
-                                        <View style={styles.bulletText}>
+                                        <View style={styles.bulletContent}>
                                             <FormattedText text={bullet} />
                                         </View>
                                     </View>
@@ -322,21 +315,16 @@ export const ResumeTemplate = ({ data }: { data: ResumeJson }) => {
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Education</Text>
                         {education.map((edu, i) => (
-                            <View key={i} style={{ marginBottom: 4 }}>
-                                <View style={styles.eduRow}>
-                                    <Text style={styles.entryTitle}>{edu.university}</Text>
-                                    <Text style={styles.dateText}>
-                                        {edu.location || ''}
-                                    </Text>
+                            <View key={i} style={styles.entryBlock} wrap={false}>
+                                <View style={styles.rowBetween}>
+                                    <Text style={styles.bold}>{edu.institution}</Text>
                                 </View>
-                                <View style={styles.eduRow}>
-                                    <Text style={styles.eduDegree}>
+                                <View style={styles.rowBetween}>
+                                    <Text style={styles.italic}>
                                         {edu.degree}
+                                        {edu.cgpa ? ` (CGPA: ${edu.cgpa})` : ''}
                                     </Text>
-                                    <Text style={styles.dateText}>
-                                        {edu.graduationDate || ''}
-                                        {edu.cgpa ? ` | CGPA: ${edu.cgpa}` : ''}
-                                    </Text>
+                                    <Text style={styles.dateText}>{edu.dateRange}</Text>
                                 </View>
                             </View>
                         ))}
@@ -348,22 +336,15 @@ export const ResumeTemplate = ({ data }: { data: ResumeJson }) => {
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Additional Details</Text>
                         {additionalDetails.map((detail, i) => (
-                            <View key={i} style={styles.bullet}>
-                                <Text style={styles.bulletDot}>•</Text>
-                                <View style={styles.bulletText}>
-                                    <Text>
-                                        <Text style={styles.highlight}>{detail.title}</Text>
-                                        {detail.description?.length > 0
-                                            ? `: ${detail.description.join(', ')}`
-                                            : ''}
-                                        {detail.date ? ` (${detail.date})` : ''}
-                                    </Text>
+                            <View key={i} style={styles.listRow}>
+                                <Text style={styles.listLabel}>{detail.title}:</Text>
+                                <View style={{ flex: 1 }}>
+                                    <FormattedText text={detail.description.join(' | ')} />
                                 </View>
                             </View>
                         ))}
                     </View>
                 )}
-
             </Page>
         </Document>
     );

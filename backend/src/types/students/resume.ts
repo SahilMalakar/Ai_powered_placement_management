@@ -1,32 +1,31 @@
 import { z } from 'zod';
 
 export const resumeJsonSchema = z.object({
-    personalInfo: z.object({
-        fullName: z.string(),
+    targetRole: z.string().describe("The identified industry role for this resume (e.g., 'Full-Stack Developer')"),
+    name: z.string().describe("Full name of the student"),
+    contact: z.object({
         email: z.string(),
-        phoneNumber: z.string().nullable().optional(),
-        location: z.string().nullable().optional(),
-        summary: z.string(),
-        links: z
-            .array(
-                z.object({
-                    platform: z.string(),
-                    url: z.string(),
-                })
-            )
-            .nullable()
-            .optional(),
+        phone: z.string().nullable().optional(),
+        linkedin: z.string().nullable().optional(),
+        github: z.string().nullable().optional(),
+        portfolio: z.string().nullable().optional(),
+        leetcode: z.string().nullable().optional(),
+        address: z.string().nullable().optional(),
     }),
-    experience: z
+    summary: z.string(),
+    skills: z.array(z.object({
+        category: z.string(),
+        items: z.array(z.string())
+    })).describe("Grouped technical skills"),
+    workExperience: z
         .array(
             z.object({
-                role: z.string(),
+                title: z.string(),
                 company: z.string(),
                 location: z.string().nullable().optional(),
-                startDate: z.string(),
-                endDate: z.string().nullable().optional(),
-                description: z.array(z.string()),
-                toolsUsed: z.string().nullable().optional(),
+                dateRange: z.string(),
+                techStack: z.array(z.string()),
+                bullets: z.array(z.string()),
             })
         )
         .nullable()
@@ -34,36 +33,21 @@ export const resumeJsonSchema = z.object({
     projects: z.array(
         z.object({
             title: z.string(),
-            description: z.array(z.string()),
-            keyTools: z.string().nullable().optional(),
-            links: z
-                .array(
-                    z.object({
-                        label: z.string(),
-                        url: z.string(),
-                    })
-                )
-                .nullable()
-                .optional(),
-            startDate: z.string().nullable().optional(),
-            endDate: z.string().nullable().optional(),
+            techStack: z.array(z.string()),
+            githubUrl: z.string().nullable().optional(),
+            liveUrl: z.string().nullable().optional(),
+            dateRange: z.string().nullable().optional(),
+            bullets: z.array(z.string()),
         })
-    ),
-    skills: z.array(
-        z.object({
-            category: z.string(),
-            skills: z.array(z.string()),
-        })
-    ),
+    ).default([]),
     education: z.array(
         z.object({
-            university: z.string(),
+            institution: z.string(),
             degree: z.string(),
-            location: z.string().nullable().optional(),
-            graduationDate: z.string().nullable().optional(),
+            dateRange: z.string(),
             cgpa: z.string().nullable().optional(),
         })
-    ),
+    ).default([]),
     additionalDetails: z
         .array(
             z.object({

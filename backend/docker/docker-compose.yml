@@ -14,6 +14,6 @@ services:
     environment:
       - NODE_ENV=development
       # We boldly override the local .env variables right here inline!
-      - DATABASE_URL=postgresql://postgres:strongpassword@host.docker.internal:5432/placement_db?schema=public
+      - DATABASE_URL=postgresql://postgres:sweety@12345@host.docker.internal:5432/placement_db?schema=public
       - REDIS_URL=redis://:strongpassword@host.docker.internal:6379
     restart: unless-stopped

@@ -2,6 +2,8 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { router } from './routes/v1/index.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './configs/swagger.js';
 
 const app: Express = express();
 
@@ -28,6 +30,8 @@ app.use(cookieParser());
 app.get('/', (req, res) => {
     res.send({ message: 'Hello from auth service' });
 });
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 console.log('hello from app');
 

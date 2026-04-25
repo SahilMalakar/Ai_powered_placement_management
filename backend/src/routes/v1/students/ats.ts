@@ -7,22 +7,63 @@ import {
     getAtsResultsController,
 } from '../../../modules/students/controllers/ats.controller.js';
 
+/**
+ * @swagger
+ * tags:
+ *   name: ATS
+ *   description: ATS analysis management
+ */
+
 const atsRouter: Router = Router();
 
-// Endpoint to initiate an ATS Analysis.
-// Method: POST /
-// Auth: Student Only
-// Input: multipart/form-data (resume file + jobDescription text)
+/**
+ * @swagger
+ * /api/v1/students/ats:
+ *   post:
+ *     summary: Initiate an ATS Analysis
+ *     tags: [ATS]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [resume, jobDescription]
+ *             properties:
+ *               resume:
+ *                 type: string
+ *                 format: binary
+ *               jobDescription:
+ *                 type: string
+ *                 example: "We are looking for a Node.js developer with 2+ years of experience in Express and PostgreSQL."
+ *     responses:
+ *       202:
+ *         description: ATS analysis successfully queued
+ */
 atsRouter.post(
     '/ats',
     authMiddleware,
     requireStudent,
-    atsUpload.single('resume'), // Field name in the form must be 'resume'
+    atsUpload.single('resume'),
     requestAtsAnalysisController
 );
 
-// Endpoint to fetch student's own ATS analysis history.
-// Method: GET /
+/**
+ * @swagger
+ * /api/v1/students/ats:
+ *   get:
+ *     summary: Fetch student's own ATS analysis history
+ *     tags: [ATS]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: ATS results fetched successfully
+ */
 atsRouter.get('/ats', authMiddleware, requireStudent, getAtsResultsController);
 
 export { atsRouter };

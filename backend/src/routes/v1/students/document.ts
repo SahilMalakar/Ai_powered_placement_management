@@ -7,10 +7,44 @@ import {
     deleteDocumentController,
 } from '../../../modules/students/controllers/document.controller.js';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Documents
+ *   description: Student document management
+ */
+
 const documentRouter: Router = Router();
 
-// Route to handle bulk upload of semester marksheets, CGPA, and other certificates.
-// Expects multipart/form-data with fields: sem1..sem8, cgpa, other.
+/**
+ * @swagger
+ * /api/v1/students/documents:
+ *   post:
+ *     summary: Bulk upload student documents
+ *     tags: [Documents]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sem1: { type: string, format: binary }
+ *               sem2: { type: string, format: binary }
+ *               sem3: { type: string, format: binary }
+ *               sem4: { type: string, format: binary }
+ *               sem5: { type: string, format: binary }
+ *               sem6: { type: string, format: binary }
+ *               sem7: { type: string, format: binary }
+ *               sem8: { type: string, format: binary }
+ *               other: { type: string, format: binary }
+ *     responses:
+ *       202:
+ *         description: Document upload successfully queued
+ */
 documentRouter.post(
     '/documents',
     authMiddleware,
@@ -29,7 +63,26 @@ documentRouter.post(
     uploadDocumentsController
 );
 
-// Route to manually delete a document and its Cloudinary resource.
+/**
+ * @swagger
+ * /api/v1/students/documents/{id}:
+ *   delete:
+ *     summary: Delete a document
+ *     tags: [Documents]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The document ID
+ *     responses:
+ *       200:
+ *         description: Document deleted successfully
+ */
 documentRouter.delete(
     '/documents/:id',
     authMiddleware,
