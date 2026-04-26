@@ -25,7 +25,6 @@ export const metadata: Metadata = {
 import QueryProvider from "@/providers/QueryProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
-import { NavabarLanding } from "@/components/layout/NavabarLanding";
 
 export default function RootLayout({
   children,
@@ -46,10 +45,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <NavabarLanding />
-            <main className="flex-1 container mx-auto px-4 md:px-8">
-              {children}
-            </main>
+            {children}
             <ToasterProvider />
           </QueryProvider>
         </ThemeProvider>
