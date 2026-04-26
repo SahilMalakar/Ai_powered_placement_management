@@ -10,15 +10,17 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  
-  /* Brand Colors */
+
+  /* Brand Colors — core 5 */
   --color-navy: var(--navy);
   --color-deep-blue: var(--deep-blue);
   --color-steel: var(--steel);
-  --color-teal-blue: var(--teal-blue);
-  --color-mist: var(--mist);
   --color-sky: var(--sky);
   --color-pale: var(--pale);
+
+  /* Brand Colors — optional/rare, use only when core 5 don't fit */
+  --color-teal-blue: var(--teal-blue);
+  --color-mist: var(--mist);
 
   /* Semantic Colors */
   --color-success: var(--success);
@@ -64,99 +66,154 @@
 }
 
 :root {
-  /* Design Tokens */
-  --navy: #001D39;
+  /* ─── Brand Scale ─────────────────────────────── */
+  /* Core — reach for these first */
+  --navy:      #001D39;
   --deep-blue: #0A4174;
-  --steel: #49769F;
+  --steel:     #49769F;
+  --sky:       #7BBDE8;
+  --pale:      #BDD8E9;
+
+  /* Optional — only when core 5 don't fit */
   --teal-blue: #4E8EA2;
-  --mist: #6EA2B3;
-  --sky: #7BBDE8;
-  --pale: #BDD8E9;
-  
+  --mist:      #6EA2B3;
+
+  /* ─── Semantic ────────────────────────────────── */
   --success: #1D9E75;
   --warning: #EF9F27;
-  --error: #E24B4A;
+  --error:   #E24B4A;
 
-  /* Shadcn Semantic Tokens (Light Mode) */
-  --background: #F8FAFC; /* Slightly tinted as per design theory */
-  --foreground: var(--navy);
-  --card: #ffffff;
-  --card-foreground: var(--navy);
-  --popover: #ffffff;
-  --popover-foreground: var(--navy);
-  --primary: var(--deep-blue);
-  --primary-foreground: #ffffff;
-  --secondary: var(--steel);
-  --secondary-foreground: #ffffff;
-  --muted: var(--pale);
-  --muted-foreground: var(--steel);
-  --accent: var(--sky);
-  --accent-foreground: var(--navy);
-  --destructive: var(--error);
+  /* ─── Shadcn Tokens — Light Mode ─────────────── */
+  --background:          #F8FAFC;
+  --foreground:          var(--navy);
+
+  --card:                #ffffff;
+  --card-foreground:     var(--navy);
+
+  --popover:             #ffffff;
+  --popover-foreground:  var(--navy);
+
+  --primary:             var(--deep-blue);
+  --primary-foreground:  #ffffff;
+
+  --secondary:           var(--steel);
+  --secondary-foreground:#ffffff;
+
+  --muted:               var(--pale);
+  --muted-foreground:    var(--steel);
+
+  --accent:              var(--sky);
+  --accent-foreground:   var(--navy);
+
+  --destructive:         var(--error);
   --destructive-foreground: #ffffff;
-  --border: var(--pale);
-  --input: var(--pale);
-  --ring: var(--sky);
+
+  --border:              var(--pale);
+  --input:               var(--pale);
+  --ring:                var(--sky);
+
+  /* ─── Charts ──────────────────────────────────── */
   --chart-1: var(--deep-blue);
-  --chart-2: var(--teal-blue);
-  --chart-3: var(--steel);
-  --chart-4: var(--mist);
-  --chart-5: var(--sky);
+  --chart-2: var(--steel);
+  --chart-3: var(--sky);
+  --chart-4: var(--teal-blue);
+  --chart-5: var(--pale);
+
+  /* ─── Radius ──────────────────────────────────── */
   --radius: 0.625rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: var(--navy);
-  --sidebar-primary: var(--deep-blue);
+
+  /* ─── Sidebar ─────────────────────────────────── */
+  --sidebar:                    #ffffff;
+  --sidebar-foreground:         var(--navy);
+  --sidebar-primary:            var(--deep-blue);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: var(--pale);
-  --sidebar-accent-foreground: var(--navy);
-  --sidebar-border: var(--pale);
-  --sidebar-ring: var(--sky);
+  --sidebar-accent:             var(--pale);
+  --sidebar-accent-foreground:  var(--navy);
+  --sidebar-border:             var(--pale);
+  --sidebar-ring:               var(--sky);
 }
 
 .dark {
-  /* Shadcn Semantic Tokens (Dark Mode) */
-  --background: var(--navy);
-  --foreground: var(--pale);
-  --card: #00264A; /* Lighter shade of navy for elevation */
-  --card-foreground: var(--pale);
-  --popover: #00264A;
-  --popover-foreground: var(--pale);
-  --primary: var(--sky);
-  --primary-foreground: var(--navy);
-  --secondary: var(--steel);
-  --secondary-foreground: #ffffff;
-  --muted: #002E5A;
-  --muted-foreground: var(--mist);
-  --accent: var(--teal-blue);
-  --accent-foreground: #ffffff;
-  --destructive: var(--error);
+  /*
+   * Dark mode uses a neutral near-black base with a subtle blue tint.
+   * Four elevation layers create depth without shadows:
+   *   #0F1117 → #1A1F2E → #222840 → #2A3352
+   *
+   * Navy (#001D39) is NOT used as a background — it reads as
+   * "blue mode". These values feel dark-first, brand-second.
+   */
+
+  /* ─── Shadcn Tokens — Dark Mode ──────────────── */
+  --background:          #0F1117;  /* base page — neutral dark, barely blue-tinted */
+  --foreground:          #E2E8F0;  /* warm white — easier on eyes than pure white */
+
+  --card:                #1A1F2E;  /* elevated surface, clearly distinct from bg */
+  --card-foreground:     #E2E8F0;
+
+  --popover:             #1A1F2E;
+  --popover-foreground:  #E2E8F0;
+
+  --primary:             var(--sky);    /* #7BBDE8 — pops cleanly on dark */
+  --primary-foreground:  #0F1117;
+
+  --secondary:           #2A3352;
+  --secondary-foreground:#E2E8F0;
+
+  --muted:               #222840;  /* hover rows, input bg, secondary panels */
+  --muted-foreground:    #8FA3BF;  /* placeholders, labels, meta text */
+
+  --accent:              #1E3A5F;  /* selected item bg, hover highlight */
+  --accent-foreground:   var(--sky);
+
+  --destructive:         var(--error);
   --destructive-foreground: #ffffff;
-  --border: #00366A;
-  --input: #00366A;
-  --ring: var(--sky);
+
+  --border:              #2A3352;
+  --input:               #2A3352;
+  --ring:                var(--sky);
+
+  /* ─── Charts ──────────────────────────────────── */
   --chart-1: var(--sky);
-  --chart-2: var(--teal-blue);
-  --chart-3: var(--steel);
+  --chart-2: var(--steel);
+  --chart-3: var(--teal-blue);
   --chart-4: var(--mist);
-  --chart-5: var(--pale);
-  --sidebar: var(--navy);
-  --sidebar-foreground: var(--pale);
-  --sidebar-primary: var(--sky);
-  --sidebar-primary-foreground: var(--navy);
-  --sidebar-accent: #00264A;
-  --sidebar-accent-foreground: var(--pale);
-  --sidebar-border: #00366A;
-  --sidebar-ring: var(--sky);
+  --chart-5: #E2E8F0;
+
+  /* ─── Sidebar ─────────────────────────────────── */
+  --sidebar:                    #141824;  /* slightly lighter than bg for separation */
+  --sidebar-foreground:         #E2E8F0;
+  --sidebar-primary:            var(--sky);
+  --sidebar-primary-foreground: #0F1117;
+  --sidebar-accent:             #1E2A3A;
+  --sidebar-accent-foreground:  #E2E8F0;
+  --sidebar-border:             #2A3352;
+  --sidebar-ring:               var(--sky);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE / Edge */
+  }
+  *::-webkit-scrollbar {
+    display: none;                /* Chrome / Safari / Opera */
   }
   body {
     @apply bg-background text-foreground;
   }
   html {
     @apply font-sans;
+    overflow: hidden;
+    height: 100%;
+  }
+  body {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  body::-webkit-scrollbar {
+    display: none;
   }
 }
