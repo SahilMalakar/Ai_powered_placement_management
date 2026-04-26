@@ -26,9 +26,10 @@ const resetPasswordSchema = z.object({
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
 
 export function ResetPasswordForm() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const router = useRouter()
+
   const searchParams = useSearchParams()
   const emailParam = searchParams.get("email") || ""
 

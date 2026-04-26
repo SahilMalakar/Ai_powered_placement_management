@@ -21,8 +21,8 @@ const forgetPasswordSchema = z.object({
 type ForgetPasswordValues = z.infer<typeof forgetPasswordSchema>
 
 export function ForgetPasswordForm() {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const router = useRouter()
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   const {
     register,

@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 
 import QueryProvider from "@/providers/QueryProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
+import AuthProvider from "@/providers/AuthProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 export default function RootLayout({
@@ -45,7 +46,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
             <ToasterProvider />
           </QueryProvider>
         </ThemeProvider>

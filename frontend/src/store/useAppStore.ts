@@ -10,7 +10,9 @@ interface User {
 
 interface AppState {
   user: User | null;
+  isAuthenticated: boolean;
   setUser: (user: User | null) => void;
+  setAuthenticated: (isAuthenticated: boolean) => void;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
 }
@@ -24,7 +26,9 @@ export const useAppStore = create<AppState>()(
   devtools((set) => ({
     // Represents the authenticated user's profile or null if unauthenticated
     user: null,
-    setUser: (user) => set({ user }),
+    isAuthenticated: false,
+    setUser: (user) => set({ user, isAuthenticated: !!user }),
+    setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
     isLoading: false,
     setIsLoading: (isLoading) => set({ isLoading }),
   }))
