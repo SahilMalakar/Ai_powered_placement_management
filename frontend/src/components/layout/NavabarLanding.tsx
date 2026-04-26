@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export function NavabarLanding() {
@@ -12,17 +12,17 @@ export function NavabarLanding() {
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold font-heading tracking-tight text-navy dark:text-pale">
             PlacementCube
-          </span>
+          </span> 
         </Link>
 
         {/* Right Side - Actions */}
         <div className="flex items-center gap-4 font-heading">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/signup">Signup</Link>
-          </Button>
+          <Link href="/login" className={buttonVariants({ variant: "ghost" })}>
+            Login
+          </Link>
+          <Link href="/signup" className={buttonVariants({ variant: "default" })}>
+            Signup
+          </Link>
           <div className="ml-2">
             <ThemeToggle />
           </div>

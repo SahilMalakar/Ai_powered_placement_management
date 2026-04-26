@@ -7,7 +7,7 @@ import * as z from "zod"
 import { Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
@@ -125,9 +125,15 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
             )}
             {mode === "login" && (
               <div className="flex justify-end">
-                <Button variant="link" asChild className="px-0 font-sans text-xs text-steel hover:text-navy dark:text-mist dark:hover:text-pale h-auto">
-                  <Link href="/forget-password">Forgot password?</Link>
-                </Button>
+                <Link 
+                  href="/forget-password"
+                  className={cn(
+                    buttonVariants({ variant: "link" }),
+                    "px-0 font-sans text-xs text-steel hover:text-navy dark:text-mist dark:hover:text-pale h-auto"
+                  )}
+                >
+                  Forgot password?
+                </Link>
               </div>
             )}
           </div>

@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
@@ -82,12 +82,16 @@ export function ForgetPasswordForm() {
         </div>
       </form>
       <div className="text-center">
-        <Button variant="link" asChild className="text-sm text-steel hover:text-navy dark:text-mist dark:hover:text-pale">
-          <Link href="/login" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Login
-          </Link>
-        </Button>
+        <Link 
+          href="/login" 
+          className={cn(
+            buttonVariants({ variant: "link" }),
+            "text-sm text-steel hover:text-navy dark:text-mist dark:hover:text-pale flex items-center gap-2"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Login
+        </Link>
       </div>
     </div>
   )

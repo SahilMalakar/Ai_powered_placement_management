@@ -217,3 +217,12 @@
     display: none;
   }
 }
+
+/* ─── Student Layout ──────────────────────────────────── */
+/* Sidebar offset — must stay in sync with SIDEBAR_WIDTH (260px)
+   in components/layout/student/sidebar.tsx               */
+@media (min-width: 768px) {
+  .student-main {
+    padding-left: 260px;
+  }
+}
