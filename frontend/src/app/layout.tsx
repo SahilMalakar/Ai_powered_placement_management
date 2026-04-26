@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import QueryProvider from "@/providers/QueryProvider";
 import ToasterProvider from "@/providers/ToasterProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -29,12 +30,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <QueryProvider>
-          {children}
-          <ToasterProvider />
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            {children}
+            <ToasterProvider />
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
