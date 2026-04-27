@@ -222,6 +222,16 @@ export const getFullStudentData = async (userId: number, tx: any = prisma) => {
             semesters: {
                 orderBy: { semester: 'asc' },
             },
+            documents: {
+                select: {
+                    id: true,
+                    type: true,
+                    url: true,
+                    semester: true,
+                    createdAt: true,
+                },
+                where: { deletedAt: null },
+            },
         },
     });
 };

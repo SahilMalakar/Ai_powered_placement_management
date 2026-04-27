@@ -37,11 +37,39 @@ export const getStudentProfileService = async (userId: number) => {
         throw new NotFoundError('Profile not found. Please create one.');
     }
 
-    // Set Cache with 10-minute TTL
-    await cacheClient.set(cacheKey, JSON.stringify(fullData), 'EX', 600);
+    // Transform documents for easier frontend mapping (sem1-sem8 slots)
+    const transformedDocs = transformDocuments(fullData.documents);
+    const responseData = { ...fullData, documents: transformedDocs };
 
-    return fullData;
+    // Set Cache with 10-minute TTL
+    await cacheClient.set(cacheKey, JSON.stringify(responseData), 'EX', 600);
+
+    return responseData;
 };
+
+/**
+ * Transforms a flat array of documents into a structured object:
+ * { sem1: Doc|null, ..., sem8: Doc|null, other: Doc[] }
+ */
+function transformDocuments(docs: any[]) {
+    const semMapping: Record<string, any> = {};
+    const other: any[] = [];
+
+    for (let i = 1; i <= 8; i++) {
+        semMapping[`sem${i}`] = null;
+    }
+
+    docs.forEach((doc) => {
+        if (doc.type === 'SGPA' && doc.semester) {
+            semMapping[`sem${doc.semester}`] = doc;
+        } else {
+            // Note: CGPA or OTHER go to the 'other' list for now
+            other.push(doc);
+        }
+    });
+
+    return { ...semMapping, other };
+}
 
 export const updateStudentProfile = async (
     userId: number,

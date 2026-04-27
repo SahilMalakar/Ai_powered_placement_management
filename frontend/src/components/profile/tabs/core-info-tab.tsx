@@ -15,14 +15,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
+
+import { useProfile } from "@/hooks/student/use-profile"
+import { useEffect } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name too short"),
@@ -30,16 +33,23 @@ const profileSchema = z.object({
   branch: z.string(),
   rollNo: z.string(),
   dob: z.string(),
-  university: z.string(),
-  degree: z.string(),
-  graduationYear: z.string(),
-  summary: z.string(),
-  linkedin: z.string().url().or(z.literal("")),
-  github: z.string().url().or(z.literal("")),
-  portfolio: z.string().url().or(z.literal("")),
+  university: z.string().optional(),
+  degree: z.string().optional(),
+  graduationYear: z.string().optional(),
+  summary: z.string().optional(),
+  linkedin: z.string().url().or(z.literal("")).optional(),
+  github: z.string().url().or(z.literal("")).optional(),
+  portfolio: z.string().url().or(z.literal("")).optional(),
 })
 
-export function CoreInfoTab() {
+interface CoreInfoTabProps {
+  onNext: (data: any) => void
+  initialData?: any
+}
+
+export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
+  const { data: profileData, isLoading } = useProfile()
+
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -58,8 +68,75 @@ export function CoreInfoTab() {
     },
   })
 
+  // Populate form with fetched data or session data
+  useEffect(() => {
+    const p = profileData?.profile
+    const sessionCore = initialData?.core || initialData
+    const sessionSocial = initialData?.socialLinks
+
+    form.reset({
+      fullName: sessionCore?.fullName || p?.fullName || "",
+      phoneNumber: sessionCore?.phoneNumber || p?.phoneNumber || "",
+      branch: sessionCore?.branch || p?.branch || "",
+      rollNo: sessionCore?.rollNo || p?.rollNo || "",
+      dob: sessionCore?.dob 
+        ? sessionCore.dob 
+        : p?.dob ? new Date(p.dob).toISOString().split('T')[0] : "",
+      university: sessionCore?.university || p?.university || "",
+      degree: sessionCore?.degree || p?.degree || "",
+      graduationYear: sessionCore?.graduationYear?.toString() || p?.graduationYear?.toString() || "",
+      summary: sessionCore?.summary || p?.summary || "",
+      linkedin: sessionSocial?.find((l: any) => l.platform === "LinkedIn")?.url || p?.socialLinks?.find(l => l.platform === "LinkedIn")?.url || "",
+      github: sessionSocial?.find((l: any) => l.platform === "GitHub")?.url || p?.socialLinks?.find(l => l.platform === "GitHub")?.url || "",
+      portfolio: sessionSocial?.find((l: any) => l.platform === "Portfolio")?.url || p?.socialLinks?.find(l => l.platform === "Portfolio")?.url || "",
+    })
+  }, [profileData, initialData, form])
+
   function onSubmit(values: z.infer<typeof profileSchema>) {
-    console.log(values)
+    const socialLinks = [
+      { platform: "LinkedIn", url: values.linkedin || "" },
+      { platform: "GitHub", url: values.github || "" },
+      { platform: "Portfolio", url: values.portfolio || "" },
+    ].filter(link => link.url !== "")
+
+    const coreData = {
+      fullName: values.fullName,
+      phoneNumber: values.phoneNumber,
+      branch: values.branch as any,
+      rollNo: values.rollNo,
+      dob: values.dob,
+      university: values.university,
+      degree: values.degree,
+      graduationYear: values.graduationYear ? parseInt(values.graduationYear) : undefined,
+      summary: values.summary,
+    }
+
+    onNext({ core: coreData, socialLinks })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-start gap-6 mb-8">
+          <Skeleton className="h-20 w-20 rounded-full" />
+          <div className="flex-1 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="flex justify-end gap-3 pt-6">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -68,7 +145,9 @@ export function CoreInfoTab() {
         <div className="flex items-start gap-6 mb-8">
           <Avatar className="h-20 w-20 border-2 border-primary/20">
             <AvatarImage src="" />
-            <AvatarFallback className="bg-deep-blue text-white text-xl font-bold">RS</AvatarFallback>
+            <AvatarFallback className="bg-deep-blue text-white text-xl font-bold">
+              {form.getValues("fullName")?.charAt(0) || "S"}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -116,9 +195,15 @@ export function CoreInfoTab() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="cse">Computer Science</SelectItem>
-                    <SelectItem value="ete">Electronics & Telecommunication</SelectItem>
-                    <SelectItem value="ee">Electrical Engineering</SelectItem>
+                    <SelectItem value="CSE">Computer Science (CSE)</SelectItem>
+                    <SelectItem value="ETE">Electronics & Telecommunication (ETE)</SelectItem>
+                    <SelectItem value="EE">Electrical Engineering (EE)</SelectItem>
+                    <SelectItem value="ME">Mechanical Engineering (ME)</SelectItem>
+                    <SelectItem value="IE">Instrumentation Engineering (IE)</SelectItem>
+                    <SelectItem value="CE">Civil Engineering (CE)</SelectItem>
+                    <SelectItem value="CHE">Chemical Engineering (CHE)</SelectItem>
+                    <SelectItem value="IPE">Industrial & Production Engineering (IPE)</SelectItem>
+                    <SelectItem value="MCA">Master of Computer Applications (MCA)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -259,8 +344,10 @@ export function CoreInfoTab() {
         </div>
 
         <div className="flex justify-end gap-3 pt-6">
-          <Button type="button" variant="secondary" className="px-6 h-10">Cancel</Button>
-          <Button type="submit" className="btn-primary px-8 h-10">Save changes</Button>
+          <Button type="submit" className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2">
+            Next step
+            <span className="text-lg">→</span>
+          </Button>
         </div>
       </form>
     </Form>
