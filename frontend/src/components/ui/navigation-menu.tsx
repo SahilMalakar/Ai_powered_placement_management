@@ -1,4 +1,4 @@
-import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/navigation-menu"
+import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
 
