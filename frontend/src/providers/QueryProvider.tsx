@@ -6,8 +6,7 @@ import { ReactNode, useState } from 'react';
 
 /**
  * Orchestrates the global data fetching and caching lifecycle for the application.
- * It provides a stable QueryClient instance via React state to maintain cache consistency
- * and configures a resilient retry strategy with exponential backoff for network requests.
+ * It provides a stable QueryClient instance via React state to maintain cache consistency.
  */
 export default function QueryProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -15,8 +14,10 @@ export default function QueryProvider({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // Implements exponential backoff to prevent thundering herd issues during recovery
-            // retryDelay: 3000, 
+            // Disable caching for now as requested
+            staleTime: 0,
+            gcTime: 0, // In TanStack Query v5, cacheTime is now gcTime
+            refetchOnWindowFocus: false,
           },
         },
       })

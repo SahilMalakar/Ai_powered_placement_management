@@ -13,6 +13,12 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+    
+// Request interceptor for logging
+api.interceptors.request.use((config) => {
+  console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+  return config;
+});
 
 // Response interceptor to handle global errors like 401
 api.interceptors.response.use(

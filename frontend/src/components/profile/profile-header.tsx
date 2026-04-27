@@ -52,15 +52,15 @@ export function ProfileHeader() {
         <h1 className="text-3xl font-bold font-heading tracking-tight text-foreground">My Profile</h1>
         <p className="text-muted-foreground font-body">Manage your student profile and details</p>
       </div>
-      
+
       <div className="flex items-center gap-3 mt-4 md:mt-0">
         <Badge variant="outline" className={cn(currentStatus.className, "px-3 py-1 font-medium gap-1.5")}>
           <Icon className="h-3.5 w-3.5" />
           {currentStatus.label}
         </Badge>
-        
+
         <div className="flex items-center bg-card rounded-md shadow-button border border-border overflow-hidden">
-          <Button 
+          <Button
             className="btn-primary rounded-r-none h-9 px-4 border-none shadow-none"
             onClick={() => initiateVerify()}
             disabled={status === "PROCESSING" || status === "VERIFIED" || isPending}
@@ -70,7 +70,7 @@ export function ProfileHeader() {
           </Button>
           <Separator orientation="vertical" className="h-4 bg-white/20" />
           <DropdownMenu>
-            <DropdownMenuTrigger 
+            <DropdownMenuTrigger
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
                 "h-9 w-9 rounded-l-none hover:bg-accent/50 border-none focus-visible:ring-0"
