@@ -10,7 +10,7 @@ export function NavabarLanding() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         {/* Left Side - Website Name */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold font-heading tracking-tight text-navy dark:text-pale">
+          <span className="text-xl font-bold font-heading tracking-tight text-foreground">
             PlacementCube
           </span> 
         </Link>

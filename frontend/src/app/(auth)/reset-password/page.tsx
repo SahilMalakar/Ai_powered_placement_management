@@ -11,7 +11,7 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form"
 export default function ResetPasswordPage() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-[450px] shadow-lg border-border animate-in fade-in zoom-in duration-300">
+      <Card className="w-full max-w-[450px] shadow-card border-border animate-in fade-in zoom-in duration-300">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-heading font-semibold tracking-tight">
             Reset Password

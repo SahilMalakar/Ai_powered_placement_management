@@ -136,7 +136,7 @@ function SidebarBrand() {
 export function DesktopSidebar() {
   return (
     <aside
-      className="fixed inset-y-0 left-0 z-40 hidden md:flex flex-col border-r border-sidebar-border bg-sidebar shadow-lg"
+      className="fixed inset-y-0 left-0 z-40 hidden md:flex flex-col rounded-r-2xl border-r border-sidebar-border bg-sidebar shadow-sidebar"
       style={{ width: SIDEBAR_WIDTH }}
     >
       <SidebarBrand />
@@ -174,8 +174,8 @@ export function MobileSidebar() {
         variant="default"
         size="lg"
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl shadow-lg md:hidden",
-          "bg-primary text-primary-foreground hover:bg-primary/90",
+          "fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl shadow-sidebar md:hidden",
+          "btn-primary",
           "transition-transform duration-200 active:scale-95"
         )}
         onClick={() => setOpen(true)}
@@ -197,7 +197,7 @@ export function MobileSidebar() {
       {/* ── Sidebar panel ── */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-sidebar-border bg-sidebar md:hidden shadow-2xl",
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col rounded-r-2xl border-r border-sidebar-border bg-sidebar md:hidden shadow-sidebar",
           "transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "-translate-x-full"
         )}
