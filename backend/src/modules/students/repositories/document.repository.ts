@@ -1,32 +1,36 @@
 import { prisma } from '../../../prisma/prisma.js';
 import { DocumentType } from '../../../prisma/generated/prisma/enums.js';
 
-// Fetches a specific document by its unique database ID.
+/**
+ * Fetches a specific document by its unique database ID.
+ */
 export const findDocumentById = async (id: number) => {
     return await prisma.document.findFirst({
-        where: { id, deletedAt: null },
+        where: { id },
     });
 };
 
-// Finds an existing document for a student by type and semester (for SGPA).
-// 'includeDeleted' allows finding soft-deleted records to prevent unique constraint violations on re-upload.
+/**
+ * Finds an existing document for a student by type and semester (for SGPA).
+ */
 export const findDocumentBySemester = async (
     userId: number,
     type: DocumentType,
-    semester?: number,
-    includeDeleted = false
+    semester?: number
 ) => {
     return await prisma.document.findFirst({
         where: {
             userId,
             type,
             semester: semester ?? null,
-            ...(includeDeleted ? {} : { deletedAt: null }),
         },
     });
 };
 
-// Creates or updates a document record. If a soft-deleted record exists, it restores it.
+/**
+ * Creates or updates a document record.
+ * If a document already exists for the same semester/type, it updates the URL.
+ */
 export const upsertDocument = async (
     userId: number,
     type: DocumentType,
@@ -34,8 +38,7 @@ export const upsertDocument = async (
     publicId: string,
     semester?: number
 ) => {
-    // Search for ANY existing record (including soft-deleted) to prevent unique constraint errors
-    const existing = await findDocumentBySemester(userId, type, semester, true);
+    const existing = await findDocumentBySemester(userId, type, semester);
 
     if (existing) {
         return await prisma.document.update({
@@ -43,7 +46,6 @@ export const upsertDocument = async (
             data: {
                 url,
                 publicId,
-                deletedAt: null, // Restore if it was soft-deleted
             },
         });
     }
@@ -53,10 +55,11 @@ export const upsertDocument = async (
     });
 };
 
-// Soft-deletes a document. Guard on deletedAt: null prevents double-delete race conditions.
-export const deleteDocumentRecord = async (id: number) => {
-    return await prisma.document.update({
-        where: { id, deletedAt: null },
-        data: { deletedAt: new Date() },
+/**
+ * Hard-deletes a document permanently from the database.
+ */
+export const hardDeleteDocumentRecord = async (id: number) => {
+    return await prisma.document.delete({
+        where: { id },
     });
 };

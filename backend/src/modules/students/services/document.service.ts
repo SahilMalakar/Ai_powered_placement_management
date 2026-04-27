@@ -4,7 +4,7 @@ import {
 } from '../../../queues/document.queue.js';
 import { deleteFromCloudinary } from '../../../utils/fileHandler/cloudinary.js';
 import {
-    deleteDocumentRecord,
+    hardDeleteDocumentRecord,
     findDocumentById,
 } from '../repositories/document.repository.js';
 import { resetVerificationState } from '../repositories/verification.repository.js';
@@ -86,8 +86,8 @@ export const deleteDocumentService = async (
         );
     }
 
-    // 1. Soft-delete from DB first
-    await deleteDocumentRecord(documentId);
+    // 1. Permanent Hard Delete from DB for all document types
+    await hardDeleteDocumentRecord(documentId);
 
     // 2. Verification Integrity Check: If an SGPA document is deleted, reset the verification status.
     // This forces the student to re-initiate verification if their evidence is removed.
