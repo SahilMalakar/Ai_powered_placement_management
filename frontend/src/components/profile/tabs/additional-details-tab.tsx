@@ -3,24 +3,24 @@ import { useProfile } from "@/hooks/student/use-profile"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Edit2, Trash2 } from "lucide-react"
+import { Plus, Edit2, Trash2, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ExperienceDialog } from "./experience-dialog"
+import { AdditionalDetailDialog } from "./additional-detail-dialog"
 
-interface ExperienceTabProps {
-  onNext: () => void
+interface AdditionalDetailsTabProps {
   onPrev: () => void
+  onSave: (data?: any) => void
+  isSaving: boolean
   initialData?: any
 }
 
-export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProps) {
+export function AdditionalDetailsTab({ onPrev, onSave, isSaving, initialData }: AdditionalDetailsTabProps) {
   const { data: profileData, isLoading } = useProfile()
-  const { mutate: updateProfile, isPending } = useUpdateProfile()
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile()
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingExperience, setEditingExperience] = useState<any>(null)
+  const [editingDetail, setEditingDetail] = useState<any>(null)
 
   if (isLoading) {
     return (
@@ -32,59 +32,52 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
     )
   }
 
-  const experiences = profileData?.profile?.experiences || []
+  const additionalDetails = profileData?.profile?.additionalDetails || []
 
-  const handleSave = (data: any) => {
-    let updatedExperiences: any[]
+  const handleSaveDetail = (data: any) => {
+    let updatedDetails: any[]
     
-    if (editingExperience) {
-      // Update existing
-      updatedExperiences = experiences.map((exp) => 
-        exp.id === editingExperience.id ? { ...data } : { ...exp }
+    if (editingDetail) {
+      updatedDetails = additionalDetails.map((d) => 
+        d.id === editingDetail.id ? { ...data } : { ...d }
       )
     } else {
-      // Add new
-      updatedExperiences = [...experiences, data]
+      updatedDetails = [...additionalDetails, data]
     }
 
-    // Clean up for backend (remove id, profileId, and convert nulls to undefined)
-    const cleanedExperiences = updatedExperiences.map(({ id: _id, profileId: _pid, ...rest }) => {
+    // Clean up for backend
+    const cleanedDetails = updatedDetails.map(({ id: _id, profileId: _pid, ...rest }) => {
       const cleaned: any = { ...rest }
-      // Backend Zod schema is strict about nulls for optional strings
-      if (cleaned.location === null) cleaned.location = undefined
-      if (cleaned.toolsUsed === null) cleaned.toolsUsed = undefined
-      if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
+      if (cleaned.date === null || cleaned.date === "") cleaned.date = undefined
       return cleaned
     })
 
     updateProfile({
-      experiences: cleanedExperiences as any
+      additionalDetails: cleanedDetails as any
     })
   }
 
-  const handleDelete = (id: number) => {
-    const updatedExperiences = experiences
-      .filter(exp => exp.id !== id)
+  const handleDeleteDetail = (id: number) => {
+    const updatedDetails = additionalDetails
+      .filter(d => d.id !== id)
       .map(({ id: _id, profileId: _pid, ...rest }) => {
         const cleaned: any = { ...rest }
-        if (cleaned.location === null) cleaned.location = undefined
-        if (cleaned.toolsUsed === null) cleaned.toolsUsed = undefined
-        if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
+        if (cleaned.date === null || cleaned.date === "") cleaned.date = undefined
         return cleaned
       })
 
     updateProfile({
-      experiences: updatedExperiences as any
+      additionalDetails: updatedDetails as any
     })
   }
 
   const openAddDialog = () => {
-    setEditingExperience(null)
+    setEditingDetail(null)
     setIsDialogOpen(true)
   }
 
-  const openEditDialog = (exp: any) => {
-    setEditingExperience(exp)
+  const openEditDialog = (detail: any) => {
+    setEditingDetail(detail)
     setIsDialogOpen(true)
   }
 
@@ -92,56 +85,49 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
     <div className="space-y-6 flex flex-col h-full">
       <div className="flex-1 space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Work Experience</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Additional Details</h3>
           <Button 
             variant="outline" 
             size="sm" 
             className="gap-2 border-border shadow-button" 
-            disabled={isPending}
+            disabled={isSaving || isUpdating}
             onClick={openAddDialog}
           >
             <Plus className="h-4 w-4" />
-            Add experience
+            Add detail
           </Button>
         </div>
 
         <div className="space-y-4">
-          {experiences.map((exp) => (
-            <Card key={exp.id} className={cn("bg-card shadow-card border-border overflow-hidden", isPending && "opacity-50")}>
+          {additionalDetails.map((detail: any) => (
+            <Card key={detail.id} className={cn("bg-card shadow-card border-border overflow-hidden", (isSaving || isUpdating) && "opacity-50")}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-bold text-foreground font-heading">{exp.role} — {exp.company}</h4>
-                    <p className="text-sm text-muted-foreground mt-1 font-body">
-                      {new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} – 
-                      {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : "Present"} 
-                      {exp.location && ` · ${exp.location}`}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-foreground font-heading">{detail.title}</h4>
+                      {detail.date && (
+                        <span className="text-[10px] text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full font-mono">
+                          {new Date(detail.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
                     <div className="mt-3 space-y-1">
-                      {exp.description.map((bullet, i) => (
+                      {Array.isArray(detail.description) && detail.description.map((bullet: string, i: number) => (
                         <p key={i} className="text-xs text-muted-foreground font-body flex gap-2">
                           <span className="text-primary">•</span>
                           {bullet}
                         </p>
                       ))}
                     </div>
-                    {exp.toolsUsed && (
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {exp.toolsUsed.split(',').map((tool) => (
-                          <Badge key={tool.trim()} variant="secondary" className="bg-secondary/50 text-foreground font-medium text-[11px] px-2.5 py-0.5 border-border">
-                            {tool.trim()}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
                   </div>
                   <div className="flex gap-2 ml-4">
                     <Button 
                       variant="outline" 
                       size="icon" 
                       className="h-8 w-8 border-border" 
-                      disabled={isPending}
-                      onClick={() => openEditDialog(exp)}
+                      disabled={isSaving || isUpdating}
+                      onClick={() => openEditDialog(detail)}
                     >
                       <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
                     </Button>
@@ -149,8 +135,8 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
                       variant="outline" 
                       size="icon" 
                       className="h-8 w-8 border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20"
-                      onClick={() => handleDelete(exp.id!)}
-                      disabled={isPending}
+                      onClick={() => handleDeleteDetail(detail.id!)}
+                      disabled={isSaving || isUpdating}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -160,16 +146,16 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
             </Card>
           ))}
 
-          {experiences.length === 0 && (
+          {additionalDetails.length === 0 && (
             <Button 
               variant="ghost" 
               className="w-full border-2 border-dashed border-border py-8 rounded-xl hover:bg-accent/50 text-muted-foreground font-medium transition-all group"
-              disabled={isPending}
+              disabled={isSaving || isUpdating}
               onClick={openAddDialog}
             >
               <div className="flex flex-col items-center gap-2">
                 <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                <span>Add your first work experience</span>
+                <span>Add achievements, certifications, or other details</span>
               </div>
             </Button>
           )}
@@ -181,24 +167,26 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
           variant="secondary" 
           onClick={onPrev}
           className="px-6 h-11 rounded-xl shadow-button flex items-center gap-2"
+          disabled={isSaving || isUpdating}
         >
           <span className="text-lg">←</span>
           Previous
         </Button>
         <Button 
-          onClick={onNext}
+          onClick={() => onSave()}
           className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2"
+          disabled={isSaving || isUpdating}
         >
-          Next step
-          <span className="text-lg">→</span>
+          {isSaving ? "Saving..." : "Save profile"}
+          {!isSaving && <Check className="h-4 w-4" />}
         </Button>
       </div>
 
-      <ExperienceDialog 
+      <AdditionalDetailDialog 
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        onSave={handleSave}
-        initialData={editingExperience}
+        onSave={handleSaveDetail}
+        initialData={editingDetail}
       />
     </div>
   )

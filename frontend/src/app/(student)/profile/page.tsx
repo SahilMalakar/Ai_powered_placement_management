@@ -8,13 +8,14 @@ import { CoreInfoTab } from "@/components/profile/tabs/core-info-tab"
 import { ExperienceTab } from "@/components/profile/tabs/experience-tab"
 import { ProjectsTab } from "@/components/profile/tabs/projects-tab"
 import { SkillsTab } from "@/components/profile/tabs/skills-tab"
+import { AdditionalDetailsTab } from "@/components/profile/tabs/additional-details-tab"
 import { DocumentsTab } from "@/components/profile/tabs/documents-tab"
 import { AcademicTab } from "@/components/profile/tabs/academic-tab"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { useCreateProfile } from "@/hooks/student/use-create-profile"
 import { useProfile } from "@/hooks/student/use-profile"
 
-const STEPS = ["core", "experience", "projects", "skills"] as const
+const STEPS = ["core", "experience", "projects", "skills", "additional"] as const
 type Step = typeof STEPS[number]
 
 export default function ProfilePage() {
@@ -84,7 +85,10 @@ export default function ProfilePage() {
             <ProjectsTab onNext={() => handleNext()} onPrev={handlePrev} initialData={formData.projects} />
           </TabsContent>
           <TabsContent value="skills" className="mt-0 focus-visible:outline-none">
-            <SkillsTab onPrev={handlePrev} onSave={handleSave} isSaving={isSaving} initialData={formData.skills} />
+            <SkillsTab onNext={() => handleNext()} onPrev={handlePrev} isSaving={isSaving} initialData={formData.skills} />
+          </TabsContent>
+          <TabsContent value="additional" className="mt-0 focus-visible:outline-none">
+            <AdditionalDetailsTab onPrev={handlePrev} onSave={handleSave} isSaving={isSaving} initialData={formData.additionalDetails} />
           </TabsContent>
         </div>
       </Tabs>

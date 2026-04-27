@@ -62,6 +62,19 @@ export function AcademicTab() {
             </div>
           </div>
         </div>
+
+        {p?.backlog && p.backlogSubjects && p.backlogSubjects.length > 0 && (
+          <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Backlog Subjects</label>
+            <div className="min-h-12 w-full rounded-xl border border-border bg-card shadow-button flex flex-wrap gap-2 items-center p-3">
+              {p.backlogSubjects.map((subject: string) => (
+                <div key={subject} className="bg-destructive/10 text-destructive text-[11px] font-bold px-3 py-1 rounded-full border border-destructive/20">
+                  {subject}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-6 pt-4 border-t border-border/50">

@@ -1,22 +1,26 @@
-"use client"
-
+import { useState } from "react"
 import { useProfile } from "@/hooks/student/use-profile"
+import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, X } from "lucide-react"
+import { Plus, X, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { SkillDialog } from "./skill-dialog"
 
 interface SkillsTabProps {
+  onNext: () => void
   onPrev: () => void
-  onSave: (data?: any) => void
   isSaving: boolean
   initialData?: any
 }
 
-export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabProps) {
+export function SkillsTab({ onNext, onPrev, isSaving, initialData }: SkillsTabProps) {
   const { data: profileData, isLoading } = useProfile()
-  // No longer calling updateProfile here individually
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile()
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<any>(null)
 
   if (isLoading) {
     return (
@@ -32,10 +36,56 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
 
   const skillCategories = profileData?.profile?.skills || []
 
-  const removeSkill = (categoryId: number, skillToRemove: string) => {
-    // In a real wizard, this should update parent state or local state
-    // For now, we'll just skip individual updates and let the user click "Save"
-    // Actually, I'll just keep the existing data and only handle the "Save" click for the whole profile
+  const handleSaveCategory = (data: any) => {
+    let updatedCategories: any[]
+    
+    if (editingCategory) {
+      updatedCategories = skillCategories.map((c) => 
+        c.id === editingCategory.id ? { ...data } : { ...c }
+      )
+    } else {
+      updatedCategories = [...skillCategories, data]
+    }
+
+    // Clean up for backend
+    const cleanedCategories = updatedCategories.map(({ id: _id, profileId: _pid, ...rest }) => rest)
+
+    updateProfile({
+      skills: cleanedCategories as any
+    })
+  }
+
+  const handleDeleteCategory = (id: number) => {
+    const updatedCategories = skillCategories
+      .filter(c => c.id !== id)
+      .map(({ id: _id, profileId: _pid, ...rest }) => rest)
+
+    updateProfile({
+      skills: updatedCategories as any
+    })
+  }
+
+  const removeSkill = (category: any, skillToRemove: string) => {
+    const updatedSkills = category.skills.filter((s: string) => s !== skillToRemove)
+    
+    // If no skills left, maybe delete the category? For now just update.
+    const updatedCategories = skillCategories.map((c) => 
+      c.id === category.id ? { ...c, skills: updatedSkills } : { ...c }
+    ).map(({ id: _id, profileId: _pid, ...rest }) => rest)
+
+    updateProfile({
+      skills: updatedCategories as any
+    })
+  }
+
+  const openAddDialog = () => {
+    setEditingCategory(null)
+    setIsDialogOpen(true)
+  }
+
+  const openEditDialog = (category: any) => {
+    setEditingCategory(category)
+    setIsDialogOpen(true)
   }
 
   return (
@@ -43,7 +93,13 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
       <div className="flex-1 space-y-8">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Skills</h3>
-          <Button variant="outline" size="sm" className="gap-2 border-border shadow-button" disabled={isSaving}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2 border-border shadow-button" 
+            disabled={isSaving || isUpdating}
+            onClick={openAddDialog}
+          >
             <Plus className="h-4 w-4" />
             Add category
           </Button>
@@ -51,20 +107,42 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
 
         <div className="space-y-8">
           {skillCategories.map((category) => (
-            <div key={category.id} className={cn("space-y-4", isSaving && "opacity-50")}>
-              <h4 className="font-semibold text-foreground font-heading">{category.category}</h4>
+            <div key={category.id} className={cn("space-y-4 group", (isSaving || isUpdating) && "opacity-50")}>
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold text-foreground font-heading">{category.category}</h4>
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                    onClick={() => openEditDialog(category)}
+                    disabled={isSaving || isUpdating}
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDeleteCategory(category.id!)}
+                    disabled={isSaving || isUpdating}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
               <div className="flex flex-wrap gap-2 items-center">
-                {category.skills.map((skill) => (
+                {category.skills.map((skill: string) => (
                   <Badge 
                     key={skill} 
                     variant="outline" 
-                    className="bg-card shadow-button border-border font-medium px-4 py-1.5 hover:bg-accent group transition-colors"
+                    className="bg-card shadow-button border-border font-medium px-4 py-1.5 hover:bg-accent group/skill transition-colors"
                   >
                     {skill}
                     <button 
-                      className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => removeSkill(category.id!, skill)}
-                      disabled={isSaving}
+                      className="ml-2 opacity-0 group-hover/skill:opacity-100 transition-opacity"
+                      onClick={() => removeSkill(category, skill)}
+                      disabled={isSaving || isUpdating}
                     >
                       <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
                     </button>
@@ -74,7 +152,8 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
                   variant="outline" 
                   size="sm" 
                   className="h-8 border-dashed border-border text-muted-foreground hover:text-foreground hover:border-solid gap-1 text-xs"
-                  disabled={isSaving}
+                  disabled={isSaving || isUpdating}
+                  onClick={() => openEditDialog(category)}
                 >
                   <Plus className="h-3 w-3" />
                   add
@@ -84,9 +163,17 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
           ))}
 
           {skillCategories.length === 0 && (
-            <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl text-muted-foreground font-body">
-              No skills added yet. Start by adding a category!
-            </div>
+            <Button 
+              variant="ghost" 
+              className="w-full border-2 border-dashed border-border py-12 rounded-2xl hover:bg-accent/50 text-muted-foreground font-medium transition-all group"
+              disabled={isSaving || isUpdating}
+              onClick={openAddDialog}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Plus className="h-6 w-6 group-hover:scale-110 transition-transform" />
+                <span>No skills added yet. Start by adding a category!</span>
+              </div>
+            </Button>
           )}
         </div>
       </div>
@@ -96,20 +183,27 @@ export function SkillsTab({ onPrev, onSave, isSaving, initialData }: SkillsTabPr
           variant="secondary" 
           onClick={onPrev}
           className="px-6 h-11 rounded-xl shadow-button flex items-center gap-2"
-          disabled={isSaving}
+          disabled={isSaving || isUpdating}
         >
           <span className="text-lg">←</span>
           Previous
         </Button>
         <Button 
-          onClick={() => onSave()}
+          onClick={onNext}
           className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2"
-          disabled={isSaving}
+          disabled={isSaving || isUpdating}
         >
-          {isSaving ? "Saving..." : "Save profile"}
-          {!isSaving && <span className="text-lg">✓</span>}
+          Next step
+          <span className="text-lg">→</span>
         </Button>
       </div>
+
+      <SkillDialog 
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSave={handleSaveCategory}
+        initialData={editingCategory}
+      />
     </div>
   )
 }
