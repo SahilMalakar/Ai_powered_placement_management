@@ -68,7 +68,8 @@ export const updateVerificationStatus = async (
 
 /**
  * Transactionally saves verified academic data extracted from documents.
- * Updates StudentProfile, SemesterResults, and User.isProfileCompleted.
+ * Updates StudentProfile and SemesterResults.
+ * (Note: isProfileCompleted is now handled separately by the student service)
  */
 export const saveVerifiedAcademicData = async (
     userId: number,
@@ -108,10 +109,32 @@ export const saveVerifiedAcademicData = async (
             })),
         });
 
-        // 3. Mark User Profile as Completed (since strictly dependent on VERIFIED status)
-        await tx.user.update({
-            where: { id: userId },
-            data: { isProfileCompleted: true },
+        return profile;
+    });
+};
+
+/**
+ * Transactionally resets the verification state of a student.
+ * Used when critical documents (SGPA marksheets) are deleted.
+ */
+export const resetVerificationState = async (userId: number) => {
+    return await prisma.$transaction(async (tx) => {
+        // 1. Reset Profile status and clear academic data
+        const profile = await tx.studentProfile.update({
+            where: { userId },
+            data: {
+                verificationStatus: VerificationStatus.NOT_VERIFIED,
+                verificationReason: 'Verification reset due to document deletion.',
+                astuRollNo: null,
+                cgpa: null,
+                backlog: false,
+                backlogSubjects: [],
+            },
+        });
+
+        // 2. Clear verified semester results
+        await tx.semesterResult.deleteMany({
+            where: { userId },
         });
 
         return profile;

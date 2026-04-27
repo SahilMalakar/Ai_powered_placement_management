@@ -11,6 +11,8 @@ import { HTTP_STATUS } from '../../../utils/httpStatus.js';
 // Controller to handle multi-field (Bulk) document uploads.
 export const uploadDocumentsController = asyncHandler(
     async (req: Request, res: Response) => {
+        console.log("body ", req.body)
+        console.log("files ", req.files)
         if (!req.user) {
             throw new BadRequestError('Unauthorized user session.');
         }

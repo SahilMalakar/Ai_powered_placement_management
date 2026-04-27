@@ -125,8 +125,7 @@ export const updateStudentProfile = async (
 
     const { isCompleted, processedData } = await prepareProfileData(
         userId,
-        mergedData as CreateProfileInput,
-        existing.profile.verificationStatus
+        mergedData as CreateProfileInput
     );
 
     // Persistence
@@ -169,11 +168,10 @@ export const createStudentProfileService = async (
         throw new ConflictError('Profile already exists use update instead');
     }
 
-    // Process data (Completion status) - New profiles are NOT_VERIFIED by default
+    // Process data (Completion status)
     const { isCompleted, processedData } = await prepareProfileData(
         userId,
-        studentData,
-        VerificationStatus.NOT_VERIFIED
+        studentData
     );
 
     // persistence via Transaction
@@ -203,8 +201,7 @@ export const createStudentProfileService = async (
 
 async function prepareProfileData(
     userId: number,
-    studentData: CreateProfileInput,
-    currentStatus: VerificationStatus
+    studentData: CreateProfileInput
 ) {
     const { ...allOtherData } = studentData;
 
@@ -228,9 +225,9 @@ async function prepareProfileData(
         return value !== null && value !== undefined && value !== '';
     });
 
-    // A profile is ONLY complete if basic fields are filled AND verification is successful
-    const isCompleted =
-        checklistMatched && currentStatus === VerificationStatus.VERIFIED;
+    // A profile is "Complete" (Basic Info) if mandatory fields are filled.
+    // Verification is now a separate state.
+    const isCompleted = checklistMatched;
 
     const processedData = {
         core: coreFields,

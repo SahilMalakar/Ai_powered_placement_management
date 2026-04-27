@@ -7,6 +7,7 @@ import {
     deleteDocumentRecord,
     findDocumentById,
 } from '../repositories/document.repository.js';
+import { resetVerificationState } from '../repositories/verification.repository.js';
 import { DocumentType } from '../../../prisma/generated/prisma/enums.js';
 import {
     BadRequestError,
@@ -74,6 +75,7 @@ export const deleteDocumentService = async (
     userId: number,
     documentId: number
 ) => {
+    console.log("documentId in service ", documentId)
     const doc = await findDocumentById(documentId);
     if (!doc) {
         throw new NotFoundError('Document not found.');
@@ -87,7 +89,14 @@ export const deleteDocumentService = async (
     // 1. Soft-delete from DB first
     await deleteDocumentRecord(documentId);
 
-    // 2. Cleanup from Cloudinary
+    // 2. Verification Integrity Check: If an SGPA document is deleted, reset the verification status.
+    // This forces the student to re-initiate verification if their evidence is removed.
+    if (doc.type === DocumentType.SGPA) {
+        console.log(`[Document Service] SGPA document deleted for user ${userId}. Resetting verification state.`);
+        await resetVerificationState(userId);
+    }
+
+    // 3. Cleanup from Cloudinary
     if (doc.publicId) {
         await deleteFromCloudinary(doc.publicId).catch((err) =>
             console.error(
