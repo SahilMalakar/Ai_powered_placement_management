@@ -15,7 +15,7 @@ const optionalUrlSchema = z
     .optional()
     .transform((val) => (val === '' ? undefined : val));
 
-const coreSchema = z.object({
+export const CreateProfileSchema = z.object({
     fullName: z.string().min(3, 'Full name must be at least 3 characters'),
     branch: z.enum(Branch, {
         message: 'Invalid branch',
@@ -23,16 +23,17 @@ const coreSchema = z.object({
     rollNo: z.string().min(1, 'Roll number is required'),
     dob: dateString,
     phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
+    university: z.string(),
+    degree: z.string(),
+    graduationYear: z.number().int(),
     summary: z.string().optional(),
-    university: z.string().optional(),
-    degree: z.string().optional(),
-    graduationYear: z.number().int().optional(),
-    // Restricted fields (added here only to trigger service-level errors)
-    backlog: z.any().optional(),
-    backlogSubjects: z.any().optional(),
-    astuRollNo: z.any().optional(),
-    verificationStatus: z.any().optional(),
-});
+}).strict();
+
+export const UpdateProfileSchema = CreateProfileSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
+
 
 export const semesterResultSchema = z.object({
     semester: z.number().min(1).max(8),
@@ -41,18 +42,23 @@ export const semesterResultSchema = z.object({
 
 const socialLinkSchema = z.object({
     platform: z.string(),
-    url: z.string().url('Invalid URL').or(z.literal('')),
+    url: z.url('Invalid URL').or(z.literal('')),
 });
 
-const experienceSchema = z.object({
-    role: z.string(),
-    company: z.string(),
+export const experienceSchema = z.object({
+    role: z.string().min(1, 'Role is required'),
+    company: z.string().min(1, 'Company is required'),
     location: z.string().optional(),
     startDate: dateString,
     endDate: dateString.optional(),
-    description: z.array(z.string()),
+    description: z.array(z.string()).min(1, 'Description is required'),
     toolsUsed: z.string().optional(),
-});
+}).strict();
+
+export const updateExperienceSchema = experienceSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
 
 const projectSchema = z.object({
     title: z.string(),
@@ -75,36 +81,15 @@ const additionalDetailSchema = z.object({
     date: dateString.optional(),
 });
 
-export const createProfileSchema = z.object({
-    core: coreSchema,
-    socialLinks: z.array(socialLinkSchema).optional(),
-    experiences: z.array(experienceSchema).optional(),
-    projects: z.array(projectSchema).optional(),
-    skills: z.array(skillSchema).optional(),
-    additionalDetails: z.array(additionalDetailSchema).optional(),
-    semesterResults: z.array(semesterResultSchema).optional(),
-});
 
-// Schema for partial updates ensures that individual fields can be updated without providing the full object
-export const updateProfileSchema = z
-    .object({
-        core: coreSchema.partial(),
-        socialLinks: z.array(socialLinkSchema).optional(),
-        experiences: z.array(experienceSchema).optional(),
-        projects: z.array(projectSchema).optional(),
-        skills: z.array(skillSchema).optional(),
-        additionalDetails: z.array(additionalDetailSchema).optional(),
-        semesterResults: z.array(z.any()).optional(),
-    })
-    .partial();
+export type CreateProfileInput = z.infer<typeof CreateProfileSchema>;
+export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
 
-export type CreateProfileInput = z.infer<typeof createProfileSchema>;
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
-
-export type CoreProfile = z.infer<typeof coreSchema>;
+// export type CoreProfile = z.infer<typeof coreSchema>;
 export type SemesterResultInput = z.infer<typeof semesterResultSchema>;
 export type SocialLinkInput = z.infer<typeof socialLinkSchema>;
 export type ExperienceInput = z.infer<typeof experienceSchema>;
+export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>;
 export type ProjectInput = z.infer<typeof projectSchema>;
 export type SkillInput = z.infer<typeof skillSchema>;
 export type AdditionalDetailInput = z.infer<typeof additionalDetailSchema>;

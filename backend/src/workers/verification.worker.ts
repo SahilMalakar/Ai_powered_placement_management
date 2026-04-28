@@ -4,7 +4,7 @@ import {
     VERIFICATION_QUEUE_NAME,
     type VerificationJobPayload,
 } from '../queues/verification.queue.js';
-import { findProfileByUserId } from '../modules/students/repositories/student.repository.js';
+import {  getProfileRepo } from '../modules/students/repositories/student.repository.js';
 import {
     getStudentSgpaDocuments,
     updateVerificationStatus,
@@ -43,7 +43,7 @@ export const initializeVerificationWorker = async () => {
             try {
                 // 1. Fetch source documents
                 const [profile, sgpaDocs] = await Promise.all([
-                    findProfileByUserId(userId),
+                    getProfileRepo(userId),
                     getStudentSgpaDocuments(userId),
                 ]);
 

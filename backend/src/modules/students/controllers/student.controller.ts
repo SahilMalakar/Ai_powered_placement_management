@@ -5,7 +5,7 @@ import { HTTP_STATUS } from '../../../utils/httpStatus.js';
 import {
     createStudentProfileService,
     getStudentProfileService,
-    updateStudentProfile,
+    updateStudentProfileService,
 } from '../services/student.service.js';
 
 //  Returns the full merged data: User + Profile + Relations + Semesters
@@ -43,13 +43,13 @@ export const createStudentProfileController = asyncHandler(async (req, res) => {
     );
 });
 
-export const updateProfileController = asyncHandler(async (req, res) => {
+export const updateStudentProfileController = asyncHandler(async (req, res) => {
     if (!req.user) {
         throw new UnauthorizedError('Unauthorized');
     }
 
     const userId = req.user.userId;
-    const result = await updateStudentProfile(userId, req.body);
+    const result = await updateStudentProfileService(userId, req.body);
 
     return sendSuccess(
         res,

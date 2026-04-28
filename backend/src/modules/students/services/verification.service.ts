@@ -3,7 +3,7 @@ import {
     updateVerificationStatus,
     transitionToProcessing,
 } from '../repositories/verification.repository.js';
-import { findProfileByUserId } from '../repositories/student.repository.js';
+import { getProfileRepo } from '../repositories/student.repository.js';
 import { addVerificationJob } from '../../../queues/verification.queue.js';
 import {
     BadRequestError,
@@ -18,7 +18,7 @@ import { VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
  */
 export const initiateVerificationService = async (userId: number) => {
     // 1. Check if user profile exists
-    const profile = await findProfileByUserId(userId);
+    const profile = await getProfileRepo(userId);
     if (!profile) throw new NotFoundError('Student profile not found.');
 
     // 2 & 4. Atomic Idempotency & Status Update (via Repository)
