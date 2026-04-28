@@ -36,7 +36,7 @@ experienceRouter.use(authMiddleware, requireStudent);
  *       404:
  *         description: Profile not found
  */
-experienceRouter.get("/", getExperiencesController);
+experienceRouter.get("/experiences", getExperiencesController);
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ experienceRouter.get("/", getExperiencesController);
  *       404:
  *         description: Profile not found
  */
-experienceRouter.post("/", validateRequest(experienceSchema), addExperienceController);
+experienceRouter.post("/experiences", validateRequest(experienceSchema), addExperienceController);
 
 /**
  * @swagger
@@ -116,7 +116,7 @@ experienceRouter.post("/", validateRequest(experienceSchema), addExperienceContr
  *       404:
  *         description: Experience not found
  */
-experienceRouter.patch("/:id", validateRequest(updateExperienceSchema), updateExperienceController);
+experienceRouter.patch("/experiences/:id", validateRequest(updateExperienceSchema), updateExperienceController);
 
 /**
  * @swagger
@@ -142,6 +142,6 @@ experienceRouter.patch("/:id", validateRequest(updateExperienceSchema), updateEx
  *       404:
  *         description: Experience not found
  */
-experienceRouter.delete("/:id", deleteExperienceController);
+experienceRouter.delete("/experiences/:id", deleteExperienceController);
 
 export { experienceRouter };

@@ -7,8 +7,6 @@ export async function invalidateCache(...keys: string[]) {
     await Promise.all(keys.map((key) => cacheClient.del(key)));
 }
 
-
-// Invalidates the student's core profile cache and session cache.
 export async function invalidateStudentCache(userId: number) {
     await invalidateCache(
         CACHE_KEYS.STUDENT_CORE(userId),
@@ -16,8 +14,22 @@ export async function invalidateStudentCache(userId: number) {
     );
 }
 
-
-// Invalidates the student's experience cache.
 export async function invalidateExperienceCache(userId: number) {
     await invalidateCache(CACHE_KEYS.STUDENT_EXPERIENCES(userId));
+}
+
+export async function invalidateSocialLinkCache(userId: number) {
+    await invalidateCache(CACHE_KEYS.STUDENT_SOCIALLINKS(userId));
+}
+
+export async function invalidateProjectCache(userId: number) {
+    await invalidateCache(CACHE_KEYS.STUDENT_PROJECTS(userId));
+}
+
+export async function invalidateSkillCache(userId: number) {
+    await invalidateCache(CACHE_KEYS.STUDENT_SKILLS(userId));
+}
+
+export async function invalidateAdditionalDetailCache(userId: number) {
+    await invalidateCache(CACHE_KEYS.STUDENT_ADDITIONAL_DETAILS(userId));
 }

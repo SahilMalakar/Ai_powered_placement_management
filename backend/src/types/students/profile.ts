@@ -34,17 +34,6 @@ export const UpdateProfileSchema = CreateProfileSchema.partial().strict().refine
     { message: "At least one field must be provided for update" }
 );
 
-
-export const semesterResultSchema = z.object({
-    semester: z.number().min(1).max(8),
-    sgpa: z.number().min(0).max(10),
-});
-
-const socialLinkSchema = z.object({
-    platform: z.string(),
-    url: z.url('Invalid URL').or(z.literal('')),
-});
-
 export const experienceSchema = z.object({
     role: z.string().min(1, 'Role is required'),
     company: z.string().min(1, 'Company is required'),
@@ -60,25 +49,55 @@ export const updateExperienceSchema = experienceSchema.partial().strict().refine
     { message: "At least one field must be provided for update" }
 );
 
-const projectSchema = z.object({
-    title: z.string(),
-    description: z.array(z.string()), // Updated to array of bullets
+export const projectSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    description: z.array(z.string()).min(1, "Description is required"), // Updated to array of bullets
     link: optionalUrlSchema,
     secondaryLink: optionalUrlSchema,
     keyTools: z.string().optional(), // Replaced techStack with keyTools
     startDate: dateString.optional(),
     endDate: dateString.optional(),
-});
+}).strict();
 
-const skillSchema = z.object({
-    category: z.string(), // e.g. "Languages"
-    skills: z.array(z.string()), // e.g. ["JS", "TS"]
-});
+export const updateProjectSchema = projectSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
 
-const additionalDetailSchema = z.object({
-    title: z.string(), // e.g. "OpenSource Contribution"
-    description: z.array(z.string()), // Detailed bullets
+export const socialLinkSchema = z.object({
+    platform: z.string().min(1, "Platform is required"),
+    url: z.url('Invalid URL').or(z.literal('')),
+}).strict();
+
+export const updateSocialLinkSchema = socialLinkSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
+
+export const skillSchema = z.object({
+    category: z.string().min(1, "Category is required"), // e.g. "Languages"
+    skills: z.array(z.string()).min(1, "At least one skill is required"), // e.g. ["JS", "TS"]
+}).strict();
+
+export const updateSkillSchema = skillSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
+
+export const additionalDetailSchema = z.object({
+    title: z.string().min(1, "Title is required"), // e.g. "OpenSource Contribution"
+    description: z.array(z.string()).min(1, "Description is required"), // Detailed bullets
     date: dateString.optional(),
+}).strict();
+
+export const updateAdditionalDetailSchema = additionalDetailSchema.partial().strict().refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided for update" }
+);
+
+export const semesterResultSchema = z.object({
+    semester: z.number().min(1).max(8),
+    sgpa: z.number().min(0).max(10),
 });
 
 
@@ -88,8 +107,12 @@ export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
 // export type CoreProfile = z.infer<typeof coreSchema>;
 export type SemesterResultInput = z.infer<typeof semesterResultSchema>;
 export type SocialLinkInput = z.infer<typeof socialLinkSchema>;
+export type UpdateSocialLinkInput = z.infer<typeof updateSocialLinkSchema>;
 export type ExperienceInput = z.infer<typeof experienceSchema>;
 export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>;
 export type ProjectInput = z.infer<typeof projectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type SkillInput = z.infer<typeof skillSchema>;
+export type UpdateSkillInput = z.infer<typeof updateSkillSchema>;
 export type AdditionalDetailInput = z.infer<typeof additionalDetailSchema>;
+export type UpdateAdditionalDetailInput = z.infer<typeof updateAdditionalDetailSchema>;
