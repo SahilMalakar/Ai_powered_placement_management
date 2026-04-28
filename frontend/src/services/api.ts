@@ -13,20 +13,31 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-    
+
 // Request interceptor for logging
 api.interceptors.request.use((config) => {
-  console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+  const method = config.method?.toUpperCase();
+  const url = config.url;
+  console.log(`%c🚀 API [REQUEST]: ${method} ${url}`, "color: #818cf8; font-weight: bold;");
   return config;
 });
 
-// Response interceptor to handle global errors like 401
+// Response interceptor to handle global errors and logging
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const { method, url } = response.config;
+    const status = response.status;
+    console.log(`%c✅ API [SUCCESS]: ${method?.toUpperCase()} ${url} (${status})`, "color: #1D9E75; font-weight: bold;");
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // Don't redirect for /auth/me — it's expected to 401 for guests
-      const requestUrl = error.config?.url || '';
+    const { method, url } = error.config || {};
+    const status = error.response?.status;
+    const message = error.response?.data?.message || error.message;
+    console.log(`%c❌ API [ERROR]: ${method?.toUpperCase()} ${url} (${status}) - ${message}`, "color: #E24B4A; font-weight: bold;");
+
+    if (status === 401) {
+      const requestUrl = url || '';
       if (!requestUrl.includes('/auth/me') && typeof window !== 'undefined') {
         window.location.href = '/login';
       }

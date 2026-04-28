@@ -69,8 +69,11 @@ export const getExperiencesService = async (userId: number) => {
     // check cache first
     const cached = await cacheClient.get(cacheKey);
     if (cached) {
+        console.log(`🎯 Cache HIT: ${cacheKey}`);
         return JSON.parse(cached);
     }
+
+    console.log(`⚪ Cache MISS: ${cacheKey}`);
 
     const profile = await getProfileRepo(userId);
     if (!profile) throw new NotFoundError("Profile not found.");

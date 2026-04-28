@@ -1,12 +1,12 @@
 import { useState } from "react"
-import { useProfile } from "@/hooks/student/use-profile"
-import { useUpdateProfile } from "@/hooks/student/use-update-profile"
+import { useAdditionalDetails, useAddAdditionalDetail, useUpdateAdditionalDetail, useDeleteAdditionalDetail } from "@/hooks/student/use-additional-details"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AdditionalDetailDialog } from "./additional-detail-dialog"
+import { AdditionalDetail } from "@/types/profile"
 
 interface AdditionalDetailsTabProps {
   onPrev: () => void
@@ -15,12 +15,16 @@ interface AdditionalDetailsTabProps {
   initialData?: any
 }
 
-export function AdditionalDetailsTab({ onPrev, onSave, isSaving, initialData }: AdditionalDetailsTabProps) {
-  const { data: profileData, isLoading } = useProfile()
-  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile()
+export function AdditionalDetailsTab({ onPrev, onSave, isSaving: isSavingProp }: AdditionalDetailsTabProps) {
+  const { data: additionalDetailsData, isLoading } = useAdditionalDetails()
+  const { mutate: addDetail, isPending: isAdding } = useAddAdditionalDetail()
+  const { mutate: updateDetail, isPending: isUpdating } = useUpdateAdditionalDetail()
+  const { mutate: deleteDetail, isPending: isDeleting } = useDeleteAdditionalDetail()
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingDetail, setEditingDetail] = useState<any>(null)
+  const [editingDetail, setEditingDetail] = useState<AdditionalDetail | null>(null)
+
+  const isSaving = isAdding || isUpdating || isDeleting || isSavingProp
 
   if (isLoading) {
     return (
@@ -32,43 +36,22 @@ export function AdditionalDetailsTab({ onPrev, onSave, isSaving, initialData }: 
     )
   }
 
-  const additionalDetails = profileData?.profile?.additionalDetails || []
+  const additionalDetails = additionalDetailsData || []
 
   const handleSaveDetail = (data: any) => {
-    let updatedDetails: any[]
-    
     if (editingDetail) {
-      updatedDetails = additionalDetails.map((d) => 
-        d.id === editingDetail.id ? { ...data } : { ...d }
-      )
+      updateDetail({ id: editingDetail.id, data }, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     } else {
-      updatedDetails = [...additionalDetails, data]
+      addDetail(data, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     }
-
-    // Clean up for backend
-    const cleanedDetails = updatedDetails.map(({ id: _id, profileId: _pid, ...rest }) => {
-      const cleaned: any = { ...rest }
-      if (cleaned.date === null || cleaned.date === "") cleaned.date = undefined
-      return cleaned
-    })
-
-    updateProfile({
-      additionalDetails: cleanedDetails as any
-    })
   }
 
   const handleDeleteDetail = (id: number) => {
-    const updatedDetails = additionalDetails
-      .filter(d => d.id !== id)
-      .map(({ id: _id, profileId: _pid, ...rest }) => {
-        const cleaned: any = { ...rest }
-        if (cleaned.date === null || cleaned.date === "") cleaned.date = undefined
-        return cleaned
-      })
-
-    updateProfile({
-      additionalDetails: updatedDetails as any
-    })
+    deleteDetail(id)
   }
 
   const openAddDialog = () => {
@@ -76,7 +59,7 @@ export function AdditionalDetailsTab({ onPrev, onSave, isSaving, initialData }: 
     setIsDialogOpen(true)
   }
 
-  const openEditDialog = (detail: any) => {
+  const openEditDialog = (detail: AdditionalDetail) => {
     setEditingDetail(detail)
     setIsDialogOpen(true)
   }
@@ -162,23 +145,15 @@ export function AdditionalDetailsTab({ onPrev, onSave, isSaving, initialData }: 
         </div>
       </div>
 
-      <div className="flex justify-between items-center pt-8 border-t border-border mt-auto">
+      <div className="flex justify-start items-center pt-8 border-t border-border mt-auto">
         <Button 
           variant="secondary" 
           onClick={onPrev}
-          className="px-6 h-11 rounded-xl shadow-button flex items-center gap-2"
+          className="px-5 h-9 rounded-xl shadow-button flex items-center gap-2"
           disabled={isSaving || isUpdating}
         >
           <span className="text-lg">←</span>
           Previous
-        </Button>
-        <Button 
-          onClick={() => onSave()}
-          className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2"
-          disabled={isSaving || isUpdating}
-        >
-          {isSaving ? "Saving..." : "Save profile"}
-          {!isSaving && <Check className="h-4 w-4" />}
         </Button>
       </div>
 

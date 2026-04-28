@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
 
+
 function Calendar({
   className,
   classNames,
@@ -73,11 +74,11 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "relative rounded-(--cell-radius)",
+          "relative rounded-md border border-border bg-card px-2 py-0.5 hover:bg-accent/50 transition-colors cursor-pointer",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(
-          "absolute inset-0 bg-popover opacity-0",
+          "hidden",
           defaultClassNames.dropdown
         ),
         caption_label: cn(
@@ -144,6 +145,75 @@ function Calendar({
             />
           )
         },
+        Dropdown: ({ value, onChange, options, ...props }) => {
+          const [open, setOpen] = React.useState(false)
+          const listRef = React.useRef<HTMLDivElement>(null)
+          const containerRef = React.useRef<HTMLDivElement>(null)
+          const selected = options?.find((o) => o.value === value)
+
+          // Close on outside click
+          React.useEffect(() => {
+            if (!open) return
+            const handler = (e: MouseEvent) => {
+              if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setOpen(false)
+              }
+            }
+            document.addEventListener("mousedown", handler)
+            return () => document.removeEventListener("mousedown", handler)
+          }, [open])
+
+          // Scroll to selected item when opened
+          React.useEffect(() => {
+            if (open && listRef.current) {
+              const active = listRef.current.querySelector("[data-active]") as HTMLElement
+              if (active) {
+                active.scrollIntoView({ block: "center" })
+              }
+            }
+          }, [open])
+
+          return (
+            <div ref={containerRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setOpen(!open)}
+                className="flex items-center gap-1 h-7 rounded-md border border-border bg-card px-2.5 text-sm font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                {selected?.label}
+                <ChevronDownIcon className={cn("size-3 text-muted-foreground transition-transform", open && "rotate-180")} />
+              </button>
+              {open && (
+                <div
+                  ref={listRef}
+                  className="absolute z-50 top-full mt-1 left-0 min-w-[100%] max-h-[180px] overflow-y-auto rounded-lg border border-border bg-card shadow-lg py-1 scrollbar-thin"
+                >
+                  {options?.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      data-active={option.value === value ? true : undefined}
+                      onClick={() => {
+                        const event = { target: { value: option.value.toString() } } as any
+                        onChange?.(event)
+                        setOpen(false)
+                      }}
+                      className={cn(
+                        "block w-full text-left px-3 py-1.5 text-xs cursor-pointer transition-colors hover:bg-accent",
+                        option.value === value
+                          ? "bg-primary/10 text-primary font-semibold"
+                          : "text-foreground"
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        },
+
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (

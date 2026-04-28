@@ -45,6 +45,7 @@ export const getExperiencesController = asyncHandler(async (req, res) => {
     if (!req.user){
          throw new UnauthorizedError("Unauthorized");
     }
+    console.log(`🔍 Fetching experiences for userId: ${req.user.userId}`);
     const result = await getExperiencesService(req.user.userId);
     return sendSuccess(res, result, "Experiences fetched successfully", HTTP_STATUS.OK);
 });

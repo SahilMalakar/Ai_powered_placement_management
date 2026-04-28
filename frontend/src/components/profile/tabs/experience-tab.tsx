@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { useProfile } from "@/hooks/student/use-profile"
-import { useUpdateProfile } from "@/hooks/student/use-update-profile"
+import { useExperiences, useAddExperience, useUpdateExperience, useDeleteExperience } from "@/hooks/student/use-experiences"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ExperienceDialog } from "./experience-dialog"
+import { Experience } from "@/types/profile"
 
 interface ExperienceTabProps {
   onNext: () => void
@@ -15,12 +15,16 @@ interface ExperienceTabProps {
   initialData?: any
 }
 
-export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProps) {
-  const { data: profileData, isLoading } = useProfile()
-  const { mutate: updateProfile, isPending } = useUpdateProfile()
+export function ExperienceTab({ onNext, onPrev }: ExperienceTabProps) {
+  const { data: experiencesData, isLoading } = useExperiences()
+  const { mutate: addExperience, isPending: isAdding } = useAddExperience()
+  const { mutate: updateExperience, isPending: isUpdating } = useUpdateExperience()
+  const { mutate: deleteExperience, isPending: isDeleting } = useDeleteExperience()
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingExperience, setEditingExperience] = useState<any>(null)
+  const [editingExperience, setEditingExperience] = useState<Experience | null>(null)
+
+  const isPending = isAdding || isUpdating || isDeleting
 
   if (isLoading) {
     return (
@@ -32,50 +36,22 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
     )
   }
 
-  const experiences = profileData?.profile?.experiences || []
+  const experiences = experiencesData || []
 
   const handleSave = (data: any) => {
-    let updatedExperiences: any[]
-    
     if (editingExperience) {
-      // Update existing
-      updatedExperiences = experiences.map((exp) => 
-        exp.id === editingExperience.id ? { ...data } : { ...exp }
-      )
+      updateExperience({ id: editingExperience.id, data }, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     } else {
-      // Add new
-      updatedExperiences = [...experiences, data]
+      addExperience(data, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     }
-
-    // Clean up for backend (remove id, profileId, and convert nulls to undefined)
-    const cleanedExperiences = updatedExperiences.map(({ id: _id, profileId: _pid, ...rest }) => {
-      const cleaned: any = { ...rest }
-      // Backend Zod schema is strict about nulls for optional strings
-      if (cleaned.location === null) cleaned.location = undefined
-      if (cleaned.toolsUsed === null) cleaned.toolsUsed = undefined
-      if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
-      return cleaned
-    })
-
-    updateProfile({
-      experiences: cleanedExperiences as any
-    })
   }
 
   const handleDelete = (id: number) => {
-    const updatedExperiences = experiences
-      .filter(exp => exp.id !== id)
-      .map(({ id: _id, profileId: _pid, ...rest }) => {
-        const cleaned: any = { ...rest }
-        if (cleaned.location === null) cleaned.location = undefined
-        if (cleaned.toolsUsed === null) cleaned.toolsUsed = undefined
-        if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
-        return cleaned
-      })
-
-    updateProfile({
-      experiences: updatedExperiences as any
-    })
+    deleteExperience(id)
   }
 
   const openAddDialog = () => {
@@ -83,7 +59,7 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
     setIsDialogOpen(true)
   }
 
-  const openEditDialog = (exp: any) => {
+  const openEditDialog = (exp: Experience) => {
     setEditingExperience(exp)
     setIsDialogOpen(true)
   }
@@ -180,16 +156,16 @@ export function ExperienceTab({ onNext, onPrev, initialData }: ExperienceTabProp
         <Button 
           variant="secondary" 
           onClick={onPrev}
-          className="px-6 h-11 rounded-xl shadow-button flex items-center gap-2"
+          className="px-5 h-9 rounded-xl shadow-button flex items-center gap-2"
         >
           <span className="text-lg">←</span>
           Previous
         </Button>
         <Button 
           onClick={onNext}
-          className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2"
+          className="btn-primary px-7 h-9 rounded-xl shadow-button flex items-center gap-2"
         >
-          Next step
+          Next
           <span className="text-lg">→</span>
         </Button>
       </div>

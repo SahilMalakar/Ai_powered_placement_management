@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
 
 const projectSchema = z.object({
   title: z.string().min(2, "Title is required"),
@@ -171,10 +172,14 @@ export function ProjectDialog({
                 control={form.control}
                 name="startDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start Date (Optional)</FormLabel>
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="mb-2">Start Date (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        placeholder="Select start date"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -184,11 +189,16 @@ export function ProjectDialog({
                 control={form.control}
                 name="endDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End Date (Optional)</FormLabel>
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="mb-2">End Date (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        placeholder="Select end date"
+                      />
                     </FormControl>
+                    {!field.value && <p className="text-[10px] text-muted-foreground mt-1">Leave blank if currently working</p>}
                     <FormMessage />
                   </FormItem>
                 )}

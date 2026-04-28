@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import axios from "axios"
@@ -27,6 +27,7 @@ type AuthFormValues = z.infer<typeof authSchema>
 
 export function useAuth() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const setAuthenticated = useAppStore((state) => state.setAuthenticated)
 
   const loginMutation = useMutation({
@@ -35,6 +36,7 @@ export function useAuth() {
       return response.data
     },
     onSuccess: () => {
+      queryClient.clear()
       setAuthenticated(true)
       toast.success("Login successful!")
       router.replace("/dashboard")
@@ -54,6 +56,7 @@ export function useAuth() {
       return response.data
     },
     onSuccess: () => {
+      queryClient.clear()
       setAuthenticated(true)
       toast.success("Signup successful!")
       router.replace("/dashboard")

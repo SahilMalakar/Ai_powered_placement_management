@@ -124,7 +124,7 @@ export function DocumentsTab() {
       <div className="pt-4">
         <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Other Certificates</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {documents?.other.map((doc: any) => (
+          {(documents?.other || []).map((doc: any) => (
             <div key={doc.id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-card shadow-card transition-all">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">

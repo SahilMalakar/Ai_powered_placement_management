@@ -1,12 +1,12 @@
 import { useState } from "react"
+import { useProjects, useAddProject, useUpdateProject, useDeleteProject } from "@/hooks/student/use-projects"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, ExternalLink, GitFork } from "lucide-react"
-import { useProfile } from "@/hooks/student/use-profile"
-import { useUpdateProfile } from "@/hooks/student/use-update-profile"
-import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { ProjectDialog } from "./project-dialog"
+import { Project } from "@/types/profile"
 
 interface ProjectsTabProps {
   onNext: () => void
@@ -14,12 +14,16 @@ interface ProjectsTabProps {
   initialData?: any
 }
 
-export function ProjectsTab({ onNext, onPrev, initialData }: ProjectsTabProps) {
-  const { data: profileData, isLoading } = useProfile()
-  const { mutate: updateProfile, isPending } = useUpdateProfile()
+export function ProjectsTab({ onNext, onPrev }: ProjectsTabProps) {
+  const { data: projectsData, isLoading } = useProjects()
+  const { mutate: addProject, isPending: isAdding } = useAddProject()
+  const { mutate: updateProject, isPending: isUpdating } = useUpdateProject()
+  const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject()
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingProject, setEditingProject] = useState<any>(null)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+
+  const isPending = isAdding || isUpdating || isDeleting
 
   if (isLoading) {
     return (
@@ -31,51 +35,22 @@ export function ProjectsTab({ onNext, onPrev, initialData }: ProjectsTabProps) {
     )
   }
 
-  const projects = profileData?.profile?.projects || []
+  const projects = projectsData || []
 
   const handleSave = (data: any) => {
-    let updatedProjects: any[]
-    
     if (editingProject) {
-      updatedProjects = projects.map((p) => 
-        p.id === editingProject.id ? { ...data } : { ...p }
-      )
+      updateProject({ id: editingProject.id, data }, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     } else {
-      updatedProjects = [...projects, data]
+      addProject(data, {
+        onSuccess: () => setIsDialogOpen(false)
+      })
     }
-
-    // Clean up for backend
-    const cleanedProjects = updatedProjects.map(({ id: _id, profileId: _pid, ...rest }) => {
-      const cleaned: any = { ...rest }
-      if (cleaned.link === null || cleaned.link === "") cleaned.link = undefined
-      if (cleaned.secondaryLink === null || cleaned.secondaryLink === "") cleaned.secondaryLink = undefined
-      if (cleaned.startDate === null || cleaned.startDate === "") cleaned.startDate = undefined
-      if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
-      if (cleaned.keyTools === null) cleaned.keyTools = undefined
-      return cleaned
-    })
-
-    updateProfile({
-      projects: cleanedProjects as any
-    })
   }
 
   const handleDelete = (id: number) => {
-    const updatedProjects = projects
-      .filter(p => p.id !== id)
-      .map(({ id: _id, profileId: _pid, ...rest }) => {
-        const cleaned: any = { ...rest }
-        if (cleaned.link === null || cleaned.link === "") cleaned.link = undefined
-        if (cleaned.secondaryLink === null || cleaned.secondaryLink === "") cleaned.secondaryLink = undefined
-        if (cleaned.startDate === null || cleaned.startDate === "") cleaned.startDate = undefined
-        if (cleaned.endDate === null || cleaned.endDate === "") cleaned.endDate = undefined
-        if (cleaned.keyTools === null) cleaned.keyTools = undefined
-        return cleaned
-      })
-
-    updateProfile({
-      projects: updatedProjects as any
-    })
+    deleteProject(id)
   }
 
   const openAddDialog = () => {
@@ -83,7 +58,7 @@ export function ProjectsTab({ onNext, onPrev, initialData }: ProjectsTabProps) {
     setIsDialogOpen(true)
   }
 
-  const openEditDialog = (project: any) => {
+  const openEditDialog = (project: Project) => {
     setEditingProject(project)
     setIsDialogOpen(true)
   }
@@ -195,16 +170,16 @@ export function ProjectsTab({ onNext, onPrev, initialData }: ProjectsTabProps) {
         <Button 
           variant="secondary" 
           onClick={onPrev}
-          className="px-6 h-11 rounded-xl shadow-button flex items-center gap-2"
+          className="px-5 h-9 rounded-xl shadow-button flex items-center gap-2"
         >
           <span className="text-lg">←</span>
           Previous
         </Button>
         <Button 
           onClick={onNext}
-          className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2"
+          className="btn-primary px-7 h-9 rounded-xl shadow-button flex items-center gap-2"
         >
-          Next step
+          Next
           <span className="text-lg">→</span>
         </Button>
       </div>

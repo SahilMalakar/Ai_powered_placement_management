@@ -26,6 +26,7 @@ import {
 import { useProfile } from "@/hooks/student/use-profile"
 import { useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { DatePicker } from "@/components/ui/date-picker"
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name too short"),
@@ -37,17 +38,16 @@ const profileSchema = z.object({
   degree: z.string().optional(),
   graduationYear: z.string().optional(),
   summary: z.string().optional(),
-  linkedin: z.string().url().or(z.literal("")).optional(),
-  github: z.string().url().or(z.literal("")).optional(),
-  portfolio: z.string().url().or(z.literal("")).optional(),
 })
 
 interface CoreInfoTabProps {
   onNext: (data: any) => void
+  onSave: (data?: any) => void
   initialData?: any
+  isSaving?: boolean
 }
 
-export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
+export function CoreInfoTab({ onNext, onSave, initialData, isSaving }: CoreInfoTabProps) {
   const { data: profileData, isLoading } = useProfile()
 
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -62,9 +62,6 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
       degree: "",
       graduationYear: "",
       summary: "",
-      linkedin: "",
-      github: "",
-      portfolio: "",
     },
   })
 
@@ -72,7 +69,13 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
   useEffect(() => {
     const p = profileData?.profile
     const sessionCore = initialData?.core || initialData
-    const sessionSocial = initialData?.socialLinks
+    
+    console.log("🛠️ CoreInfoTab Effect:", { 
+      hasProfileData: !!profileData, 
+      hasProfile: !!p, 
+      profileName: p?.fullName,
+      sessionName: sessionCore?.fullName 
+    });
 
     form.reset({
       fullName: sessionCore?.fullName || p?.fullName || "",
@@ -86,19 +89,10 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
       degree: sessionCore?.degree || p?.degree || "",
       graduationYear: sessionCore?.graduationYear?.toString() || p?.graduationYear?.toString() || "",
       summary: sessionCore?.summary || p?.summary || "",
-      linkedin: sessionSocial?.find((l: any) => l.platform === "LinkedIn")?.url || p?.socialLinks?.find(l => l.platform === "LinkedIn")?.url || "",
-      github: sessionSocial?.find((l: any) => l.platform === "GitHub")?.url || p?.socialLinks?.find(l => l.platform === "GitHub")?.url || "",
-      portfolio: sessionSocial?.find((l: any) => l.platform === "Portfolio")?.url || p?.socialLinks?.find(l => l.platform === "Portfolio")?.url || "",
     })
   }, [profileData, initialData, form])
 
   function onSubmit(values: z.infer<typeof profileSchema>) {
-    const socialLinks = [
-      { platform: "LinkedIn", url: values.linkedin || "" },
-      { platform: "GitHub", url: values.github || "" },
-      { platform: "Portfolio", url: values.portfolio || "" },
-    ].filter(link => link.url !== "")
-
     const coreData = {
       fullName: values.fullName,
       phoneNumber: values.phoneNumber,
@@ -111,7 +105,23 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
       summary: values.summary,
     }
 
-    onNext({ core: coreData, socialLinks })
+    onNext(coreData)
+  }
+
+  const handleManualSave = () => {
+    const values = form.getValues()
+    const coreData = {
+      fullName: values.fullName,
+      phoneNumber: values.phoneNumber,
+      branch: values.branch as any,
+      rollNo: values.rollNo,
+      dob: values.dob,
+      university: values.university,
+      degree: values.degree,
+      graduationYear: values.graduationYear ? parseInt(values.graduationYear) : undefined,
+      summary: values.summary,
+    }
+    onSave(coreData)
   }
 
   if (isLoading) {
@@ -190,20 +200,25 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
                 <FormLabel className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Branch</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="bg-background/50">
+                    <SelectTrigger className="w-full h-8 bg-background/50 border-input rounded-lg px-3 shadow-sm hover:border-ring/40 transition-all text-sm">
                       <SelectValue placeholder="Select branch" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="CSE">Computer Science (CSE)</SelectItem>
-                    <SelectItem value="ETE">Electronics & Telecommunication (ETE)</SelectItem>
-                    <SelectItem value="EE">Electrical Engineering (EE)</SelectItem>
-                    <SelectItem value="ME">Mechanical Engineering (ME)</SelectItem>
-                    <SelectItem value="IE">Instrumentation Engineering (IE)</SelectItem>
-                    <SelectItem value="CE">Civil Engineering (CE)</SelectItem>
-                    <SelectItem value="CHE">Chemical Engineering (CHE)</SelectItem>
-                    <SelectItem value="IPE">Industrial & Production Engineering (IPE)</SelectItem>
-                    <SelectItem value="MCA">Master of Computer Applications (MCA)</SelectItem>
+                  <SelectContent 
+                    className="bg-card border-border shadow-modal rounded-xl p-1 z-50"
+                    alignItemWithTrigger={false}
+                    side="bottom"
+                    sideOffset={6}
+                  >
+                    <SelectItem value="CSE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">CSE</SelectItem>
+                    <SelectItem value="ETE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">ETE</SelectItem>
+                    <SelectItem value="EE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">EE</SelectItem>
+                    <SelectItem value="ME" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">ME</SelectItem>
+                    <SelectItem value="IE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">IE</SelectItem>
+                    <SelectItem value="CE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">CE</SelectItem>
+                    <SelectItem value="CHE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">CHE</SelectItem>
+                    <SelectItem value="IPE" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">IPE</SelectItem>
+                    <SelectItem value="MCA" className="rounded-md py-2.5 px-3 cursor-pointer hover:bg-accent/60 transition-colors text-sm">MCA</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -229,10 +244,14 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
             control={form.control}
             name="dob"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Date of birth</FormLabel>
+              <FormItem className="flex flex-col">
+                <FormLabel className="text-muted-foreground text-xs uppercase tracking-wider font-semibold mb-2">Date of birth</FormLabel>
                 <FormControl>
-                  <Input type="date" className="bg-background/50" {...field} />
+                  <DatePicker 
+                    value={field.value} 
+                    onChange={field.onChange} 
+                    placeholder="Select DOB"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -298,54 +317,19 @@ export function CoreInfoTab({ onNext, initialData }: CoreInfoTabProps) {
           )}
         />
 
-        <div className="pt-6 border-t border-border">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6">Social Links</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormField
-              control={form.control}
-              name="linkedin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground text-xs font-semibold">LinkedIn</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://linkedin.com/in/..." className="bg-background/50" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="github"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground text-xs font-semibold">GitHub</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://github.com/..." className="bg-background/50" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="portfolio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground text-xs font-semibold">Portfolio</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." className="bg-background/50" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
 
         <div className="flex justify-end gap-3 pt-6">
-          <Button type="submit" className="btn-primary px-10 h-11 rounded-xl shadow-button flex items-center gap-2">
-            Next step
+          <Button 
+            type="button" 
+            variant="secondary" 
+            className="px-5 h-9 rounded-xl shadow-button flex items-center gap-2" 
+            disabled={isSaving}
+            onClick={handleManualSave}
+          >
+            {isSaving ? "Saving..." : "Save profile"}
+          </Button>
+          <Button type="submit" className="btn-primary px-7 h-9 rounded-xl shadow-button flex items-center gap-2" disabled={isSaving}>
+            Next
             <span className="text-lg">→</span>
           </Button>
         </div>

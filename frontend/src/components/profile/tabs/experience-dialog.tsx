@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
 
 const experienceSchema = z.object({
   role: z.string().min(2, "Role is required"),
@@ -156,10 +157,14 @@ export function ExperienceDialog({
                 control={form.control}
                 name="startDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start Date</FormLabel>
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="mb-2">Start Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        placeholder="Select start date"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,12 +174,17 @@ export function ExperienceDialog({
                 control={form.control}
                 name="endDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End Date (Optional)</FormLabel>
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="mb-2">End Date (Optional)</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        placeholder="Select end date"
+                      />
                     </FormControl>
-                    <FormMessage className="text-[10px]">Leave blank if currently working</FormMessage>
+                    {!field.value && <p className="text-[10px] text-muted-foreground mt-1">Leave blank if currently working</p>}
+                    <FormMessage />
                   </FormItem>
                 )}
               />

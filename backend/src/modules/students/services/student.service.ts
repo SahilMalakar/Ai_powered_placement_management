@@ -25,7 +25,7 @@ export const getStudentProfileService = async (userId: number) => {
 
     const cachedData = await cacheClient.get(cacheKey);
     if (cachedData) {
-        console.log('🎯cache hit')
+        console.log(`🎯 Cache HIT: ${cacheKey}`);
         // redis(string) ----> json
         return JSON.parse(cachedData)
     }
@@ -37,7 +37,7 @@ export const getStudentProfileService = async (userId: number) => {
         throw new NotFoundError("Profile not found. Please create one.")
     }
 
-    console.log("❌ cache miss");
+    console.log(`⚪ Cache MISS: ${cacheKey}`);
     // redis store cache in string format with 5 minutes TTL
     await cacheClient.set(cacheKey, JSON.stringify(profile), `EX`, 5 * 60)
 
