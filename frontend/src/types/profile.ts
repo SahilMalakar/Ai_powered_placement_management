@@ -80,18 +80,23 @@ export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 export type SkillInput = z.infer<typeof skillSchema>;
+export type UpdateSkillInput = Partial<SkillInput>;
 export type Skill = SkillInput & { id: number; profileId: number };
 
 export type SocialLinkInput = z.infer<typeof socialLinkSchema>;
+export type UpdateSocialLinkInput = Partial<SocialLinkInput>;
 export type SocialLink = SocialLinkInput & { id: number; profileId: number };
 
 export type ExperienceInput = z.infer<typeof experienceSchema>;
+export type UpdateExperienceInput = Partial<ExperienceInput>;
 export type Experience = ExperienceInput & { id: number; profileId: number };
 
 export type ProjectInput = z.infer<typeof projectSchema>;
+export type UpdateProjectInput = Partial<ProjectInput>;
 export type Project = ProjectInput & { id: number; profileId: number };
 
 export type AdditionalDetailInput = z.infer<typeof additionalDetailSchema>;
+export type UpdateAdditionalDetailInput = Partial<AdditionalDetailInput>;
 export type AdditionalDetail = AdditionalDetailInput & { id: number; profileId: number };
 
 export type StudentProfileData = {

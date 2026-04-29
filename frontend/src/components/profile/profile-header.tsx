@@ -59,21 +59,42 @@ export function ProfileHeader() {
           {currentStatus.label}
         </Badge>
 
-        <div className="flex items-center bg-card rounded-md shadow-button border border-border overflow-hidden">
-          <Button
-            className="btn-primary rounded-r-none h-9 px-4 border-none shadow-none"
-            onClick={() => initiateVerify()}
-            disabled={status === "PROCESSING" || status === "VERIFIED" || isPending}
-          >
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            {status === "PROCESSING" ? "Processing..." : status === "VERIFIED" ? "Already Verified" : "Verify now"}
-          </Button>
-          <Separator orientation="vertical" className="h-4 bg-white/20" />
+        {status !== "VERIFIED" && (
+          <div className="flex items-center bg-card rounded-md shadow-button border border-border overflow-hidden">
+            <Button
+              className="btn-primary rounded-r-none h-9 px-4 border-none shadow-none"
+              onClick={() => initiateVerify()}
+              disabled={status === "PROCESSING" || isPending}
+            >
+              {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {status === "PROCESSING" ? "Processing..." : "Verify now"}
+            </Button>
+            <Separator orientation="vertical" className="h-4 bg-white/20" />
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                  "h-9 w-9 rounded-l-none hover:bg-accent/50 border-none focus-visible:ring-0"
+                )}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 shadow-modal">
+                <DropdownMenuItem className="cursor-pointer">Download PDF</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">Privacy Settings</DropdownMenuItem>
+                <Separator className="my-1" />
+                <DropdownMenuItem className="text-destructive cursor-pointer">Reset Profile</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        {status === "VERIFIED" && (
           <DropdownMenu>
             <DropdownMenuTrigger
               className={cn(
-                buttonVariants({ variant: "ghost", size: "icon" }),
-                "h-9 w-9 rounded-l-none hover:bg-accent/50 border-none focus-visible:ring-0"
+                buttonVariants({ variant: "outline", size: "icon" }),
+                "h-9 w-9 rounded-md shadow-button border-border hover:bg-accent/50 focus-visible:ring-0"
               )}
             >
               <MoreHorizontal className="h-4 w-4" />
@@ -85,7 +106,7 @@ export function ProfileHeader() {
               <DropdownMenuItem className="text-destructive cursor-pointer">Reset Profile</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        )}
       </div>
     </div>
   )
