@@ -20,6 +20,7 @@ export const applicationSnapshotSchema = z.object({
     branch: z.string(), // Usually an enum, but captured as string in snapshot
     cgpa: z.number(),
     backlog: z.boolean(),
+    backlogSubjects: z.array(z.string()),
     astuRollNo: z.string(),
     rollNo: z.string(),
     verificationStatus: z.string(),

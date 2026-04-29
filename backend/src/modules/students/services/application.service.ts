@@ -1,5 +1,4 @@
 import { applyToJobWithTransaction } from '../repositories/application.repository.js';
-import { findResumeById } from '../repositories/resume.repository.js';
 import { applicationSnapshotSchema } from '../../../types/students/application.js';
 import type { ApplicationSnapshot } from '../../../types/students/application.js';
 
@@ -18,6 +17,7 @@ export const applyToJobService = async (userId: number, jobId: number) => {
             branch: String(profile.branch), // Explicit cast to string for long-term snapshot stability
             cgpa: profile.cgpa,
             backlog: profile.backlog,
+            backlogSubjects: profile.backlogSubjects,
             astuRollNo: profile.astuRollNo,
             rollNo: profile.rollNo,
             verificationStatus: String(profile.verificationStatus),

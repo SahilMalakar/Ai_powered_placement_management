@@ -12,14 +12,73 @@ export const createJob = async (jobData: JobCreateInput) => {
     });
 };
 
-export const getAllJobs = async () => {
-    return await prisma.job.findMany();
+export const getAllJobs = async (filters: {
+    search?: string;
+    branch?: string;
+    cgpa?: string;
+    page?: number;
+    limit?: number;
+    status?: JobStatus;
+}) => {
+    const { search, branch, cgpa, page = 1, limit = 10, status } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+        deletedAt: null,
+    };
+
+    if (status) {
+        where.status = status;
+    }
+
+    if (search) {
+        where.OR = [
+            { title: { contains: search, mode: 'insensitive' } },
+            { company: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+        ];
+    }
+
+    if (branch) {
+        where.allowedBranches = {
+            has: branch,
+        };
+    }
+
+    if (cgpa) {
+        where.requiredCgpa = {
+            lte: parseFloat(cgpa),
+        };
+    }
+
+    const [jobs, total] = await Promise.all([
+        prisma.job.findMany({
+            where,
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: Number(skip),
+            take: Number(limit),
+        }),
+        prisma.job.count({ where }),
+    ]);
+
+    return {
+        jobs,
+        pagination: {
+            total,
+            page: Number(page),
+            limit: Number(limit),
+            totalPages: Math.ceil(total / limit),
+        },
+    };
 };
 
 export const getJobById = async (jobId: number) => {
     return await prisma.job.findUnique({
         where: {
             id: jobId,
+            deletedAt: null,
         },
     });
 };

@@ -91,6 +91,21 @@ export const getAllJobsController = asyncHandler(async (req, res) => {
         throw new UnauthorizedError('Unauthorized');
     }
 
-    const jobs = await getAllJobsService();
-    return sendSuccess(res, jobs, 'Jobs fetched successfully', HTTP_STATUS.OK);
+    const { search, branch, cgpa, page, limit } = req.query;
+
+    const filters = {
+        search: search as string,
+        branch: branch as string,
+        cgpa: cgpa as string,
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 10,
+    };
+
+    const jobsData = await getAllJobsService(filters, req.user.role);
+    return sendSuccess(
+        res,
+        jobsData,
+        'Jobs fetched successfully',
+        HTTP_STATUS.OK
+    );
 });
