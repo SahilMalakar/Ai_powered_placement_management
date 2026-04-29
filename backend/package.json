@@ -12,7 +12,9 @@
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "db:generate": "cd src && pnpm dlx prisma generate"
+        "db:generate": "cd src && pnpm dlx prisma generate",
+        "cache:clear": "node scripts/check-queue.js --clear-cache",
+        "cache:list": "node scripts/check-queue.js --list-cache"
     },
     "keywords": [],
     "author": "",

@@ -2,10 +2,14 @@ import api from "@/services/api"
 
 /**
  * Student Document Service
- * Handles bulk document uploads and deletions.
+ * Handles single document uploads, fetching all documents, and deletions.
  */
 
-export const uploadDocuments = async (formData: FormData) => {
+export const getDocuments = async () => {
+  return api.get("/students/documents").then((r) => r.data.data)
+}
+
+export const uploadDocument = async (formData: FormData) => {
   return api.post("/students/documents", formData, {
     headers: {
       "Content-Type": "multipart/form-data",

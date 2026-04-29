@@ -38,20 +38,40 @@ export const upsertDocument = async (
     publicId: string,
     semester?: number
 ) => {
-    const existing = await findDocumentBySemester(userId, type, semester);
+    const semValue = semester ?? null;
 
-    if (existing) {
-        return await prisma.document.update({
-            where: { id: existing.id },
-            data: {
-                url,
-                publicId,
+    return await prisma.document.upsert({
+        where: {
+            userId_type_semester: {
+                userId,
+                type,
+                semester: semValue as number,
             },
-        });
-    }
+        },
+        update: {
+            url,
+            publicId,
+        },
+        create: {
+            userId,
+            type,
+            url,
+            publicId,
+            semester: semValue,
+        },
+    });
+};
 
-    return await prisma.document.create({
-        data: { userId, type, url, publicId, semester: semester ?? null },
+/**
+ * Fetches all documents for a specific user.
+ */
+export const findDocumentsByUserId = async (userId: number) => {
+    return await prisma.document.findMany({
+        where: { userId },
+        orderBy: [
+            { type: 'asc' },
+            { semester: 'asc' }
+        ]
     });
 };
 

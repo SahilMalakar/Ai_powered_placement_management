@@ -1,26 +1,22 @@
 import Redis from "ioredis";
+import dotenv from "dotenv";
 
-const redis = new Redis("redis://:strongpassword@127.0.0.1:6379");
+dotenv.config();
 
-const QUEUES = ["resumeQueue", "atsQueue", "documentQueue"];
+const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
 
-async function checkQueues() {
-  console.log("\n📊 BullMQ Queue Status\n" + "=".repeat(40));
+const QUEUES = ["resumeQueue", "documentQueue", "verificationQueue"];
 
-  for (const queue of QUEUES) {
-    const waiting = await redis.llen(`bull:${queue}:wait`);
-    const active = await redis.llen(`bull:${queue}:active`);
-    const failed = await redis.zcard(`bull:${queue}:failed`);
-    const delayed = await redis.zcard(`bull:${queue}:delayed`);
-    const completed = await redis.zcard(`bull:${queue}:completed`);
+async function getQueueStats(queueName) {
+  const [waiting, active, completed, failed, delayed] = await Promise.all([
+    redis.llen(`bull:${queueName}:wait`),
+    redis.scard(`bull:${queueName}:active`),
+    redis.scard(`bull:${queueName}:completed`),
+    redis.scard(`bull:${queueName}:failed`),
+    redis.zcard(`bull:${queueName}:delayed`),
+  ]);
 
-    console.log(`\n🔹 ${queue}`);
-    console.log(`   Waiting:   ${waiting}`);
-    console.log(`   Active:    ${active}`);
-    console.log(`   Failed:    ${failed}`);
-    console.log(`   Delayed:   ${delayed}`);
-    console.log(`   Completed: ${completed}`);
-  }
+  return { waiting, active, completed, failed, delayed };
 }
 
 async function clearQueue(queueName) {
@@ -33,21 +29,65 @@ async function clearQueue(queueName) {
   console.log(`🗑️  Cleared ${keys.length} keys for ${queueName}`);
 }
 
-const arg = process.argv[2];
-
-if (arg === "--clear") {
-  const target = process.argv[3] || "resumeQueue";
-  console.log(`\n⚠️  Clearing queue: ${target}`);
-  await clearQueue(target);
-  console.log("Done!");
-} else if (arg === "--clear-all") {
-  console.log("\n⚠️  Clearing ALL queues");
-  for (const queue of QUEUES) {
-    await clearQueue(queue);
+async function listCache() {
+  const keys = await redis.keys("*");
+  const cacheKeys = keys.filter(k => !k.startsWith("bull:"));
+  
+  if (cacheKeys.length === 0) {
+    console.log("\n📭 Cache is empty.");
+    return;
   }
-  console.log("Done!");
-} else {
-  await checkQueues();
+
+  console.log("\n📋 Current Cache Keys:");
+  cacheKeys.forEach(k => console.log(`  - ${k}`));
+  console.log(`\nTotal: ${cacheKeys.length} keys`);
 }
 
-await redis.quit();
+async function clearCache() {
+  const keys = await redis.keys("*");
+  const cacheKeys = keys.filter(k => !k.startsWith("bull:"));
+  
+  if (cacheKeys.length === 0) {
+    console.log("\n⚠️ No cache keys found to clear.");
+    return;
+  }
+
+  await redis.del(...cacheKeys);
+  console.log(`\nHTX  🗑️  Cleared ${cacheKeys.length} application cache keys.`);
+}
+
+async function main() {
+  const arg = process.argv[2];
+
+  if (arg === "--clear") {
+    const target = process.argv[3] || "resumeQueue";
+    console.log(`\n⚠️  Clearing queue: ${target}`);
+    await clearQueue(target);
+  } else if (arg === "--clear-all") {
+    console.log("\n⚠️  Clearing ALL queues");
+    for (const queue of QUEUES) {
+      await clearQueue(queue);
+    }
+  } else if (arg === "--list-cache") {
+    await listCache();
+  } else if (arg === "--clear-cache") {
+    await clearCache();
+  } else {
+    console.log("\n📊 Queue Statistics:");
+    for (const queue of QUEUES) {
+      const stats = await getQueueStats(queue);
+      console.log(`\n--- ${queue} ---`);
+      console.log(`  Waiting:   ${stats.waiting}`);
+      console.log(`  Active:    ${stats.active}`);
+      console.log(`  Completed: ${stats.completed}`);
+      console.log(`  Failed:    ${stats.failed}`);
+      console.log(`  Delayed:   ${stats.delayed}`);
+    }
+    
+    await listCache();
+  }
+
+  redis.disconnect();
+}
+
+main().catch(console.error);

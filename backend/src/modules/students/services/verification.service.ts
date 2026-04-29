@@ -11,6 +11,7 @@ import {
     NotFoundError,
 } from '../../../utils/errors/httpErrors.js';
 import { VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
+import { invalidateStudentCache } from '../../../utils/cacheInvalidation.js';
 
 /**
  * Service to initiate the verification process.
@@ -21,7 +22,15 @@ export const initiateVerificationService = async (userId: number) => {
     const profile = await getProfileRepo(userId);
     if (!profile) throw new NotFoundError('Student profile not found.');
 
-    // 2 & 4. Atomic Idempotency & Status Update (via Repository)
+    // 2. Document Availability Check (BEFORE status transition)
+    const sgpaDocsCount = await getSgpaDocumentsCount(userId);
+    if (sgpaDocsCount === 0) {
+        throw new BadRequestError(
+            'No SGPA marksheets found. Please upload at least one marksheet to initiate verification.'
+        );
+    }
+
+    // 3. Atomic Idempotency & Status Update (via Repository)
     const success = await transitionToProcessing(userId);
 
     if (!success) {
@@ -30,20 +39,12 @@ export const initiateVerificationService = async (userId: number) => {
         );
     }
 
-    // 3. Document Availability Check
-    const sgpaDocsCount = await getSgpaDocumentsCount(userId);
-
-    if (sgpaDocsCount === 0) {
-        // Rollback if no docs (though status block ensures we are safe)
-        await updateVerificationStatus(userId, VerificationStatus.NOT_VERIFIED);
-        throw new BadRequestError(
-            'No SGPA marksheets found. Please upload at least one marksheet to initiate verification.'
-        );
-    }
-
     try {
         // Dispatch the background job to start PDF text extraction and Regex matching
         await addVerificationJob(userId);
+        
+        // 4. Invalidate Cache so the frontend sees the PROCESSING status immediately
+        await invalidateStudentCache(userId);
     } catch (error) {
         // Rollback status if queueing fails to prevent student from being "stuck"
         await updateVerificationStatus(userId, profile.verificationStatus);

@@ -10,6 +10,9 @@ export async function invalidateCache(...keys: string[]) {
 export async function invalidateStudentCache(userId: number) {
     await invalidateCache(
         CACHE_KEYS.STUDENT_CORE(userId),
+        CACHE_KEYS.STUDENT_PROFILE(userId),
+        CACHE_KEYS.STUDENT_DOCUMENTS(userId),
+        CACHE_KEYS.STUDENT_ACADEMIC(userId),
         CACHE_KEYS.USER_SESSION(userId),
     );
 }
@@ -32,4 +35,8 @@ export async function invalidateSkillCache(userId: number) {
 
 export async function invalidateAdditionalDetailCache(userId: number) {
     await invalidateCache(CACHE_KEYS.STUDENT_ADDITIONAL_DETAILS(userId));
+}
+
+export async function invalidateDocumentCache(userId: number) {
+    await invalidateCache(CACHE_KEYS.STUDENT_DOCUMENTS(userId));
 }

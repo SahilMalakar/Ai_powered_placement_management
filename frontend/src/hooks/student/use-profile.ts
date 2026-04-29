@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, UseQueryOptions } from "@tanstack/react-query"
 import { getProfile } from "@/services/student/profile.service"
 import { QUERY_KEYS } from "@/constants/query-keys"
 
-export function useProfile() {
+export function useProfile(options?: Partial<UseQueryOptions<any>>) {
   const query = useQuery({
     queryKey: [QUERY_KEYS.STUDENT_PROFILE],
     queryFn: async () => {
@@ -10,6 +10,7 @@ export function useProfile() {
       return getProfile();
     },
     staleTime: 1.5 * 60 * 1000, // 1.5 minutes
+    ...options,
   })
 
   if (query.data && !query.isFetching) {

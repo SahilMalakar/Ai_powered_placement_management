@@ -41,34 +41,22 @@ export const getProfileRepo = async (userId: number) => {
     return await prisma.studentProfile.findUnique({
         where: {
             userId,
-            deletedAt: null
+            deletedAt: null,
         },
-        select: {
-            id: true,
-            userId: true,
-            fullName: true,
-            branch: true,
-            rollNo: true,
-            dob: true,
-            phoneNumber: true,
-            summary: true,
-            university: true,
-            degree: true,
-            graduationYear: true,
-            createdAt: true,
-            updatedAt: true,
-            deletedAt: true,
+        include: {
             user: {
                 select: {
                     email: true,
                     role: true,
-                    isProfileCompleted: true
-                }
+                    isProfileCompleted: true,
+                    semesters: {
+                        orderBy: { semester: "asc" },
+                    },
+                },
             },
-            verificationStatus: true
-        }
-    })      
-}
+        },
+    });
+};
 
 export const createStudentProfileRepo = async (
     userId: number,
@@ -171,3 +159,34 @@ export const updateStudentProfileRepo = async (
         return profile;
     });
 }
+
+/**
+ * Fetches flattened academic record for a student.
+ */
+export const getAcademicRecordRepo = async (userId: number) => {
+    const data = await prisma.user.findUnique({
+        where: { id: userId, deletedAt: null },
+        select: {
+            semesters: {
+                orderBy: { semester: 'asc' },
+            },
+            profile: {
+                select: {
+                    cgpa: true,
+                    astuRollNo: true,
+                    backlog: true,
+                    backlogSubjects: true,
+                    verificationStatus: true,
+                    verificationReason: true,
+                }
+            }
+        }
+    });
+
+    if (!data || !data.profile) return null;
+
+    return {
+        ...data.profile,
+        semesters: data.semesters
+    };
+};

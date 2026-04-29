@@ -7,7 +7,7 @@ import {
     createStudentProfileController,
     getStudentProfileController,
     updateStudentProfileController,
-    
+    getAcademicRecordController,
 } from '../../../modules/students/controllers/student.controller.js';
 
 /**
@@ -37,6 +37,26 @@ profileRouter.get(
     authMiddleware,
     requireStudent,
     getStudentProfileController
+);
+
+/**
+ * @swagger
+ * /api/v1/students/profile/academic:
+ *   get:
+ *     summary: Fetch verified academic records (CGPA, SGPAs)
+ *     tags: [Profiles]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Academic records fetched successfully
+ */
+profileRouter.get(
+    '/profile/academic',
+    authMiddleware,
+    requireStudent,
+    getAcademicRecordController
 );
 
 /**

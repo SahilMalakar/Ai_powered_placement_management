@@ -6,6 +6,7 @@ import {
     createStudentProfileService,
     getStudentProfileService,
     updateStudentProfileService,
+    getAcademicRecordService,
 } from '../services/student.service.js';
 
 //  Returns the full merged data: User + Profile + Relations + Semesters
@@ -55,6 +56,21 @@ export const updateStudentProfileController = asyncHandler(async (req, res) => {
         res,
         result,
         'Profile updated successfully',
+        HTTP_STATUS.OK
+    );
+});
+export const getAcademicRecordController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    const userId = req.user.userId;
+    const result = await getAcademicRecordService(userId);
+
+    return sendSuccess(
+        res,
+        result,
+        'Academic records fetched successfully',
         HTTP_STATUS.OK
     );
 });

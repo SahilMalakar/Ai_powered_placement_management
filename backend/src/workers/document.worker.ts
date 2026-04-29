@@ -8,11 +8,14 @@ import {
     uploadToCloudinary,
     deleteFromCloudinary,
 } from '../utils/fileHandler/cloudinary.js';
-import {
-    upsertDocument,
-    findDocumentBySemester,
-} from '../modules/students/repositories/document.repository.js';
+import { upsertDocument, findDocumentBySemester } from '../modules/students/repositories/document.repository.js';
 import fs from 'fs/promises';
+import { 
+    invalidateDocumentCache, 
+    invalidateStudentCache 
+} from '../utils/cacheInvalidation.js';
+import { resetVerificationState } from '../modules/students/repositories/verification.repository.js';
+import { DocumentType } from '../prisma/generated/prisma/enums.js';
 
 // Initialize the Document Upload Worker.
 // Listens for jobs on the 'documentQueue' and performs Cloudinary uploads + DB writes.
@@ -54,7 +57,12 @@ export const initializeDocumentWorker = () => {
                         semesterUndefined
                     );
 
-                    // 4. DB confirmed — delete old Cloudinary file
+                    // 4. Verification Integrity: If an SGPA marksheet is updated, reset the verification state
+                    if (type === DocumentType.SGPA) {
+                        await resetVerificationState(userId);
+                    }
+
+                    // 5. DB confirmed — delete old Cloudinary file
                     if (oldPublicId) {
                         deleteFromCloudinary(oldPublicId).catch((err) =>
                             console.error(
@@ -97,6 +105,13 @@ export const initializeDocumentWorker = () => {
                     await fs.unlink(filePath).catch(() => {});
                 }
             }
+
+            // 6. Purge ALL Student Caches (Documents + Profile) after all files in this job are processed
+            await Promise.all([
+                invalidateDocumentCache(userId),
+                invalidateStudentCache(userId)
+            ]);
+            console.log(`[Document Worker] All Caches Purged for user ${userId}`);
         },
         {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

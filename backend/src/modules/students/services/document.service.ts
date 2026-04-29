@@ -6,76 +6,103 @@ import { deleteFromCloudinary } from '../../../utils/fileHandler/cloudinary.js';
 import {
     hardDeleteDocumentRecord,
     findDocumentById,
+    findDocumentsByUserId,
 } from '../repositories/document.repository.js';
 import { resetVerificationState } from '../repositories/verification.repository.js';
-import { DocumentType } from '../../../prisma/generated/prisma/enums.js';
+import { DocumentType, VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
 import {
-    BadRequestError,
     ForbiddenError,
     NotFoundError,
 } from '../../../utils/errors/httpErrors.js';
+import { getProfileRepo } from '../repositories/student.repository.js';
+import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
+import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import { 
+    invalidateDocumentCache, 
+    invalidateStudentCache 
+} from '../../../utils/cacheInvalidation.js';
+import type { UploadDocumentInput } from '../../../types/students/document.js';
 
-// Service to enqueue a bulk document upload job.
-// Returns immediately after queueing — actual Cloudinary/DB work is done by the worker.
-export const uploadBulkDocumentsService = async (
+/**
+ * Service to fetch all documents for the student.
+ * Uses Redis caching for performance.
+ */
+export const getDocumentsService = async (userId: number) => {
+    const cacheKey = CACHE_KEYS.STUDENT_DOCUMENTS(userId);
+    const cacheClient = getRedisConnectionForCaching();
+
+    const cached = await cacheClient.get(cacheKey);
+    if (cached) {
+        return JSON.parse(cached);
+    }
+
+    const documents = await findDocumentsByUserId(userId);
+
+    await cacheClient.set(cacheKey, JSON.stringify(documents), 'EX', 600);
+
+    return documents;
+};
+
+/**
+ * Service to enqueue a single document upload job.
+ */
+export const uploadSingleDocumentService = async (
     userId: number,
-    files: { [fieldname: string]: Express.Multer.File[] }
+    data: UploadDocumentInput,
+    file: Express.Multer.File
 ) => {
-    const jobFiles: DocumentJobFile[] = [];
-
-    for (const [fieldname, fileArray] of Object.entries(files)) {
-        const file = fileArray[0];
-        let type: DocumentType;
-        let semester: number | null;
-        let folder = 'marksheets';
-
-        // Map field names to document types and Cloudinary folders
-        if (fieldname.startsWith('sem')) {
-            const semNum = parseInt(fieldname.replace('sem', ''), 10);
-            if (isNaN(semNum) || semNum < 1 || semNum > 8) {
-                throw new BadRequestError(
-                    `Invalid semester field: ${fieldname}`
-                );
-            }
-            type = DocumentType.SGPA;
-            semester = semNum;
-        } else if (fieldname === 'other') {
-            type = DocumentType.OTHER;
-            folder = 'certificates';
-            semester = null;
-        } else {
-            continue; // Skip unknown fields
-        }
-
-        jobFiles.push({
-            fieldname,
-            filePath: file!.path, // Local temp file path (worker will cleanup after upload)
-            type,
-            folder,
-            semester,
-        });
+    // 1. Profile Verification Check: Students cannot change documents if verification is PROCESSING
+    const profile = await getProfileRepo(userId);
+    if (!profile) {
+        throw new NotFoundError('Student profile not found.');
+    }
+    if (profile.verificationStatus === VerificationStatus.PROCESSING) {
+        throw new ForbiddenError(
+            'Cannot upload documents while profile is under verification.'
+        );
     }
 
-    if (jobFiles.length === 0) {
-        throw new BadRequestError('No valid document files found to process.');
-    }
+    const { type, semester } = data;
+    const folder = type === DocumentType.SGPA ? 'marksheets' : 'certificates';
 
-    // Enqueue a single job with all files → worker processes them
-    const job = await addDocumentJobToQueue({ userId, files: jobFiles });
+    const jobFile: DocumentJobFile = {
+        fieldname: file.fieldname,
+        filePath: file.path,
+        type: type as DocumentType,
+        folder,
+        semester: semester ?? null,
+    };
+
+    // Enqueue job for background processing (Cloudinary upload + DB write)
+    const job = await addDocumentJobToQueue({ userId, files: [jobFile] });
+
+    // Invalidate cache immediately to ensure fresh data on next fetch
+    await invalidateDocumentCache(userId);
+    await invalidateStudentCache(userId);
 
     return {
         jobId: job.id,
-        queued: jobFiles.map((f) => f.fieldname),
-        message: 'Documents are being processed in the background.',
+        type,
+        semester,
+        message: 'Document is being processed in the background.',
     };
 };
 
-// Service to delete a document and clean up its associated Cloudinary resource.
+/**
+ * Service to delete a document and clean up its associated Cloudinary resource.
+ */
 export const deleteDocumentService = async (
     userId: number,
     documentId: number
 ) => {
-    console.log("documentId in service ", documentId)
+    // 1. Check if profile is under verification
+    const profile = await getProfileRepo(userId);
+    if (profile?.verificationStatus === VerificationStatus.PROCESSING) {
+        throw new ForbiddenError(
+            'Cannot delete documents while profile is under verification.'
+        );
+    }
+
     const doc = await findDocumentById(documentId);
     if (!doc) {
         throw new NotFoundError('Document not found.');
@@ -86,17 +113,15 @@ export const deleteDocumentService = async (
         );
     }
 
-    // 1. Permanent Hard Delete from DB for all document types
+    // 2. Permanent Hard Delete from DB
     await hardDeleteDocumentRecord(documentId);
 
-    // 2. Verification Integrity Check: If an SGPA document is deleted, reset the verification status.
-    // This forces the student to re-initiate verification if their evidence is removed.
+    // 3. Verification Integrity Check: If an SGPA document is deleted, reset the verification status.
     if (doc.type === DocumentType.SGPA) {
-        console.log(`[Document Service] SGPA document deleted for user ${userId}. Resetting verification state.`);
         await resetVerificationState(userId);
     }
 
-    // 3. Cleanup from Cloudinary
+    // 4. Cleanup from Cloudinary
     if (doc.publicId) {
         await deleteFromCloudinary(doc.publicId).catch((err) =>
             console.error(
@@ -106,5 +131,9 @@ export const deleteDocumentService = async (
         );
     }
 
-    return { message: 'Document deleted successfully.' };
+    // 5. Invalidate cache
+    await invalidateDocumentCache(userId);
+    await invalidateStudentCache(userId);
+
+    return { message: 'Document removed successfully.' };
 };

@@ -6,6 +6,7 @@ import {
     createStudentProfileRepo,
     getProfileRepo,
     updateStudentProfileRepo,
+    getAcademicRecordRepo,
 } from '../repositories/student.repository.js';
 import {
     BadRequestError,
@@ -30,7 +31,7 @@ export const getStudentProfileService = async (userId: number) => {
         return JSON.parse(cachedData)
     }
 
-    // fetch the profile with user.email + role for caching
+    // fetch the profile with all relations for the dashboard
     const profile = await getProfileRepo(userId)
 
     if (!profile) {
@@ -134,6 +135,25 @@ export const updateStudentProfileService = async (
     return result
 }
 
+
+export const getAcademicRecordService = async (userId: number) => {
+    const cacheKey = CACHE_KEYS.STUDENT_ACADEMIC(userId);
+    const cacheClient = getRedisConnectionForCaching();
+
+    const cached = await cacheClient.get(cacheKey);
+    if (cached) {
+        return JSON.parse(cached);
+    }
+
+    const academic = await getAcademicRecordRepo(userId);
+    if (!academic) {
+        throw new NotFoundError("Academic records not found.");
+    }
+
+    await cacheClient.set(cacheKey, JSON.stringify(academic), 'EX', 15 * 60); // 15 min TTL
+
+    return academic;
+}
 
 // Security Guard: Prevents students from manually injecting academic data 
 // that must only be updated via the official Document Verification process.

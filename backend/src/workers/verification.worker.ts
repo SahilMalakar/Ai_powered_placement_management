@@ -13,8 +13,7 @@ import {
 import { extractTextFromPdfBuffer } from '../utils/fileHandler/pdfParser.js';
 import { VerificationStatus } from '../prisma/generated/prisma/enums.js';
 import { verificationRawTextSchema } from '../types/students/verification.js';
-import { CACHE_KEYS } from '../utils/cacheKeys.js';
-import { getRedisConnectionForCaching } from '../configs/redis.config.js';
+import { invalidateStudentCache } from '../utils/cacheInvalidation.js';
 
 // Helper to validate name tokens against extracted text for robustness
 const validateNameTokens = (
@@ -195,14 +194,7 @@ export const initializeVerificationWorker = async () => {
                 }
 
                 // 5. Redis Cache Purge (Executed for both SUCCESS and FAILURE to keep UI in sync)
-                const cacheClient = getRedisConnectionForCaching();
-                const profileKey = CACHE_KEYS.STUDENT_PROFILE(userId);
-                const sessionKey = CACHE_KEYS.USER_SESSION(userId);
-
-                await Promise.all([
-                    cacheClient.del(profileKey),
-                    cacheClient.del(sessionKey),
-                ]);
+                await invalidateStudentCache(userId);
                 console.log(
                     `[Verification Worker] Cache Invalidated for user ${userId}`
                 );
@@ -247,12 +239,9 @@ export const initializeVerificationWorker = async () => {
                 );
 
                 // Purge cache so student sees the FAILED status
-                const cacheClient = getRedisConnectionForCaching();
-                await cacheClient.del(
-                    CACHE_KEYS.STUDENT_PROFILE(job.data.userId)
-                );
+                await invalidateStudentCache(job.data.userId);
                 console.log(
-                    `[Verification Worker] Reset status to FAILED for user ${job.data.userId}`
+                    `[Verification Worker] Reset status to FAILED and Purged Cache for user ${job.data.userId}`
                 );
             } catch (dbError: unknown) {
                 console.error(

@@ -80,3 +80,6 @@ export const updateProfile = async (data: UpdateProfileInput) => {
     };
   });
 };
+export const getAcademicRecord = async () => {
+  return api.get("/students/profile/academic").then((r) => r.data.data);
+};

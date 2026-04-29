@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { authMiddleware } from '../../../middlewares/auth.middleware.js';
 import { requireStudent } from '../../../middlewares/rbac.middleware.js';
 import { documentUpload } from '../../../utils/fileHandler/multer.js';
+import { validateRequest } from '../../../middlewares/validate.middlware.js';
+import { uploadDocumentSchema } from '../../../types/students/document.js';
 import {
-    uploadDocumentsController,
+    getDocumentsController,
+    uploadDocumentController,
     deleteDocumentController,
 } from '../../../modules/students/controllers/document.controller.js';
 
@@ -11,16 +14,34 @@ import {
  * @swagger
  * tags:
  *   name: Documents
- *   description: Student document management
+ *   description: Student document (Marksheets & Certificates) management
  */
 
 const documentRouter: Router = Router();
+
+// Apply student authorization to all document routes
+documentRouter.use(authMiddleware, requireStudent);
+
+/**
+ * @swagger
+ * /api/v1/students/documents:
+ *   get:
+ *     summary: Fetch all documents for the logged-in student
+ *     tags: [Documents]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: List of documents fetched successfully
+ */
+documentRouter.get('/documents', getDocumentsController);
 
 /**
  * @swagger
  * /api/v1/students/documents:
  *   post:
- *     summary: Bulk upload student documents
+ *     summary: Upload a single student document (SGPA or OTHER)
  *     tags: [Documents]
  *     security:
  *       - bearerAuth: []
@@ -31,43 +52,41 @@ const documentRouter: Router = Router();
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required: [type, file]
  *             properties:
- *               sem1: { type: string, format: binary }
- *               sem2: { type: string, format: binary }
- *               sem3: { type: string, format: binary }
- *               sem4: { type: string, format: binary }
- *               sem5: { type: string, format: binary }
- *               sem6: { type: string, format: binary }
- *               sem7: { type: string, format: binary }
- *               sem8: { type: string, format: binary }
- *               other: { type: string, format: binary }
+ *               type: 
+ *                 type: string
+ *                 enum: [SGPA, OTHER]
+ *                 description: "The type of document"
+ *               semester:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 8
+ *                 description: "Required if type is SGPA"
+ *               file: 
+ *                 type: string
+ *                 format: binary
+ *                 description: "The document file (PDF, DOC, DOCX allowed)"
  *     responses:
  *       202:
- *         description: Document upload successfully queued
+ *         description: Document upload successfully queued for background processing
+ *       400:
+ *         description: Validation error or missing file
+ *       403:
+ *         description: Forbidden - profile is locked during verification
  */
 documentRouter.post(
     '/documents',
-    authMiddleware,
-    requireStudent,
-    documentUpload.fields([
-        { name: 'sem1', maxCount: 1 },
-        { name: 'sem2', maxCount: 1 },
-        { name: 'sem3', maxCount: 1 },
-        { name: 'sem4', maxCount: 1 },
-        { name: 'sem5', maxCount: 1 },
-        { name: 'sem6', maxCount: 1 },
-        { name: 'sem7', maxCount: 1 },
-        { name: 'sem8', maxCount: 1 },
-        { name: 'other', maxCount: 1 },
-    ]),
-    uploadDocumentsController
+    documentUpload.single('file'), // Expecting single file under 'file' key
+    validateRequest(uploadDocumentSchema),
+    uploadDocumentController
 );
 
 /**
  * @swagger
  * /api/v1/students/documents/{id}:
  *   delete:
- *     summary: Delete a document
+ *     summary: Delete a specific document
  *     tags: [Documents]
  *     security:
  *       - bearerAuth: []
@@ -78,15 +97,17 @@ documentRouter.post(
  *         required: true
  *         schema:
  *           type: integer
- *         description: The document ID
+ *         description: The database ID of the document
  *     responses:
  *       200:
  *         description: Document deleted successfully
+ *       403:
+ *         description: Forbidden - not owner or profile locked
+ *       404:
+ *         description: Document not found
  */
 documentRouter.delete(
     '/documents/:id',
-    authMiddleware,
-    requireStudent,
     deleteDocumentController
 );
 
