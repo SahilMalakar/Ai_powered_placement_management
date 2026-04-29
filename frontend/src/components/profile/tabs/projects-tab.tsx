@@ -11,7 +11,6 @@ import { Project } from "@/types/profile"
 interface ProjectsTabProps {
   onNext: () => void
   onPrev: () => void
-  initialData?: any
 }
 
 export function ProjectsTab({ onNext, onPrev }: ProjectsTabProps) {

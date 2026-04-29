@@ -12,7 +12,6 @@ interface AdditionalDetailsTabProps {
   onPrev: () => void
   onSave: (data?: any) => void
   isSaving: boolean
-  initialData?: any
 }
 
 export function AdditionalDetailsTab({ onPrev, onSave, isSaving: isSavingProp }: AdditionalDetailsTabProps) {

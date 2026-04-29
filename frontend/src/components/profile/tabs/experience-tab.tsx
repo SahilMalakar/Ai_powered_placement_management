@@ -12,7 +12,6 @@ import { Experience } from "@/types/profile"
 interface ExperienceTabProps {
   onNext: () => void
   onPrev: () => void
-  initialData?: any
 }
 
 export function ExperienceTab({ onNext, onPrev }: ExperienceTabProps) {

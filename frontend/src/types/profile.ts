@@ -13,9 +13,7 @@ const dateString = z
 
 // Helper for optional URLs that might be empty strings
 const optionalUrlSchema = z
-    .string()
     .url('Invalid URL')
-    .or(z.literal(''))
     .optional()
 
 export const coreSchema = z.object({
