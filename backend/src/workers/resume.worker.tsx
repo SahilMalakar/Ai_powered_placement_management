@@ -8,6 +8,7 @@ import {
     updateResumeJson,
     findResumeById,
     updateResumePdfUrl,
+    updateResumeStatus,
 } from '../modules/students/repositories/resume.repository.js';
 import { uploadBufferToCloudinary } from '../utils/fileHandler/cloudinary.js';
 import { ResumeTemplate } from '../utils/templates/resumeTemplate.js';
@@ -118,7 +119,7 @@ export const initializeResumeWorker = async () => {
                         return;
                     }
 
-                    await updateResumeJson(resumeId, generatedResume);
+                    await updateResumeJson(resumeId, generatedResume, 'COMPLETED');
 
                     console.log(
                         `[Resume Worker] Successfully generated resume content for ID ${resumeId}`
@@ -176,8 +177,22 @@ export const initializeResumeWorker = async () => {
                 );
 
                 if (isRateLimit) {
-                    console.warn(`[Resume Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
-                    throw new UnrecoverableError(`Rate limit reached: ${message}`);
+                    console.warn(
+                        `[Resume Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`
+                    );
+                    if (type === 'GENERATE_RESUME' && resumeId) {
+                        await updateResumeStatus(resumeId, 'FAILED').catch(
+                            () => {}
+                        );
+                    }
+                    throw new UnrecoverableError(
+                        `Rate limit reached: ${message}`
+                    );
+                }
+
+                // Mark the resume as failed if it exists and this is a generation job
+                if (type === 'GENERATE_RESUME' && resumeId) {
+                    await updateResumeStatus(resumeId, 'FAILED').catch(() => {});
                 }
 
                 throw new InternalServerError(`${type} failed: ${message}`);

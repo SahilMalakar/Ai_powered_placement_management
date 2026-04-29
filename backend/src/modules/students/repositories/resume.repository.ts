@@ -30,13 +30,29 @@ export const findResumeById = async (id: number, tx: any = prisma) => {
     });
 };
 
-// Updates the JSON content of an existing resume.
-export const updateResumeJson = async (id: number, jsonData: any) => {
+// Updates the JSON content of an existing resume and optionally its status.
+export const updateResumeJson = async (
+    id: number,
+    jsonData: any,
+    status?: 'GENERATING' | 'COMPLETED' | 'FAILED'
+) => {
     return await prisma.resume.update({
         where: { id },
         data: {
             jsonData,
+            ...(status && { status }),
         },
+    });
+};
+
+// Updates only the status of a resume.
+export const updateResumeStatus = async (
+    id: number,
+    status: 'GENERATING' | 'COMPLETED' | 'FAILED'
+) => {
+    return await prisma.resume.update({
+        where: { id },
+        data: { status },
     });
 };
 

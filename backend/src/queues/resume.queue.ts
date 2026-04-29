@@ -29,9 +29,12 @@ export interface ResumeJobPayload {
 }
 
 // Adds a new resume-related job to the queue
-export const addResumeJobToQueue = async (payload: ResumeJobPayload) => {
+export const addResumeJobToQueue = async (
+    payload: ResumeJobPayload,
+    jobId?: string
+) => {
     try {
-        const job = await resumeQueue.add(payload.type, payload);
+        const job = await resumeQueue.add(payload.type, payload, jobId ? { jobId } : undefined);
         return job;
     } catch (error: unknown) {
         console.error(

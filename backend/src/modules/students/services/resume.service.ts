@@ -13,6 +13,8 @@ import { resumeJsonSchema } from '../../../types/students/resume.js';
 import {
     BadRequestError,
     NotFoundError,
+    ConflictError,
+    InternalServerError,
 } from '../../../utils/errors/httpErrors.js';
 
 const MAX_RESUMES = 5;
@@ -20,10 +22,18 @@ const MAX_RESUMES = 5;
 // AI-Driven Resume Generation (Asynchronous via BullMQ).
 export const generateResumeService = async (userId: number) => {
     // 1. Enforce business limit (max 5 resumes per student)
-    const currentCount = await countUserResumes(userId);
-    if (currentCount >= MAX_RESUMES) {
+    const resumes = await findResumesByUserId(userId);
+    if (resumes.length >= MAX_RESUMES) {
         throw new BadRequestError(
             `Maximum limit of ${MAX_RESUMES} resumes reached. Please delete an old version to generate a new one.`
+        );
+    }
+
+    // 2. Prevent concurrent generations
+    const isAlreadyGenerating = resumes.some(r => r.status === 'GENERATING');
+    if (isAlreadyGenerating) {
+        throw new ConflictError(
+            'A resume is already being generated. Please wait for it to complete.'
         );
     }
 
@@ -35,7 +45,21 @@ export const generateResumeService = async (userId: number) => {
         );
     }
 
-    // 3. Validation Guard: Ensure mandatory sections are populated for a professional resume
+    // 3. Status Guard: Profile must be completed and verified
+    if (!fullProfile.isProfileCompleted) {
+        throw new BadRequestError(
+            'Please complete your profile before generating a resume.'
+        );
+    }
+
+    if (fullProfile.profile.verificationStatus !== 'VERIFIED') {
+        const status = fullProfile.profile.verificationStatus.toLowerCase().replace('_', ' ');
+        throw new BadRequestError(
+            `Your profile is currently ${status}. Only verified students can generate resumes.`
+        );
+    }
+    
+    // 4. Validation Guard: Ensure mandatory sections are populated for a professional resume
     const profile = fullProfile.profile;
     const missingSections: string[] = [];
 
@@ -56,12 +80,20 @@ export const generateResumeService = async (userId: number) => {
         );
     }
 
-    // 4. Create a placeholder resume record immediately to get the resumeId
-    const latestVersion = await getLatestResumeVersion(userId);
-    const newVersion = latestVersion + 1;
-    const resume = await createResumeRecord(userId, newVersion, {}); // Empty JSON initially
+    // 5. Create a placeholder resume record immediately to get the resumeId
+    let resume;
+    try {
+        const latestVersion = await getLatestResumeVersion(userId);
+        const newVersion = latestVersion + 1;
+        resume = await createResumeRecord(userId, newVersion, {}); // Empty JSON initially
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            throw new ConflictError('A generation request is already in progress or version conflict occurred. Please retry.');
+        }
+        throw error;
+    }
 
-    // 4. En-queue for background AI analysis
+    // 6. En-queue for background AI analysis
     console.log(`[Resume Service] En-queueing GENERATE_RESUME for user ${userId}. Profile data keys:`, Object.keys(fullProfile));
     
     const job = await addResumeJobToQueue({
@@ -70,7 +102,7 @@ export const generateResumeService = async (userId: number) => {
         resumeId: resume.id,
         profileData: fullProfile as unknown as Record<string, unknown>,
         branch: fullProfile.profile.branch,
-    });
+    }, `generate-resume-${userId}-${resume.version}`);
 
     return {
         message:
@@ -119,9 +151,22 @@ export const updateResumeService = async (
 
 // Initiates PDF export for a resume (Asynchronous via BullMQ).
 export const exportResumePdfService = async (id: number, userId: number) => {
+    // 1. Fetch Resume and check status
     const resume = await findResumeById(id);
     if (!resume || resume.userId !== userId) {
         throw new NotFoundError('Resume not found or unauthorized access.');
+    }
+
+    if (resume.status === 'GENERATING') {
+        throw new BadRequestError(
+            'Resume is still being generated. Please wait until it is completed before exporting.'
+        );
+    }
+
+    if (resume.status === 'FAILED') {
+        throw new BadRequestError(
+            'Resume generation failed. Please try generating a new one.'
+        );
     }
 
     // 2. Reset the PDF URL to null to indicate a new export is in progress

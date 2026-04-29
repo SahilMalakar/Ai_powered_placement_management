@@ -8,6 +8,8 @@ import {
     updateResumeController,
     exportResumeController,
 } from '../../../modules/students/controllers/resume.controller.js';
+import { validateRequest } from '../../../middlewares/validate.middlware.js';
+import { resumeJsonSchema } from '../../../types/students/resume.js';
 
 /**
  * @swagger
@@ -223,6 +225,7 @@ resumeRouter.patch(
     '/:id',
     authMiddleware,
     requireStudent,
+    validateRequest(resumeJsonSchema),
     updateResumeController
 );
 
