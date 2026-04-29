@@ -72,7 +72,8 @@ resumeRouter.post(
  *                     "targetRole": "Full Stack Developer",
  *                     "name": "John Doe",
  *                     "summary": "Experienced...",
- *                     "createdAt": "2024-04-29T12:00:00Z"
+ *                     "createdAt": "2024-04-29T12:00:00Z",
+ *                     "status": "COMPLETED"
  *                   }
  *                 ]
  *               }
@@ -113,6 +114,7 @@ resumeRouter.get(
  *                   "id": 1,
  *                   "targetRole": "Full Stack Developer",
  *                   "name": "John Doe",
+ *                   "status": "COMPLETED",
  *                   "summary": "Experienced...",
  *                   "contact": {
  *                     "email": "john@example.com"
@@ -217,7 +219,8 @@ resumeRouter.get(
  *                 "data": {
  *                   "id": 1,
  *                   "targetRole": "Full Stack Developer",
- *                   "name": "John Doe"
+ *                   "name": "John Doe",
+                  "status": "COMPLETED"
  *                 }
  *               }
  */

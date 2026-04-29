@@ -9,7 +9,6 @@ import {
 import { applicationRateLimiter } from '../../../middlewares/rateLimit.middleware.js';
 import {
     applyToJobParamsSchema,
-    applyToJobBodySchema,
 } from '../../../types/students/application.js';
 
 /**
@@ -25,7 +24,7 @@ const router: Router = Router();
  * @swagger
  * /api/v1/students/application/{jobId}/apply:
  *   post:
- *     summary: Apply to a job
+ *     summary: Apply to a job (No resume needed for initial application)
  *     tags: [Applications]
  *     security:
  *       - bearerAuth: []
@@ -35,20 +34,8 @@ const router: Router = Router();
  *         name: jobId
  *         required: true
  *         schema:
- *           type: string
+ *           type: number
  *         description: The unique ID of the job
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - resumeId
- *             properties:
- *               resumeId:
- *                 type: integer
- *                 example: 1
  *     responses:
  *       201:
  *         description: Application submitted successfully
@@ -60,8 +47,7 @@ const router: Router = Router();
  *                 "message": "Application submitted successfully",
  *                 "data": {
  *                   "id": 1,
- *                   "jobId": "abc",
- *                   "resumeId": 1,
+ *                   "jobId": 1,
  *                   "status": "APPLIED"
  *                 }
  *               }
@@ -72,7 +58,6 @@ router.post(
     requireStudent,
     applicationRateLimiter,
     validateParams(applyToJobParamsSchema),
-    validateRequest(applyToJobBodySchema),
     applyToJobController
 );
 

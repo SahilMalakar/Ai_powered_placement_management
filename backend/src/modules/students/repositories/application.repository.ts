@@ -35,13 +35,7 @@ export const findApplicationByUserIdAndJobId = async (
 export const applyToJobWithTransaction = async (
     userId: number,
     jobId: number,
-    resumeId: number | null | undefined,
-    getSnapshotFn: (
-        profile: any,
-        job: any,
-        resumeUrl: string | null
-    ) => ApplicationSnapshot,
-    findResumeFn: (resumeId: number, tx?: any) => Promise<any>
+    getSnapshotFn: (profile: any, job: any) => ApplicationSnapshot
 ) => {
     return await prisma.$transaction(async (tx) => {
         // 1. Fetch Job and check availability (inside transaction for consistency)
@@ -84,62 +78,15 @@ export const applyToJobWithTransaction = async (
         if (!job.backlogAllowed && profile.backlog)
             throw new ForbiddenError('Backlogs not allowed.');
 
-        // 5. Resume URL fetch (if applicable)
-        let resumeUrl = null;
-        if (resumeId) {
-            const resume = await findResumeFn(resumeId, tx);
-            if (!resume || resume.userId !== userId)
-                throw new ForbiddenError('Invalid resume.');
-            resumeUrl = resume.pdfUrl;
-        }
-
-        // 6. Generate Snapshot and Create Application
-        const snapshot = getSnapshotFn(profile, job, resumeUrl);
+        // 5. Generate Snapshot and Create Application
+        const snapshot = getSnapshotFn(profile, job);
 
         return await tx.application.create({
             data: {
                 userId,
                 jobId,
-                resumeId: resumeId ?? null,
                 snapshot,
             },
         });
-    });
-};
-
-/**
- * Creates a new job application (Single operation fallback).
- */
-export const createApplication = async (
-    data: {
-        userId: number;
-        jobId: number;
-        resumeId?: number | undefined;
-        snapshot: ApplicationSnapshot;
-    },
-    tx: any = prisma
-) => {
-    return await tx.application.create({
-        data: {
-            userId: data.userId,
-            jobId: data.jobId,
-            resumeId: data.resumeId ?? null,
-            snapshot: data.snapshot,
-        },
-    });
-};
-
-/**
- * Fetches a job by ID.
- */
-export const findJobForApplication = async (
-    jobId: number,
-    tx: any = prisma
-) => {
-    return await tx.job.findUnique({
-        where: {
-            id: jobId,
-            deletedAt: null,
-        },
     });
 };

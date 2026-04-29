@@ -13,9 +13,8 @@ export const applyToJobController = async (
     try {
         const userId = req.user!.userId;
         const jobId = parseInt(req.params.jobId as string);
-        const { resumeId } = req.body;
 
-        const application = await applyToJobService(userId, jobId, resumeId);
+        const application = await applyToJobService(userId, jobId);
 
         res.status(201).json({
             success: true,

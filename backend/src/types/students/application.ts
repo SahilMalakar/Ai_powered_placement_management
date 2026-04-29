@@ -11,12 +11,6 @@ export const applyToJobParamsSchema = z.object({
         .transform(Number),
 });
 
-/**
- * Validates the request body for the apply route.
- */
-export const applyToJobBodySchema = z.object({
-    resumeId: z.number().int().positive().optional().nullable(),
-});
 
 /**
  * Schema for the "frozen" snapshot of a student's profile at application time.
@@ -35,10 +29,8 @@ export const applicationSnapshotSchema = z.object({
     allowedBranches: z.array(z.string()),
     backlogAllowed: z.boolean(),
 
-    resumeUrl: z.string().nullable(),
     appliedAt: z.string().datetime(), // ISO Date string
 });
 
 export type ApplyToJobParams = z.infer<typeof applyToJobParamsSchema>;
-export type ApplyToJobBody = z.infer<typeof applyToJobBodySchema>;
 export type ApplicationSnapshot = z.infer<typeof applicationSnapshotSchema>;

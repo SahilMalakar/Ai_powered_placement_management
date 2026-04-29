@@ -7,20 +7,12 @@ import type { ApplicationSnapshot } from '../../../types/students/application.js
  * Handles the high-level logic for applying to a job.
  * Orchestration resides in the repository layer to ensure atomicity.
  */
-export const applyToJobService = async (
-    userId: number,
-    jobId: number,
-    resumeId?: number | null
-) => {
+export const applyToJobService = async (userId: number, jobId: number) => {
     /**
      * Generates the immutable snapshot for the application.
      * Uses Zod to parse/validate the snapshot BEFORE it hits the repository.
      */
-    const generateSnapshot = (
-        profile: any,
-        job: any,
-        resumeUrl: string | null
-    ): ApplicationSnapshot => {
+    const generateSnapshot = (profile: any, job: any): ApplicationSnapshot => {
         const rawSnapshot = {
             fullName: profile.fullName,
             branch: String(profile.branch), // Explicit cast to string for long-term snapshot stability
@@ -35,7 +27,6 @@ export const applyToJobService = async (
             allowedBranches: job.allowedBranches.map((b: any) => String(b)),
             backlogAllowed: job.backlogAllowed,
 
-            resumeUrl: resumeUrl,
             appliedAt: new Date().toISOString(),
         };
 
@@ -47,9 +38,7 @@ export const applyToJobService = async (
     const application = await applyToJobWithTransaction(
         userId,
         jobId,
-        resumeId,
-        generateSnapshot,
-        findResumeById
+        generateSnapshot
     );
 
     return application;
