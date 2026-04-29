@@ -6,80 +6,33 @@ import { CreateProfileInput, UpdateProfileInput, StudentProfileData } from "@/ty
  * Handles fetching, creating, and updating student profile data.
  */
 
+const transformResponse = (data: any): StudentProfileData => {
+  const profile = data;
+  const user = data.user || {};
+
+  return {
+    email: user.email || "",
+    isProfileCompleted: user.isProfileCompleted || false,
+    profile: {
+      ...profile,
+    },
+  };
+};
+
 export const getProfile = async (): Promise<StudentProfileData> => {
-  return api.get("/students/profile").then((r) => {
-    const data = r.data.data;
-    // Map the backend response to the frontend's expected nested structure
-    return {
-      email: data.user?.email || "",
-      isProfileCompleted: data.user?.isProfileCompleted || false,
-      profile: {
-        ...data,
-        socialLinks: data.socialLinks || [],
-        experiences: data.experiences || [],
-        projects: data.projects || [],
-        skills: data.skills || [],
-        additionalDetails: data.additionalDetails || [],
-      },
-      semesters: data.semesters || [],
-      documents: data.documents || {
-        sem1: null, sem2: null, sem3: null, sem4: null,
-        sem5: null, sem6: null, sem7: null, sem8: null,
-        other: []
-      }
-    };
-  });
+  return api.get("/students/profile").then((r) => transformResponse(r.data.data));
 };
 
-export const createProfile = async (data: CreateProfileInput) => {
-  console.log("🚀 TRIGGERING CREATE PROFILE (POST)", data);
-  return api.post("/students/profile", data).then((r) => {
-    const data = r.data.data;
-    return {
-      email: data.user?.email || "",
-      isProfileCompleted: data.user?.isProfileCompleted || false,
-      profile: {
-        ...data,
-        socialLinks: data.socialLinks || [],
-        experiences: data.experiences || [],
-        projects: data.projects || [],
-        skills: data.skills || [],
-        additionalDetails: data.additionalDetails || [],
-      },
-      semesters: data.semesters || [],
-      documents: data.documents || {
-        sem1: null, sem2: null, sem3: null, sem4: null,
-        sem5: null, sem6: null, sem7: null, sem8: null,
-        other: []
-      }
-    };
-  });
+export const createProfile = async (data: any) => {
+  const payload = data.core ? { ...data.core } : { ...data };
+  return api.post("/students/profile", payload).then((r) => transformResponse(r.data.data));
 };
 
-export const updateProfile = async (data: UpdateProfileInput) => {
-  console.log("🚀 TRIGGERING UPDATE PROFILE (PATCH)", data);
-  return api.patch("/students/profile", data).then((r) => {
-    const data = r.data.data;
-    return {
-      email: data.user?.email || "",
-      isProfileCompleted: data.user?.isProfileCompleted || false,
-      profile: {
-        ...data,
-        socialLinks: data.socialLinks || [],
-        experiences: data.experiences || [],
-        projects: data.projects || [],
-        skills: data.skills || [],
-        additionalDetails: data.additionalDetails || [],
-      },
-      semesters: data.semesters || [],
-      documents: data.documents || {
-        sem1: null, sem2: null, sem3: null, sem4: null,
-        sem5: null, sem6: null, sem7: null, sem8: null,
-        other: []
-      }
-    };
-  });
+export const updateProfile = async (data: any) => {
+  const payload = data.core ? { ...data.core } : { ...data };
+  return api.patch("/students/profile", payload).then((r) => transformResponse(r.data.data));
 };
+
 export const getAcademicRecord = async () => {
   return api.get("/students/profile/academic").then((r) => r.data.data);
 };
