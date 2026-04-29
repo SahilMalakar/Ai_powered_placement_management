@@ -146,21 +146,6 @@ authRouter.post(
  *                   "role": "STUDENT"
  *                 }
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
- *                   "token": "..."
- *                 }
- *               }
  */
 authRouter.get('/me', authMiddleware, meController);
 
@@ -183,33 +168,6 @@ authRouter.get('/me', authMiddleware, meController);
  *                 "success": true,
  *                 "message": "Logout successful",
  *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "User details fetched successfully",
- *                 "data": {
- *                   "id": 1,
- *                   "email": "student@example.com",
- *                   "role": "STUDENT"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
- *                   "token": "..."
- *                 }
  *               }
  */
 authRouter.post('/logout', authMiddleware, logoutController);
@@ -250,41 +208,6 @@ authRouter.post('/logout', authMiddleware, logoutController);
  *                 "message": "Password changed successfully",
  *                 "data": null
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Logout successful",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "User details fetched successfully",
- *                 "data": {
- *                   "id": 1,
- *                   "email": "student@example.com",
- *                   "role": "STUDENT"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
- *                   "token": "..."
- *                 }
- *               }
  */
 authRouter.patch(
     '/change-password',
@@ -321,49 +244,6 @@ authRouter.patch(
  *                 "success": true,
  *                 "message": "Reset email sent successfully",
  *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Password changed successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Logout successful",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "User details fetched successfully",
- *                 "data": {
- *                   "id": 1,
- *                   "email": "student@example.com",
- *                   "role": "STUDENT"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
- *                   "token": "..."
- *                 }
  *               }
  */
 authRouter.post(
@@ -409,57 +289,6 @@ authRouter.post(
  *                 "message": "Password reset successfully",
  *                 "data": null
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Reset email sent successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Password changed successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Logout successful",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "User details fetched successfully",
- *                 "data": {
- *                   "id": 1,
- *                   "email": "student@example.com",
- *                   "role": "STUDENT"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
- *                   "token": "..."
- *                 }
- *               }
  */
 authRouter.patch(
     '/reset-password',
@@ -483,65 +312,6 @@ authRouter.patch(
  *                 "success": true,
  *                 "message": "Token refreshed successfully",
  *                 "data": {
- *                   "token": "..."
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Password reset successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Reset email sent successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Password changed successfully",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Logout successful",
- *                 "data": null
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "User details fetched successfully",
- *                 "data": {
- *                   "id": 1,
- *                   "email": "student@example.com",
- *                   "role": "STUDENT"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Login successful",
- *                 "data": {
- *                   "user": {
- *                     "id": 1,
- *                     "email": "student@example.com",
- *                     "role": "STUDENT"
- *                   },
  *                   "token": "..."
  *                 }
  *               }

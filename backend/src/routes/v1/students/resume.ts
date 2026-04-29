@@ -253,14 +253,6 @@ resumeRouter.patch(
  *                 "message": "Resume export successfully queued",
  *                 "data": null
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Resume generation successfully queued",
- *                 "data": null
- *               }
  */
 resumeRouter.get(
     '/:id/export',

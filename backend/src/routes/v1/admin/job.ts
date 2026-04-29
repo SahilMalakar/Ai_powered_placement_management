@@ -140,21 +140,6 @@ jobRouter.post(
  *                   "title": "Senior Software Engineer"
  *                 }
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Jobs fetched successfully",
- *                 "data": [
- *                   {
- *                     "id": "abc",
- *                     "title": "Software Engineer",
- *                     "company": "Google",
- *                     "status": "ACTIVE"
- *                   }
- *                 ]
- *               }
  */
 jobRouter.patch(
     '/:id',
@@ -194,32 +179,6 @@ jobRouter.patch(
  *                   "status": "ACTIVE"
  *                 }
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Job updated successfully",
- *                 "data": {
- *                   "id": "abc",
- *                   "title": "Senior Software Engineer"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Jobs fetched successfully",
- *                 "data": [
- *                   {
- *                     "id": "abc",
- *                     "title": "Software Engineer",
- *                     "company": "Google",
- *                     "status": "ACTIVE"
- *                   }
- *                 ]
- *               }
  */
 jobRouter.post(
     '/:id/activate',
@@ -257,43 +216,6 @@ jobRouter.post(
  *                   "id": "abc",
  *                   "status": "DEACTIVE"
  *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Job activated successfully",
- *                 "data": {
- *                   "id": "abc",
- *                   "status": "ACTIVE"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Job updated successfully",
- *                 "data": {
- *                   "id": "abc",
- *                   "title": "Senior Software Engineer"
- *                 }
- *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "Jobs fetched successfully",
- *                 "data": [
- *                   {
- *                     "id": "abc",
- *                     "title": "Software Engineer",
- *                     "company": "Google",
- *                     "status": "ACTIVE"
- *                   }
- *                 ]
  *               }
  */
 jobRouter.post(

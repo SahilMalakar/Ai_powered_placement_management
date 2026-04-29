@@ -133,22 +133,6 @@ documentRouter.post(
  *                 "message": "Document deleted successfully",
  *                 "data": null
  *               }
- *         content:
- *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "List of documents fetched successfully",
- *                 "data": [
- *                   {
- *                     "id": 1,
- *                     "type": "SGPA",
- *                     "semester": 1,
- *                     "fileUrl": "...",
- *                     "status": "VERIFIED"
- *                   }
- *                 ]
- *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
