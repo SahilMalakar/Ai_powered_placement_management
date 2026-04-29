@@ -5,7 +5,6 @@ import {
   DesktopSidebar,
   MobileSidebar,
   StudentNavbar,
-  SIDEBAR_WIDTH,
 } from "@/components/layout/student";
 
 /**

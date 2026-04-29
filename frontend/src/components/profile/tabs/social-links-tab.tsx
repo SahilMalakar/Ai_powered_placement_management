@@ -5,7 +5,6 @@ import { useSocialLinks, useAddSocialLink, useUpdateSocialLink, useDeleteSocialL
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"

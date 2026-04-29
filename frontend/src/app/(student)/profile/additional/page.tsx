@@ -1,25 +1,18 @@
 "use client"
 
-import { CoreInfoTab } from "@/components/profile/tabs/core-info-tab"
+import { AdditionalDetailsTab } from "@/components/profile/tabs/additional-details-tab"
 import { useProfileStore } from "@/store/useProfileStore"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { useCreateProfile } from "@/hooks/student/use-create-profile"
 import { useProfile } from "@/hooks/student/use-profile"
 import { useRouter } from "next/navigation"
 
-export default function CoreInfoPage() {
+export default function AdditionalPage() {
   const router = useRouter()
-  const { formData, setFormData } = useProfileStore()
+  const { formData } = useProfileStore()
   const { data: profileData } = useProfile()
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile()
   const { mutate: createProfile, isPending: isCreating } = useCreateProfile()
-
-  const isSaving = isUpdating || isCreating
-
-  const handleNext = (data: any) => {
-    setFormData(data)
-    router.push("/profile/social")
-  }
 
   const handleSave = (finalData?: any) => {
     const completeData = { ...formData, ...finalData }
@@ -31,11 +24,10 @@ export default function CoreInfoPage() {
   }
 
   return (
-    <CoreInfoTab 
-      onNext={handleNext} 
+    <AdditionalDetailsTab 
+      onPrev={() => router.push("/profile/skills")} 
       onSave={handleSave} 
-      initialData={formData} 
-      isSaving={isSaving} 
+      isSaving={isUpdating || isCreating} 
     />
   )
 }
