@@ -42,6 +42,14 @@ const atsRouter: Router = Router();
  *     responses:
  *       202:
  *         description: ATS analysis successfully queued
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "ATS analysis successfully queued",
+ *                 "data": null
+ *               }
  */
 atsRouter.post(
     '/ats',
@@ -63,7 +71,23 @@ atsRouter.post(
  *     responses:
  *       200:
  *         description: ATS results fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "ATS results fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "score": 85,
+ *                     "feedback": "Good resume",
+ *                     "jobDescription": "...",
+ *                     "createdAt": "2024-04-29T12:00:00Z"
+ *                   }
+ *                 ]
+ *               }
  */
-atsRouter.get('/ats', authMiddleware, requireStudent, getAtsResultsController);
+atsRouter.get('/', authMiddleware, requireStudent, getAtsResultsController);
 
 export { atsRouter };

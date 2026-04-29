@@ -23,7 +23,7 @@ skillRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/skill:
+ * /api/v1/students/profile/skill:
  *   get:
  *     summary: Fetch all skills for the logged-in student
  *     tags: [Skills]
@@ -33,14 +33,33 @@ skillRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of skills fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Skills fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "category": "Languages",
+ *                     "skills": [
+ *                       "JavaScript",
+ *                       "TypeScript",
+ *                       "Python"
+ *                     ],
+ *                     "profileId": 1
+ *                   }
+ *                 ]
+ *               }
  *       404:
  *         description: Profile not found
  */
-skillRouter.get("/skills", getSkillsController);
+skillRouter.get("/", getSkillsController);
 
 /**
  * @swagger
- * /api/v1/students/skill:
+ * /api/v1/students/profile/skill:
  *   post:
  *     summary: Add a new skill category and skills
  *     tags: [Skills]
@@ -63,16 +82,33 @@ skillRouter.get("/skills", getSkillsController);
  *     responses:
  *       201:
  *         description: Skill added successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Skill added successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "category": "Languages",
+ *                   "skills": [
+ *                     "JavaScript",
+ *                     "TypeScript",
+ *                     "Python"
+ *                   ],
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Profile is locked during verification
  *       404:
  *         description: Profile not found
  */
-skillRouter.post("/skills", validateRequest(skillSchema), addSkillController);
+skillRouter.post("/", validateRequest(skillSchema), addSkillController);
 
 /**
  * @swagger
- * /api/v1/students/skill/{id}:
+ * /api/v1/students/profile/skill/{id}:
  *   patch:
  *     summary: Update an existing skill
  *     tags: [Skills]
@@ -101,16 +137,33 @@ skillRouter.post("/skills", validateRequest(skillSchema), addSkillController);
  *     responses:
  *       200:
  *         description: Skill updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Skill updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "category": "Languages",
+ *                   "skills": [
+ *                     "JavaScript",
+ *                     "TypeScript",
+ *                     "Python"
+ *                   ],
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Skill not found
  */
-skillRouter.patch("/skills/:id", validateRequest(updateSkillSchema), updateSkillController);
+skillRouter.patch("/:id", validateRequest(updateSkillSchema), updateSkillController);
 
 /**
  * @swagger
- * /api/v1/students/skill/{id}:
+ * /api/v1/students/profile/skill/{id}:
  *   delete:
  *     summary: Delete a skill
  *     tags: [Skills]
@@ -127,11 +180,19 @@ skillRouter.patch("/skills/:id", validateRequest(updateSkillSchema), updateSkill
  *     responses:
  *       200:
  *         description: Skill deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Skill deleted successfully",
+ *                 "data": null
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Skill not found
  */
-skillRouter.delete("/skills/:id", deleteSkillController);
+skillRouter.delete("/:id", deleteSkillController);
 
 export { skillRouter };

@@ -23,7 +23,7 @@ const router: Router = Router();
 
 /**
  * @swagger
- * /api/v1/students/jobs/{jobId}/apply:
+ * /api/v1/students/application/{jobId}/apply:
  *   post:
  *     summary: Apply to a job
  *     tags: [Applications]
@@ -52,9 +52,22 @@ const router: Router = Router();
  *     responses:
  *       201:
  *         description: Application submitted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Application submitted successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "jobId": "abc",
+ *                   "resumeId": 1,
+ *                   "status": "APPLIED"
+ *                 }
+ *               }
  */
 router.post(
-    '/jobs/:jobId/apply',
+    '/:jobId/apply',
     authMiddleware,
     requireStudent,
     applicationRateLimiter,

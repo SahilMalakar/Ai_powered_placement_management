@@ -24,7 +24,7 @@ documentRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/documents:
+ * /api/v1/students/document:
  *   get:
  *     summary: Fetch all documents for the logged-in student
  *     tags: [Documents]
@@ -34,12 +34,28 @@ documentRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of documents fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "List of documents fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "type": "SGPA",
+ *                     "semester": 1,
+ *                     "fileUrl": "...",
+ *                     "status": "VERIFIED"
+ *                   }
+ *                 ]
+ *               }
  */
-documentRouter.get('/documents', getDocumentsController);
+documentRouter.get('/', getDocumentsController);
 
 /**
  * @swagger
- * /api/v1/students/documents:
+ * /api/v1/students/document:
  *   post:
  *     summary: Upload a single student document (SGPA or OTHER)
  *     tags: [Documents]
@@ -70,13 +86,21 @@ documentRouter.get('/documents', getDocumentsController);
  *     responses:
  *       202:
  *         description: Document upload successfully queued for background processing
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Document upload successfully queued for background processing",
+ *                 "data": null
+ *               }
  *       400:
  *         description: Validation error or missing file
  *       403:
  *         description: Forbidden - profile is locked during verification
  */
 documentRouter.post(
-    '/documents',
+    '/',
     documentUpload.single('file'), // Expecting single file under 'file' key
     validateRequest(uploadDocumentSchema),
     uploadDocumentController
@@ -84,7 +108,7 @@ documentRouter.post(
 
 /**
  * @swagger
- * /api/v1/students/documents/{id}:
+ * /api/v1/students/document/{id}:
  *   delete:
  *     summary: Delete a specific document
  *     tags: [Documents]
@@ -101,13 +125,37 @@ documentRouter.post(
  *     responses:
  *       200:
  *         description: Document deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Document deleted successfully",
+ *                 "data": null
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "List of documents fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "type": "SGPA",
+ *                     "semester": 1,
+ *                     "fileUrl": "...",
+ *                     "status": "VERIFIED"
+ *                   }
+ *                 ]
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Document not found
  */
 documentRouter.delete(
-    '/documents/:id',
+    '/:id',
     deleteDocumentController
 );
 

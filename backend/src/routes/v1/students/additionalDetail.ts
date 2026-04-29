@@ -23,7 +23,7 @@ additionalDetailRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/additional-detail:
+ * /api/v1/students/profile/additionalDetail:
  *   get:
  *     summary: Fetch all additional details for the logged-in student
  *     tags: [Additional Details]
@@ -33,14 +33,32 @@ additionalDetailRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of additional details fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Additional details fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "title": "OpenSource Contribution",
+ *                     "description": [
+ *                       "Contributed to React core team"
+ *                     ],
+ *                     "date": "2025-01-01",
+ *                     "profileId": 1
+ *                   }
+ *                 ]
+ *               }
  *       404:
  *         description: Profile not found
  */
-additionalDetailRouter.get("/additionals", getAdditionalDetailsController);
+additionalDetailRouter.get("/", getAdditionalDetailsController);
 
 /**
  * @swagger
- * /api/v1/students/additional-detail:
+ * /api/v1/students/profile/additionalDetail:
  *   post:
  *     summary: Add a new additional detail
  *     tags: [Additional Details]
@@ -64,16 +82,32 @@ additionalDetailRouter.get("/additionals", getAdditionalDetailsController);
  *     responses:
  *       201:
  *         description: Additional detail added successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Additional detail added successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "title": "OpenSource Contribution",
+ *                   "description": [
+ *                     "Contributed to React core team"
+ *                   ],
+ *                   "date": "2025-01-01",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Profile is locked during verification
  *       404:
  *         description: Profile not found
  */
-additionalDetailRouter.post("/additionals", validateRequest(additionalDetailSchema), addAdditionalDetailController);
+additionalDetailRouter.post("/", validateRequest(additionalDetailSchema), addAdditionalDetailController);
 
 /**
  * @swagger
- * /api/v1/students/additional-detail/{id}:
+ * /api/v1/students/profile/additionalDetail/{id}:
  *   patch:
  *     summary: Update an existing additional detail
  *     tags: [Additional Details]
@@ -103,16 +137,32 @@ additionalDetailRouter.post("/additionals", validateRequest(additionalDetailSche
  *     responses:
  *       200:
  *         description: Additional detail updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Additional detail updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "title": "OpenSource Contribution",
+ *                   "description": [
+ *                     "Contributed to React core team"
+ *                   ],
+ *                   "date": "2025-01-01",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Additional detail not found
  */
-additionalDetailRouter.patch("/additionals/:id", validateRequest(updateAdditionalDetailSchema), updateAdditionalDetailController);
+additionalDetailRouter.patch("/:id", validateRequest(updateAdditionalDetailSchema), updateAdditionalDetailController);
 
 /**
  * @swagger
- * /api/v1/students/additional-detail/{id}:
+ * /api/v1/students/profile/additionalDetail/{id}:
  *   delete:
  *     summary: Delete an additional detail
  *     tags: [Additional Details]
@@ -129,11 +179,19 @@ additionalDetailRouter.patch("/additionals/:id", validateRequest(updateAdditiona
  *     responses:
  *       200:
  *         description: Additional detail deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Additional detail deleted successfully",
+ *                 "data": null
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Additional detail not found
  */
-additionalDetailRouter.delete("/additionals/:id", deleteAdditionalDetailController);
+additionalDetailRouter.delete("/:id", deleteAdditionalDetailController);
 
 export { additionalDetailRouter };

@@ -24,9 +24,17 @@ const verificationRouter: Router = Router();
  *     responses:
  *       202:
  *         description: Verification process successfully initiated
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Verification process successfully initiated",
+ *                 "data": null
+ *               }
  */
 verificationRouter.post(
-    '/verification',
+    '/',
     authMiddleware,
     requireStudent,
     initiateVerificationController

@@ -23,7 +23,7 @@ experienceRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/experience:
+ * /api/v1/students/profile/experience:
  *   get:
  *     summary: Fetch all experiences for the logged-in student
  *     tags: [Experiences]
@@ -33,14 +33,36 @@ experienceRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of experiences fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Experiences fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "role": "Backend Intern",
+ *                     "company": "Google",
+ *                     "location": "Bangalore",
+ *                     "startDate": "2025-06-01",
+ *                     "endDate": "2025-08-31",
+ *                     "description": [
+ *                       "Built REST APIs"
+ *                     ],
+ *                     "toolsUsed": "Node.js",
+ *                     "profileId": 1
+ *                   }
+ *                 ]
+ *               }
  *       404:
  *         description: Profile not found
  */
-experienceRouter.get("/experiences", getExperiencesController);
+experienceRouter.get("/", getExperiencesController);
 
 /**
  * @swagger
- * /api/v1/students/experience:
+ * /api/v1/students/profile/experience:
  *   post:
  *     summary: Add a new work experience
  *     tags: [Experiences]
@@ -68,16 +90,36 @@ experienceRouter.get("/experiences", getExperiencesController);
  *     responses:
  *       201:
  *         description: Experience added successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Experience added successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "role": "Backend Intern",
+ *                   "company": "Google",
+ *                   "location": "Bangalore",
+ *                   "startDate": "2025-06-01",
+ *                   "endDate": "2025-08-31",
+ *                   "description": [
+ *                     "Built REST APIs"
+ *                   ],
+ *                   "toolsUsed": "Node.js",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Profile is locked during verification
  *       404:
  *         description: Profile not found
  */
-experienceRouter.post("/experiences", validateRequest(experienceSchema), addExperienceController);
+experienceRouter.post("/", validateRequest(experienceSchema), addExperienceController);
 
 /**
  * @swagger
- * /api/v1/students/experience/{id}:
+ * /api/v1/students/profile/experience/{id}:
  *   patch:
  *     summary: Update an existing experience
  *     tags: [Experiences]
@@ -111,16 +153,36 @@ experienceRouter.post("/experiences", validateRequest(experienceSchema), addExpe
  *     responses:
  *       200:
  *         description: Experience updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Experience updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "role": "Backend Intern",
+ *                   "company": "Google",
+ *                   "location": "Bangalore",
+ *                   "startDate": "2025-06-01",
+ *                   "endDate": "2025-08-31",
+ *                   "description": [
+ *                     "Built REST APIs"
+ *                   ],
+ *                   "toolsUsed": "Node.js",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Experience not found
  */
-experienceRouter.patch("/experiences/:id", validateRequest(updateExperienceSchema), updateExperienceController);
+experienceRouter.patch("/:id", validateRequest(updateExperienceSchema), updateExperienceController);
 
 /**
  * @swagger
- * /api/v1/students/experience/{id}:
+ * /api/v1/students/profile/experience/{id}:
  *   delete:
  *     summary: Delete an experience
  *     tags: [Experiences]
@@ -137,11 +199,19 @@ experienceRouter.patch("/experiences/:id", validateRequest(updateExperienceSchem
  *     responses:
  *       200:
  *         description: Experience deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Experience deleted successfully",
+ *                 "data": null
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Experience not found
  */
-experienceRouter.delete("/experiences/:id", deleteExperienceController);
+experienceRouter.delete("/:id", deleteExperienceController);
 
 export { experienceRouter };

@@ -23,7 +23,7 @@ socialLinkRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/social-link:
+ * /api/v1/students/profile/socialLink:
  *   get:
  *     summary: Fetch all social links for the logged-in student
  *     tags: [Social Links]
@@ -33,14 +33,29 @@ socialLinkRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of social links fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Social links fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "platform": "LinkedIn",
+ *                     "url": "https://linkedin.com/in/johndoe",
+ *                     "profileId": 1
+ *                   }
+ *                 ]
+ *               }
  *       404:
  *         description: Profile not found
  */
-socialLinkRouter.get("/links", getSocialLinksController);
+socialLinkRouter.get("/", getSocialLinksController);
 
 /**
  * @swagger
- * /api/v1/students/social-link:
+ * /api/v1/students/profile/socialLink:
  *   post:
  *     summary: Add a new social link
  *     tags: [Social Links]
@@ -60,16 +75,29 @@ socialLinkRouter.get("/links", getSocialLinksController);
  *     responses:
  *       201:
  *         description: Social link added successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Social link added successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "platform": "LinkedIn",
+ *                   "url": "https://linkedin.com/in/johndoe",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Profile is locked during verification
  *       404:
  *         description: Profile not found
  */
-socialLinkRouter.post("/links", validateRequest(socialLinkSchema), addSocialLinkController);
+socialLinkRouter.post("/", validateRequest(socialLinkSchema), addSocialLinkController);
 
 /**
  * @swagger
- * /api/v1/students/social-link/{id}:
+ * /api/v1/students/profile/socialLink/{id}:
  *   patch:
  *     summary: Update an existing social link
  *     tags: [Social Links]
@@ -95,16 +123,29 @@ socialLinkRouter.post("/links", validateRequest(socialLinkSchema), addSocialLink
  *     responses:
  *       200:
  *         description: Social link updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Social link updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "platform": "LinkedIn",
+ *                   "url": "https://linkedin.com/in/johndoe",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Social link not found
  */
-socialLinkRouter.patch("/links/:id", validateRequest(updateSocialLinkSchema), updateSocialLinkController);
+socialLinkRouter.patch("/:id", validateRequest(updateSocialLinkSchema), updateSocialLinkController);
 
 /**
  * @swagger
- * /api/v1/students/social-link/{id}:
+ * /api/v1/students/profile/socialLink/{id}:
  *   delete:
  *     summary: Delete a social link
  *     tags: [Social Links]
@@ -121,11 +162,19 @@ socialLinkRouter.patch("/links/:id", validateRequest(updateSocialLinkSchema), up
  *     responses:
  *       200:
  *         description: Social link deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Social link deleted successfully",
+ *                 "data": null
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Social link not found
  */
-socialLinkRouter.delete("/links/:id", deleteSocialLinkController);
+socialLinkRouter.delete("/:id", deleteSocialLinkController);
 
 export { socialLinkRouter };

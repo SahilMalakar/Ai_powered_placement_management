@@ -26,7 +26,7 @@ const jobRouter: Router = Router();
 
 /**
  * @swagger
- * /api/v1/admin/jobs:
+ * /api/v1/admin/job:
  *   get:
  *     summary: Fetch all available jobs
  *     tags: [Jobs]
@@ -36,12 +36,27 @@ const jobRouter: Router = Router();
  *     responses:
  *       200:
  *         description: Jobs fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Jobs fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": "abc",
+ *                     "title": "Software Engineer",
+ *                     "company": "Google",
+ *                     "status": "ACTIVE"
+ *                   }
+ *                 ]
+ *               }
  */
-jobRouter.get('/jobs', authMiddleware, getAllJobsController);
+jobRouter.get('/', authMiddleware, getAllJobsController);
 
 /**
  * @swagger
- * /api/v1/admin/jobs:
+ * /api/v1/admin/job:
  *   post:
  *     summary: Create a new job
  *     tags: [Admin Jobs]
@@ -66,9 +81,20 @@ jobRouter.get('/jobs', authMiddleware, getAllJobsController);
  *     responses:
  *       201:
  *         description: Job created successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job created successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "title": "Software Engineer"
+ *                 }
+ *               }
  */
 jobRouter.post(
-    '/jobs',
+    '/',
     authMiddleware,
     requireAdmin,
     validateRequest(createJobSchema),
@@ -77,7 +103,7 @@ jobRouter.post(
 
 /**
  * @swagger
- * /api/v1/admin/jobs/{id}:
+ * /api/v1/admin/job/{id}:
  *   patch:
  *     summary: Update an existing job
  *     tags: [Admin Jobs]
@@ -103,9 +129,35 @@ jobRouter.post(
  *     responses:
  *       200:
  *         description: Job updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job updated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "title": "Senior Software Engineer"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Jobs fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": "abc",
+ *                     "title": "Software Engineer",
+ *                     "company": "Google",
+ *                     "status": "ACTIVE"
+ *                   }
+ *                 ]
+ *               }
  */
 jobRouter.patch(
-    '/jobs/:id',
+    '/:id',
     authMiddleware,
     requireAdmin,
     validateParams(idSchema),
@@ -115,7 +167,7 @@ jobRouter.patch(
 
 /**
  * @swagger
- * /api/v1/admin/jobs/{id}/activate:
+ * /api/v1/admin/job/{id}/activate:
  *   post:
  *     summary: Activate a job
  *     tags: [Admin Jobs]
@@ -131,9 +183,46 @@ jobRouter.patch(
  *     responses:
  *       200:
  *         description: Job activated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job activated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "status": "ACTIVE"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job updated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "title": "Senior Software Engineer"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Jobs fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": "abc",
+ *                     "title": "Software Engineer",
+ *                     "company": "Google",
+ *                     "status": "ACTIVE"
+ *                   }
+ *                 ]
+ *               }
  */
 jobRouter.post(
-    '/jobs/:id/activate',
+    '/:id/activate',
     authMiddleware,
     requireAdmin,
     validateParams(idSchema),
@@ -142,7 +231,7 @@ jobRouter.post(
 
 /**
  * @swagger
- * /api/v1/admin/jobs/{id}/deactivate:
+ * /api/v1/admin/job/{id}/deactivate:
  *   post:
  *     summary: Deactivate a job
  *     tags: [Admin Jobs]
@@ -158,9 +247,57 @@ jobRouter.post(
  *     responses:
  *       200:
  *         description: Job deactivated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job deactivated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "status": "DEACTIVE"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job activated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "status": "ACTIVE"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job updated successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "title": "Senior Software Engineer"
+ *                 }
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Jobs fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": "abc",
+ *                     "title": "Software Engineer",
+ *                     "company": "Google",
+ *                     "status": "ACTIVE"
+ *                   }
+ *                 ]
+ *               }
  */
 jobRouter.post(
-    '/jobs/:id/deactivate',
+    '/:id/deactivate',
     authMiddleware,
     requireAdmin,
     validateParams(idSchema),

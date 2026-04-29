@@ -20,7 +20,7 @@ const resumeRouter: Router = Router();
 
 /**
  * @swagger
- * /api/v1/students/resumes/generate:
+ * /api/v1/students/resume/generate:
  *   post:
  *     summary: Generate a new AI-powered resume
  *     tags: [Resumes]
@@ -30,9 +30,17 @@ const resumeRouter: Router = Router();
  *     responses:
  *       202:
  *         description: Resume generation successfully queued
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume generation successfully queued",
+ *                 "data": null
+ *               }
  */
 resumeRouter.post(
-    '/resumes/generate',
+    '/generate',
     authMiddleware,
     requireStudent,
     generateResumeController
@@ -40,7 +48,7 @@ resumeRouter.post(
 
 /**
  * @swagger
- * /api/v1/students/resumes:
+ * /api/v1/students/resume:
  *   get:
  *     summary: Fetch all resumes for the authenticated student
  *     tags: [Resumes]
@@ -50,9 +58,25 @@ resumeRouter.post(
  *     responses:
  *       200:
  *         description: Resumes fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resumes fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "targetRole": "Full Stack Developer",
+ *                     "name": "John Doe",
+ *                     "summary": "Experienced...",
+ *                     "createdAt": "2024-04-29T12:00:00Z"
+ *                   }
+ *                 ]
+ *               }
  */
 resumeRouter.get(
-    '/resumes/',
+    '/',
     authMiddleware,
     requireStudent,
     getStudentResumesController
@@ -60,7 +84,7 @@ resumeRouter.get(
 
 /**
  * @swagger
- * /api/v1/students/resumes/{id}:
+ * /api/v1/students/resume/{id}:
  *   get:
  *     summary: Fetch a single resume by its unique ID
  *     tags: [Resumes]
@@ -77,9 +101,30 @@ resumeRouter.get(
  *     responses:
  *       200:
  *         description: Resume fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume fetched successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "targetRole": "Full Stack Developer",
+ *                   "name": "John Doe",
+ *                   "summary": "Experienced...",
+ *                   "contact": {
+ *                     "email": "john@example.com"
+ *                   },
+ *                   "skills": [],
+ *                   "workExperience": [],
+ *                   "projects": [],
+ *                   "education": [],
+ *                   "additionalDetails": []
+ *                 }
+ *               }
  */
 resumeRouter.get(
-    '/resumes/:id',
+    '/:id',
     authMiddleware,
     requireStudent,
     getResumeByIdController
@@ -87,7 +132,7 @@ resumeRouter.get(
 
 /**
  * @swagger
- * /api/v1/students/resumes/{id}:
+ * /api/v1/students/resume/{id}:
  *   patch:
  *     summary: Update the JSON content of a student's resume
  *     tags: [Resumes]
@@ -161,9 +206,21 @@ resumeRouter.get(
  *     responses:
  *       200:
  *         description: Resume updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "targetRole": "Full Stack Developer",
+ *                   "name": "John Doe"
+ *                 }
+ *               }
  */
 resumeRouter.patch(
-    '/resumes/:id',
+    '/:id',
     authMiddleware,
     requireStudent,
     updateResumeController
@@ -171,7 +228,7 @@ resumeRouter.patch(
 
 /**
  * @swagger
- * /api/v1/students/resumes/{id}/export:
+ * /api/v1/students/resume/{id}/export:
  *   get:
  *     summary: Initiate PDF export for a resume
  *     tags: [Resumes]
@@ -188,9 +245,25 @@ resumeRouter.patch(
  *     responses:
  *       202:
  *         description: Resume export successfully queued
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume export successfully queued",
+ *                 "data": null
+ *               }
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume generation successfully queued",
+ *                 "data": null
+ *               }
  */
 resumeRouter.get(
-    '/resumes/:id/export',
+    '/:id/export',
     authMiddleware,
     requireStudent,
     exportResumeController

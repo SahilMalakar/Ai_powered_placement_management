@@ -23,7 +23,7 @@ projectRouter.use(authMiddleware, requireStudent);
 
 /**
  * @swagger
- * /api/v1/students/project:
+ * /api/v1/students/profile/project:
  *   get:
  *     summary: Fetch all projects for the logged-in student
  *     tags: [Projects]
@@ -33,14 +33,36 @@ projectRouter.use(authMiddleware, requireStudent);
  *     responses:
  *       200:
  *         description: List of projects fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Projects fetched successfully",
+ *                 "data": [
+ *                   {
+ *                     "id": 1,
+ *                     "title": "E-commerce App",
+ *                     "description": [
+ *                       "Built full stack app using Next.js"
+ *                     ],
+ *                     "link": "https://example.com",
+ *                     "secondaryLink": "",
+ *                     "keyTools": "React, Node.js",
+ *                     "startDate": "2025-01-01",
+ *                     "endDate": "2025-03-31",
+ *                     "profileId": 1
+ *                   }
+ *                 ]
+ *               }
  *       404:
  *         description: Profile not found
  */
-projectRouter.get("/projects", getProjectsController);
+projectRouter.get("/", getProjectsController);
 
 /**
  * @swagger
- * /api/v1/students/project:
+ * /api/v1/students/profile/project:
  *   post:
  *     summary: Add a new project
  *     tags: [Projects]
@@ -68,16 +90,36 @@ projectRouter.get("/projects", getProjectsController);
  *     responses:
  *       201:
  *         description: Project added successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Project added successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "title": "E-commerce App",
+ *                   "description": [
+ *                     "Built full stack app using Next.js"
+ *                   ],
+ *                   "link": "https://example.com",
+ *                   "secondaryLink": "",
+ *                   "keyTools": "React, Node.js",
+ *                   "startDate": "2025-01-01",
+ *                   "endDate": "2025-03-31",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Profile is locked during verification
  *       404:
  *         description: Profile not found
  */
-projectRouter.post("/projects", validateRequest(projectSchema), addProjectController);
+projectRouter.post("/", validateRequest(projectSchema), addProjectController);
 
 /**
  * @swagger
- * /api/v1/students/project/{id}:
+ * /api/v1/students/profile/project/{id}:
  *   patch:
  *     summary: Update an existing project
  *     tags: [Projects]
@@ -108,16 +150,36 @@ projectRouter.post("/projects", validateRequest(projectSchema), addProjectContro
  *     responses:
  *       200:
  *         description: Project updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Project updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "title": "E-commerce App",
+ *                   "description": [
+ *                     "Built full stack app using Next.js"
+ *                   ],
+ *                   "link": "https://example.com",
+ *                   "secondaryLink": "",
+ *                   "keyTools": "React, Node.js",
+ *                   "startDate": "2025-01-01",
+ *                   "endDate": "2025-03-31",
+ *                   "profileId": 1
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Project not found
  */
-projectRouter.patch("/projects/:id", validateRequest(updateProjectSchema), updateProjectController);
+projectRouter.patch("/:id", validateRequest(updateProjectSchema), updateProjectController);
 
 /**
  * @swagger
- * /api/v1/students/project/{id}:
+ * /api/v1/students/profile/project/{id}:
  *   delete:
  *     summary: Delete a project
  *     tags: [Projects]
@@ -134,11 +196,19 @@ projectRouter.patch("/projects/:id", validateRequest(updateProjectSchema), updat
  *     responses:
  *       200:
  *         description: Project deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Project deleted successfully",
+ *                 "data": null
+ *               }
  *       403:
  *         description: Forbidden - not owner or profile locked
  *       404:
  *         description: Project not found
  */
-projectRouter.delete("/projects/:id", deleteProjectController);
+projectRouter.delete("/:id", deleteProjectController);
 
 export { projectRouter };

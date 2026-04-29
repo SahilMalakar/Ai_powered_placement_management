@@ -31,9 +31,27 @@ const profileRouter: Router = Router();
  *     responses:
  *       200:
  *         description: Profile fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Profile fetched successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "fullName": "Sahil Malakar",
+ *                   "branch": "ETE",
+ *                   "rollNo": "22/211",
+ *                   "dob": "2002-07-02",
+ *                   "phoneNumber": "9876543210",
+ *                   "university": "AEC",
+ *                   "degree": "B.Tech",
+ *                   "graduationYear": 2024
+ *                 }
+ *               }
  */
 profileRouter.get(
-    '/profile',
+    '/',
     authMiddleware,
     requireStudent,
     getStudentProfileController
@@ -53,7 +71,7 @@ profileRouter.get(
  *         description: Academic records fetched successfully
  */
 profileRouter.get(
-    '/profile/academic',
+    '/academic',
     authMiddleware,
     requireStudent,
     getAcademicRecordController
@@ -88,11 +106,29 @@ profileRouter.get(
  *     responses:
  *       201:
  *         description: Profile created successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Profile created successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "fullName": "Sahil Malakar",
+ *                   "branch": "ETE",
+ *                   "rollNo": "22/211",
+ *                   "dob": "2002-07-02",
+ *                   "phoneNumber": "9876543210",
+ *                   "university": "AEC",
+ *                   "degree": "B.Tech",
+ *                   "graduationYear": 2024
+ *                 }
+ *               }
  *       400:
  *         description: Bad Request - Missing required fields or invalid format
  */
 profileRouter.post(
-    '/profile',
+    '/',
     authMiddleware,
     requireStudent,
     validateRequest(CreateProfileSchema),
@@ -121,11 +157,29 @@ profileRouter.post(
  *     responses:
  *       200:
  *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Profile updated successfully",
+ *                 "data": {
+ *                   "id": 1,
+ *                   "fullName": "Sahil Malakar",
+ *                   "branch": "ETE",
+ *                   "rollNo": "22/211",
+ *                   "dob": "2002-07-02",
+ *                   "phoneNumber": "9876543210",
+ *                   "university": "AEC",
+ *                   "degree": "B.Tech",
+ *                   "graduationYear": 2024
+ *                 }
+ *               }
  *       403:
  *         description: Forbidden - Profile is locked during verification
  */
 profileRouter.patch(
-    '/profile',
+    '/',
     authMiddleware,
     requireStudent,
     validateRequest(UpdateProfileSchema),
