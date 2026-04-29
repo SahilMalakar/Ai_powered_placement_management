@@ -29,14 +29,16 @@ export function useAuth() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const setAuthenticated = useAppStore((state) => state.setAuthenticated)
+  const setUser = useAppStore((state) => state.setUser)
 
   const loginMutation = useMutation({
     mutationFn: async (data: AuthFormValues) => {
       const response = await api.post("/auth/login", data)
       return response.data
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.clear()
+      setUser(response.data)
       setAuthenticated(true)
       toast.success("Login successful!")
       router.replace("/dashboard")
@@ -55,8 +57,9 @@ export function useAuth() {
       const response = await api.post("/auth/signup", data)
       return response.data
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.clear()
+      setUser(response.data)
       setAuthenticated(true)
       toast.success("Signup successful!")
       router.replace("/dashboard")

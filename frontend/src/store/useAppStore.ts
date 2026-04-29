@@ -27,7 +27,10 @@ export const useAppStore = create<AppState>()(
     // Represents the authenticated user's profile or null if unauthenticated
     user: null,
     isAuthenticated: false,
-    setUser: (user) => set({ user, isAuthenticated: !!user }),
+    setUser: (user) => {
+      console.log('[Zustand] setUser action called with:', user);
+      set({ user, isAuthenticated: !!user });
+    },
     setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
     isLoading: false,
     setIsLoading: (isLoading) => set({ isLoading }),

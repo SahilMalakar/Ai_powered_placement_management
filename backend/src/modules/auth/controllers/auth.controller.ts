@@ -28,11 +28,12 @@ export const signupController = asyncHandler(async (req, res) => {
         maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
     });
 
-    return sendSuccess(res, {
-        data: user,
-        message: 'Signup successful',
-        statusCode: HTTP_STATUS.CREATED,
-    });
+    return sendSuccess(
+        res,
+        user,
+        'Signup successful',
+        HTTP_STATUS.CREATED
+    );
 });
 
 export const loginController = asyncHandler(async (req, res) => {
