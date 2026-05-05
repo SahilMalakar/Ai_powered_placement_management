@@ -76,48 +76,52 @@ export function SkillDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-card border-border shadow-modal">
-        <DialogHeader>
-          <DialogTitle className="font-heading text-xl">
-            {initialData ? "Edit Skill Category" : "Add Skill Category"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-md bg-card border-border shadow-modal flex flex-col max-h-[90vh] p-0">
+        <div className="px-6 pt-6 pb-2">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">
+              {initialData ? "Edit Skill Category" : "Add Skill Category"}
+            </DialogTitle>
+          </DialogHeader>
+        </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Frontend, Backend, Languages" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Frontend, Backend, Languages" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="skills"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Skills (Comma separated)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="e.g. React, Next.js, TypeScript, Tailwind" 
-                      className="min-h-[100px]" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="skills"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Skills (Comma separated)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="e.g. React, Next.js, TypeScript, Tailwind" 
+                        className="min-h-[100px]" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <DialogFooter className="pt-4">
+            <DialogFooter className="px-6 py-4 border-t">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>

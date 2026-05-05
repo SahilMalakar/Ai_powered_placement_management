@@ -7,5 +7,6 @@ export const QUERY_KEYS = {
   STUDENT_PROJECTS: "student-projects",
   STUDENT_ADDITIONAL_DETAILS: "student-additional-details",
   STUDENT_ACADEMIC: "student-academic",
+  STUDENT_RESUMES: "student-resumes",
   JOBS: "jobs",
 } as const;

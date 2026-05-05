@@ -81,37 +81,59 @@ export function AdditionalDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-card border-border shadow-modal">
-        <DialogHeader>
-          <DialogTitle className="font-heading text-xl">
-            {initialData ? "Edit Detail" : "Add Additional Detail"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl bg-card border-border shadow-modal flex flex-col max-h-[90vh] p-0">
+        <div className="px-6 pt-6 pb-2">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">
+              {initialData ? "Edit Detail" : "Add Additional Detail"}
+            </DialogTitle>
+          </DialogHeader>
+        </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title / Achievement</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. OpenSource Contribution, Certification" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="title"
+                name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title / Achievement</FormLabel>
+                    <FormLabel>Description / Bullets</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. OpenSource Contribution, Certification" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date (Optional)</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
+                      <Textarea 
+                        placeholder="List details (one per line)..." 
+                        className="min-h-[120px]" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,25 +141,7 @@ export function AdditionalDetailDialog({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description / Bullets</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="List details (one per line)..." 
-                      className="min-h-[120px]" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="pt-4">
+            <DialogFooter className="px-6 py-4 border-t">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>

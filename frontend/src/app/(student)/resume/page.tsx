@@ -1,8 +1,10 @@
+import { ResumeList } from "@/components/resume/resume-list";
+
 export default function ResumePage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Resume Builder</h1>
-      <p className="text-muted-foreground">Create and manage your AI-generated resume.</p>
+    <div className="container mx-auto pt-12 pb-20 px-4 sm:px-6 lg:px-8">
+      <ResumeList />
     </div>
-  )
+  );
 }
+

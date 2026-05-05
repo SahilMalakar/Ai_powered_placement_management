@@ -101,65 +101,125 @@ export function ProjectDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-card border-border shadow-modal">
-        <DialogHeader>
-          <DialogTitle className="font-heading text-xl">
-            {initialData ? "Edit Project" : "Add Project"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl bg-card border-border shadow-modal flex flex-col max-h-[90vh] p-0">
+        <div className="px-6 pt-6 pb-2">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">
+              {initialData ? "Edit Project" : "Add Project"}
+            </DialogTitle>
+          </DialogHeader>
+        </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. SkyRoute — Distributed Hotel Booking Backend" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="keyTools"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Key Tools & Technologies</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Node.js, Redis, BullMQ, PostgreSQL" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
               <FormField
                 control={form.control}
-                name="link"
+                name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Live Link / Drive Link</FormLabel>
+                    <FormLabel>Project Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://..." {...field} />
+                      <Input placeholder="e.g. SkyRoute — Distributed Hotel Booking Backend" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="secondaryLink"
+                name="keyTools"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GitHub Repo Link</FormLabel>
+                    <FormLabel>Key Tools & Technologies</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://github.com/..." {...field} />
+                      <Input placeholder="e.g. Node.js, Redis, BullMQ, PostgreSQL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Live Link / Drive Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="secondaryLink"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>GitHub Repo Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://github.com/..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="mb-2">Start Date (Optional)</FormLabel>
+                      <FormControl>
+                        <DatePicker 
+                          value={field.value} 
+                          onChange={field.onChange} 
+                          placeholder="Select start date"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="mb-2">End Date (Optional)</FormLabel>
+                      <FormControl>
+                        <DatePicker 
+                          value={field.value} 
+                          onChange={field.onChange} 
+                          placeholder="Select end date"
+                        />
+                      </FormControl>
+                      {!field.value && <p className="text-[10px] text-muted-foreground mt-1">Leave blank if currently working</p>}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description / Key Features</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Describe your project (one feature per line)..." 
+                        className="min-h-[120px]" 
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -167,63 +227,7 @@ export function ProjectDialog({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="mb-2">Start Date (Optional)</FormLabel>
-                    <FormControl>
-                      <DatePicker 
-                        value={field.value} 
-                        onChange={field.onChange} 
-                        placeholder="Select start date"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="mb-2">End Date (Optional)</FormLabel>
-                    <FormControl>
-                      <DatePicker 
-                        value={field.value} 
-                        onChange={field.onChange} 
-                        placeholder="Select end date"
-                      />
-                    </FormControl>
-                    {!field.value && <p className="text-[10px] text-muted-foreground mt-1">Leave blank if currently working</p>}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description / Key Features</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe your project (one feature per line)..." 
-                      className="min-h-[120px]" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter className="pt-4">
+            <DialogFooter className="px-6 py-4 border-t">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>

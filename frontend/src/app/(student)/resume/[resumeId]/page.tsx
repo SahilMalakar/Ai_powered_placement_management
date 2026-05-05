@@ -1,0 +1,56 @@
+'use client';
+
+import { useParams, useRouter } from "next/navigation";
+import { useResume } from "@/hooks/student/use-resume";
+import { ResumeEditor } from "@/components/resume/resume-editor";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, Loader2, AlertCircle } from "lucide-react";
+import Link from "next/link";
+
+export default function ResumeDetailPage() {
+  const params = useParams();
+  const resumeId = parseInt(params.resumeId as string);
+  const { data: resume, isLoading, isError } = useResume(resumeId);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground animate-pulse">Loading resume data...</p>
+      </div>
+    );
+  }
+
+  if (isError || !resume) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="h-16 w-16 bg-error/10 rounded-full flex items-center justify-center mb-4">
+          <AlertCircle className="h-8 w-8 text-error" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2">Resume not found</h2>
+        <p className="text-muted-foreground mb-6">The resume you're looking for doesn't exist or you don't have access.</p>
+        <Link href="/resume">
+          <Button variant="outline">
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back to Resumes
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto pt-12 pb-20 px-4 sm:px-6 lg:px-8 max-w-5xl">
+      <div className="mb-6">
+        <Link href="/resume">
+          <Button variant="ghost" size="sm" className="pl-0 text-muted-foreground hover:text-foreground transition-colors">
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Back to List
+          </Button>
+        </Link>
+      </div>
+      
+      <ResumeEditor resume={resume} />
+    </div>
+  );
+}

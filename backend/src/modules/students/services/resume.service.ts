@@ -65,8 +65,14 @@ export const generateResumeService = async (userId: number) => {
 
     if (!profile.skills || profile.skills.length === 0)
         missingSections.push('Technical Skills');
-    if (!profile.projects || profile.projects.length === 0)
-        missingSections.push('Projects');
+
+    // Ensure student has either Projects or Work Experience
+    const hasProjects = profile.projects && profile.projects.length > 0;
+    const hasExperience = (profile as any).experiences && (profile as any).experiences.length > 0;
+
+    if (!hasProjects && !hasExperience) {
+        missingSections.push('Projects or Work Experience');
+    }
 
     // Check education via profile or semester results
     const hasEducation =
