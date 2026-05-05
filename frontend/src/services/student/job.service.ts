@@ -6,6 +6,11 @@ export const getJobs = async (filters: JobFilters): Promise<JobsResponse> => {
   return response.data.data;
 };
 
+export const getJobById = async (id: number): Promise<any> => {
+  const response = await api.get(`/admin/job/${id}`);
+  return response.data.data;
+};
+
 export const applyToJob = async (jobId: number): Promise<any> => {
   const response = await api.post(`/students/application/${jobId}/apply`);
   return response.data;

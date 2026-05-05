@@ -21,11 +21,14 @@ import {
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 interface JobCardProps {
   job: Job;
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { mutate: apply, isPending } = useApplyJob();
 
@@ -33,7 +36,6 @@ export function JobCard({ job }: JobCardProps) {
     id,
     title,
     company,
-    description,
     allowedBranches,
     requiredCgpa,
     backlogAllowed,
@@ -44,7 +46,8 @@ export function JobCard({ job }: JobCardProps) {
   const initials = company.charAt(0).toUpperCase();
   const isExpired = isPast(new Date(deadline));
 
-  const handleApply = () => {
+  const handleApply = (e: React.MouseEvent) => {
+    e.stopPropagation();
     apply(id, {
       onSuccess: () => {
         setIsDialogOpen(false);
@@ -52,12 +55,17 @@ export function JobCard({ job }: JobCardProps) {
     });
   };
 
+  const handleCardClick = () => {
+    router.push(`/jobs/${id}`);
+  };
+
   return (
     <Card
       className={cn(
-        "relative transition-all duration-200 hover:translate-y-[-2px] group",
+        "relative transition-all duration-200 hover:translate-y-[-2px] group cursor-pointer",
         isExpired && "opacity-55 grayscale-[0.2]"
       )}
+      onClick={handleCardClick}
     >
       <CardContent className="pt-6">
         {/* Header: Icon + Title + Company */}
@@ -75,11 +83,6 @@ export function JobCard({ job }: JobCardProps) {
             </div>
           </div>
         </div>
-
-        {/* Description */}
-        <p className="mt-3 text-sm text-mist dark:text-muted-foreground/70 line-clamp-2 leading-relaxed">
-          {description}
-        </p>
 
         {/* Badges: Branches, CGPA, Backlog, Deadline */}
         <div className="mt-4 flex flex-wrap gap-2">
@@ -126,6 +129,7 @@ export function JobCard({ job }: JobCardProps) {
             <DialogTrigger
               render={
                 <Button
+                  onClick={(e) => e.stopPropagation()}
                   disabled={isExpired || status !== "ACTIVE" || isPending}
                   className={cn(
                     "min-w-[100px]",
@@ -145,7 +149,7 @@ export function JobCard({ job }: JobCardProps) {
                 "Apply"
               )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
               <DialogHeader>
                 <DialogTitle>Confirm Application</DialogTitle>
                 <DialogDescription>
@@ -157,7 +161,10 @@ export function JobCard({ job }: JobCardProps) {
               <DialogFooter className="gap-2 sm:gap-0">
                 <Button
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDialogOpen(false);
+                  }}
                   disabled={isPending}
                 >
                   Cancel
@@ -173,3 +180,4 @@ export function JobCard({ job }: JobCardProps) {
     </Card>
   );
 }
+

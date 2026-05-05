@@ -13,4 +13,6 @@ export const CACHE_KEYS = {
     STUDENT_DOCUMENTS: (userId: number | string) => `student:documents:${userId}`,
     STUDENT_ACADEMIC: (userId: number | string) => `student:academic:${userId}`,
     JOBS_LIST: 'jobs:list',
+    JOB_DETAILS: (jobId: number | string) => `job:details:${jobId}`,
+    STUDENT_APPLICATIONS: (userId: number | string) => `student:applications:${userId}`,
 };

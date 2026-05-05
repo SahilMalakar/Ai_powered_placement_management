@@ -8,6 +8,7 @@ import {
     activateJobService,
     deactivateJobService,
     getAllJobsService,
+    getJobByIdService,
 } from '../services/job.service.js';
 
 export const createJobController = asyncHandler(async (req, res) => {
@@ -116,3 +117,15 @@ export const getAllJobsController = asyncHandler(async (req, res) => {
         HTTP_STATUS.OK
     );
 });
+
+export const getJobByIdController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    const jobId = Number(req.params.id);
+    const job = await getJobByIdService(jobId, req.user.role);
+
+    return sendSuccess(res, job, 'Job fetched successfully', HTTP_STATUS.OK);
+});
+

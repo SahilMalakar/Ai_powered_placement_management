@@ -19,7 +19,10 @@ const StatusBadge = ({ status }: { status: ApplicationStatus }) => {
   }
 };
 
+import { useRouter } from "next/navigation";
+
 export function ApplicationList() {
+  const router = useRouter();
   const { data: applications, isLoading, isError } = useApplications();
 
   if (isLoading) {
@@ -68,11 +71,15 @@ export function ApplicationList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {applications.map((app) => (
-        <Card key={app.id} className="group overflow-hidden border-border/50 hover:border-border transition-all shadow-card hover:shadow-lg">
+        <Card 
+          key={app.id} 
+          className="group overflow-hidden border-border/50 hover:border-primary/20 transition-all shadow-card hover:shadow-lg cursor-pointer hover:translate-y-[-2px]"
+          onClick={() => router.push(`/jobs/${app.jobId}`)}
+        >
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4 gap-4">
               <div>
-                <h3 className="font-heading font-semibold text-lg text-foreground" title={app.job.title}>
+                <h3 className="font-heading font-semibold text-lg text-foreground group-hover:text-primary transition-colors" title={app.job.title}>
                   {app.job.title}
                 </h3>
                 <div className="flex items-center text-muted-foreground text-sm mt-1 gap-1">
@@ -95,3 +102,4 @@ export function ApplicationList() {
     </div>
   );
 }
+

@@ -12,6 +12,7 @@ import {
     activateJobController,
     deactivateJobController,
     getAllJobsController,
+    getJobByIdController,
 } from '../../../modules/admin/controllers/job.controller.js';
 import { idSchema } from '../../../types/auth.js';
 
@@ -53,6 +54,43 @@ const jobRouter: Router = Router();
  *               }
  */
 jobRouter.get('/', authMiddleware, getAllJobsController);
+
+/**
+ * @swagger
+ * /api/v1/admin/job/{id}:
+ *   get:
+ *     summary: Fetch a single job by ID
+ *     tags: [Admin Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Job fetched successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Job fetched successfully",
+ *                 "data": {
+ *                   "id": "abc",
+ *                   "title": "Software Engineer",
+ *                   "company": "Google",
+ *                   "description": "Full Job Description...",
+ *                   "status": "ACTIVE"
+ *                 }
+ *               }
+ *       404:
+ *         description: Job not found
+ */
+jobRouter.get('/:id', authMiddleware, validateParams(idSchema), getJobByIdController);
 
 /**
  * @swagger

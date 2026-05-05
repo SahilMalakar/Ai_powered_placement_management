@@ -54,9 +54,10 @@ export const updateJobByIdService = async (
 
     // Cache Invalidation
     const cacheClient = getRedisConnectionForCaching();
-    const keys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
-    if (keys.length > 0) await cacheClient.del(keys);
-    console.log('🧹 Cache Invalidated: ', CACHE_KEYS.JOBS_LIST);
+    const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
+    if (listKeys.length > 0) await cacheClient.del(listKeys);
+    await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
+    console.log(`🧹 Cache Invalidated: ${CACHE_KEYS.JOBS_LIST} & ${CACHE_KEYS.JOB_DETAILS(jobId)}`);
 
     return job;
 };
@@ -85,8 +86,9 @@ export const activateJobService = async (jobId: number) => {
     // 4. Invalidate Cache Early
     try {
         const cacheClient = getRedisConnectionForCaching();
-        const keys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
-        if (keys.length > 0) await cacheClient.del(keys);
+        const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
+        if (listKeys.length > 0) await cacheClient.del(listKeys);
+        await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
     } catch (error) {
         console.error('⚠️ Cache Invalidation Warning (Activate):', error);
     }
@@ -153,9 +155,10 @@ export const deactivateJobService = async (jobId: number) => {
 
     // Cache Invalidation
     const cacheClient = getRedisConnectionForCaching();
-    const keys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
-    if (keys.length > 0) await cacheClient.del(keys);
-    console.log('🧹 Cache Invalidated: ', CACHE_KEYS.JOBS_LIST);
+    const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
+    if (listKeys.length > 0) await cacheClient.del(listKeys);
+    await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
+    console.log(`🧹 Cache Invalidated: ${CACHE_KEYS.JOBS_LIST} & ${CACHE_KEYS.JOB_DETAILS(jobId)}`);
 
     return deactivatedJob;
 };
@@ -201,5 +204,54 @@ export const getAllJobsService = async (
         // FAIL-SAFE: Fallback to Database if Redis is down
         console.error('⚠️ Redis Cache Failure (Fallback to DB):', error);
         return await getAllJobs(effectiveFilters);
+    }
+};
+
+export const getJobByIdService = async (jobId: number, userRole?: string) => {
+    const cacheKey = CACHE_KEYS.JOB_DETAILS(jobId);
+
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+
+        // Try Cache Hit
+        const cachedJob = await cacheClient.get(cacheKey);
+        if (cachedJob) {
+            const job = JSON.parse(cachedJob);
+            // Security Check for cached data
+            if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
+                throw new BadRequestError('Job is not available');
+            }
+            console.log('🚀 Cache Hit (Details): ', cacheKey);
+            return job;
+        }
+
+        // Cache Miss
+        console.log('⚡ Cache Miss (Details): ', cacheKey);
+        const job = await getJobById(jobId);
+
+        if (!job) {
+            throw new BadRequestError('Job not found');
+        }
+
+        // Security: Students should only see ACTIVE jobs
+        if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
+            throw new BadRequestError('Job is not available');
+        }
+
+        // Set Cache with 5-minute TTL
+        await cacheClient.set(cacheKey, JSON.stringify(job), 'EX', 300);
+
+        return job;
+    } catch (error) {
+        if (error instanceof BadRequestError) throw error;
+
+        // FAIL-SAFE: Fallback to Database
+        console.error('⚠️ Redis Cache Failure (Details Fallback):', error);
+        const job = await getJobById(jobId);
+        if (!job) throw new BadRequestError('Job not found');
+        if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
+            throw new BadRequestError('Job is not available');
+        }
+        return job;
     }
 };

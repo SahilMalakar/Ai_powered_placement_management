@@ -81,7 +81,7 @@ export const getAllJobs = async (filters: {
 };
 
 export const getJobById = async (jobId: number) => {
-    return await prisma.job.findUnique({
+    return await prisma.job.findFirst({
         where: {
             id: jobId,
             deletedAt: null,
