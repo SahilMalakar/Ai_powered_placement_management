@@ -9,7 +9,7 @@ export default function ExperiencePage() {
   return (
     <ExperienceTab 
       onNext={() => router.push("/profile/projects")} 
-      onPrev={() => router.push("/profile/social")} 
+      onPrev={() => router.push("/profile/documents")} 
     />
   )
 }

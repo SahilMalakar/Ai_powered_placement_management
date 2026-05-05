@@ -5,11 +5,11 @@ import { useDocuments, useUploadDocument, useDeleteDocument } from "@/hooks/stud
 import { useRef, useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Plus, Trash2, FileText, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
+import { Plus, Trash2, FileText, CheckCircle2, AlertCircle, Loader2, ArrowLeft, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
-export function DocumentsTab() {
+export function DocumentsTab({ onNext, onPrev }: { onNext: () => void, onPrev: () => void }) {
   const { data: profileData } = useProfile()
   const [pendingUploads, setPendingUploads] = useState<string[]>([])
   
@@ -238,6 +238,17 @@ export function DocumentsTab() {
             </div>
           </Button>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-6 border-t border-border/50 mt-8">
+        <Button variant="ghost" onClick={onPrev}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Previous
+        </Button>
+        <Button className="shadow-button" onClick={onNext}>
+          Next Step
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   )

@@ -15,11 +15,13 @@ import {
   ShieldQuestion, 
   Loader2, 
   RefreshCcw,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-export function AcademicTab() {
+export function AcademicTab({ onNext, onPrev }: { onNext: () => void, onPrev: () => void }) {
   const { data: academic, isLoading } = useAcademicRecord({
     // Enable smart polling ONLY when verification is processing
     refetchInterval: (query) => {
@@ -200,6 +202,16 @@ export function AcademicTab() {
             </p>
           </div>
         )}
+      </div>
+      <div className="flex items-center justify-between pt-6 border-t border-border/50 mt-8">
+        <Button variant="ghost" onClick={onPrev}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Previous
+        </Button>
+        <Button className="shadow-button" onClick={onNext}>
+          Next Step
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   )

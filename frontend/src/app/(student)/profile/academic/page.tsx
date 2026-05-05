@@ -1,7 +1,14 @@
 "use client"
 
 import { AcademicTab } from "@/components/profile/tabs/academic-tab"
+import { useRouter } from "next/navigation"
 
 export default function AcademicPage() {
-  return <AcademicTab />
+  const router = useRouter()
+  return (
+    <AcademicTab 
+      onNext={() => router.push("/profile/documents")} 
+      onPrev={() => router.push("/profile/social")} 
+    />
+  )
 }

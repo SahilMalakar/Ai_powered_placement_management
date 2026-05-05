@@ -8,7 +8,7 @@ export default function SocialPage() {
 
   return (
     <SocialLinksTab 
-      onNext={() => router.push("/profile/experience")} 
+      onNext={() => router.push("/profile/academic")} 
       onPrev={() => router.push("/profile")} 
     />
   )
