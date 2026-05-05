@@ -226,10 +226,10 @@ TRIMMING PRIORITY (cut in this order if over budget):
 WORK EXPERIENCE RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Bullet count by number of experience entries (STRICT):
-- 1 experience → 3 bullets
-- 2 experiences → 2 bullets each
-- 3 experiences → 1 bullet each
-- >3 experiences → select top 3 most relevant to {identifiedRole}, 1 bullet each
+- 1 experience → 4 bullets
+- 2 experiences → 3 bullets each
+- 3 experiences → 2 bullet each
+- >3 experiences → select top 3 most relevant to {identifiedRole}, 2 bullets each
 
 Date format: "MMM YYYY – MMM YYYY" (e.g. Jun 2023 – Aug 2023). Use "Present" if ongoing.
 techStack: Include ONLY tools explicitly listed in toolsUsed field of that experience. Max 6 tools.

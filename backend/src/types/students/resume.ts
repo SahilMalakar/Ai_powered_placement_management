@@ -5,12 +5,12 @@ export const resumeJsonSchema = z.object({
     name: z.string().describe("Full name of the student"),
     contact: z.object({
         email: z.string(),
-        phone: z.string().default(""),
-        linkedin: z.string().default(""),
-        github: z.string().default(""),
-        portfolio: z.string().default(""),
-        leetcode: z.string().default(""),
-        address: z.string().default(""),
+        phone: z.string().nullable().default(""),
+        linkedin: z.string().nullable().default(""),
+        github: z.string().nullable().default(""),
+        portfolio: z.string().nullable().default(""),
+        leetcode: z.string().nullable().default(""),
+        address: z.string().nullable().default(""),
     }),
     summary: z.string(),
     skills: z.array(z.object({
@@ -22,20 +22,21 @@ export const resumeJsonSchema = z.object({
             z.object({
                 title: z.string(),
                 company: z.string(),
-                location: z.string().default(""),
+                location: z.string().nullable().default(""),
                 dateRange: z.string(),
                 techStack: z.array(z.string()),
                 bullets: z.array(z.string()),
             })
         )
+        .nullable()
         .default([]),
     projects: z.array(
         z.object({
             title: z.string(),
             techStack: z.array(z.string()),
-            githubUrl: z.string().default(""),
-            liveUrl: z.string().default(""),
-            dateRange: z.string().default(""),
+            githubUrl: z.string().nullable().default(""),
+            liveUrl: z.string().nullable().default(""),
+            dateRange: z.string().nullable().default(""),
             bullets: z.array(z.string()),
         })
     ).default([]),
@@ -44,7 +45,7 @@ export const resumeJsonSchema = z.object({
             institution: z.string(),
             degree: z.string(),
             dateRange: z.string(),
-            cgpa: z.string().default(""),
+            cgpa: z.string().nullable().default(""),
         })
     ).default([]),
     additionalDetails: z
@@ -52,9 +53,10 @@ export const resumeJsonSchema = z.object({
             z.object({
                 title: z.string(),
                 description: z.array(z.string()),
-                date: z.string().default(""),
+                date: z.string().nullable().default(""),
             })
         )
+        .nullable()
         .default([]),
 });
 
