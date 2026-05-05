@@ -18,7 +18,7 @@ export const createResumeRecord = async (
 // Fetches all resumes for a specific user.
 export const findResumesByUserId = async (userId: number) => {
     return await prisma.resume.findMany({
-        where: { userId, deletedAt: null },
+        where: { userId },
         orderBy: { version: 'desc' },
     });
 };
@@ -26,7 +26,7 @@ export const findResumesByUserId = async (userId: number) => {
 // Fetches a resume by its unique ID.
 export const findResumeById = async (id: number, tx: any = prisma) => {
     return await tx.resume.findFirst({
-        where: { id, deletedAt: null },
+        where: { id },
     });
 };
 
@@ -67,7 +67,7 @@ export const updateResumePdfUrl = async (id: number, pdfUrl: string) => {
 // Counts the number of non-deleted resumes for a user.
 export const countUserResumes = async (userId: number) => {
     return await prisma.resume.count({
-        where: { userId, deletedAt: null },
+        where: { userId },
     });
 };
 
@@ -79,4 +79,11 @@ export const getLatestResumeVersion = async (userId: number) => {
         select: { version: true },
     });
     return latest?.version || 0;
+};
+
+// Permanently deletes a resume record from the database.
+export const deleteResumeRecord = async (id: number) => {
+    return await prisma.resume.delete({
+        where: { id },
+    });
 };

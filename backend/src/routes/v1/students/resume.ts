@@ -7,6 +7,7 @@ import {
     getStudentResumesController,
     updateResumeController,
     exportResumeController,
+    deleteResumeController,
 } from '../../../modules/students/controllers/resume.controller.js';
 import { validateRequest } from '../../../middlewares/validate.middlware.js';
 import { resumeJsonSchema } from '../../../types/students/resume.js';
@@ -265,6 +266,41 @@ resumeRouter.get(
     authMiddleware,
     requireStudent,
     exportResumeController
+);
+
+/**
+ * @swagger
+ * /api/v1/students/resume/{id}:
+ *   delete:
+ *     summary: Delete a student's resume and its associated PDF
+ *     tags: [Resumes]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The resume ID
+ *     responses:
+ *       200:
+ *         description: Resume deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               {
+ *                 "success": true,
+ *                 "message": "Resume deleted successfully",
+ *                 "data": null
+ *               }
+ */
+resumeRouter.delete(
+    '/:id',
+    authMiddleware,
+    requireStudent,
+    deleteResumeController
 );
 
 export { resumeRouter };

@@ -160,3 +160,20 @@ export const useExportResume = () => {
     },
   });
 };
+/**
+ * Hook for deleting a resume.
+ */
+export const useDeleteResume = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => resumeService.deleteResume(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENT_RESUMES] });
+      toast.success("Resume deleted successfully.");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to delete resume.");
+    },
+  });
+};

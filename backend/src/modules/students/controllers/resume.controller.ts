@@ -8,6 +8,7 @@ import {
     getStudentResumesService,
     updateResumeService,
     exportResumePdfService,
+    deleteResumeService,
 } from '../services/resume.service.js';
 
 // Controller for Resume operations.
@@ -100,5 +101,23 @@ export const exportResumeController = asyncHandler(async (req, res) => {
         result,
         'Resume export successfully queued.',
         HTTP_STATUS.ACCEPTED
+    );
+});
+
+// Deletes a resume record and its PDF.
+export const deleteResumeController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized access.');
+    }
+
+    const userId = req.user.userId;
+    const resumeId = parseInt(req.params.id as string);
+    await deleteResumeService(resumeId, userId);
+
+    return sendSuccess(
+        res,
+        null,
+        'Resume deleted successfully.',
+        HTTP_STATUS.OK
     );
 });

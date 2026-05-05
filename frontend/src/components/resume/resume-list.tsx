@@ -1,14 +1,25 @@
 'use client';
 
-import { useResumes, useGenerateResume, useExportResume } from "@/hooks/student/use-resume";
+import { useResumes, useGenerateResume, useExportResume, useDeleteResume } from "@/hooks/student/use-resume";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Download, Edit2, FileText, Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { Plus, Download, Edit2, FileText, Loader2, AlertCircle, RefreshCw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Resume } from "@/types/resume";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function ResumeList() {
   const { data: resumes, isLoading, isError, refetch } = useResumes();
@@ -82,6 +93,7 @@ export function ResumeList() {
 
 function ResumeCard({ resume }: { resume: Resume }) {
   const { mutate: exportPdf, isPending: isExporting } = useExportResume();
+  const deleteMutation = useDeleteResume();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -108,7 +120,41 @@ function ResumeCard({ resume }: { resume: Resume }) {
               Generated on {format(new Date(resume.createdAt), 'PPP')}
             </CardDescription>
           </div>
-          {getStatusBadge(resume.status)}
+          <div className="flex items-center gap-2">
+            {getStatusBadge(resume.status)}
+            
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 text-muted-foreground hover:text-error hover:bg-error/10 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                }
+              />
+              <AlertDialogContent className="bg-card border-border shadow-modal">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-heading">Delete Resume?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete this resume and its associated PDF.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-secondary text-secondary-foreground border-border hover:bg-secondary/80">Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => deleteMutation.mutate(resume.id)}
+                    className="bg-error text-white hover:bg-error/90"
+                    disabled={deleteMutation.isPending}
+                  >
+                    {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pb-4">

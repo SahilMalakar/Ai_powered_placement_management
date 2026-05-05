@@ -45,4 +45,11 @@ export const resumeService = {
     const response = await api.get(`/students/resume/${id}/export`);
     return response.data.data;
   },
+  
+  /**
+   * Deletes a resume record.
+   */
+  deleteResume: async (id: number): Promise<void> => {
+    await api.delete(`/students/resume/${id}`);
+  },
 };

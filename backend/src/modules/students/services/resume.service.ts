@@ -7,7 +7,9 @@ import {
     updateResumePdfUrl,
     createResumeRecord,
     getLatestResumeVersion,
+    deleteResumeRecord,
 } from '../repositories/resume.repository.js';
+import { deleteFromCloudinary } from '../../../utils/fileHandler/cloudinary.js';
 import { addResumeJobToQueue } from '../../../queues/resume.queue.js';
 import { resumeJsonSchema } from '../../../types/students/resume.js';
 import {
@@ -191,4 +193,31 @@ export const exportResumePdfService = async (id: number, userId: number) => {
         resumeId: id,
         jobId: job.id,
     };
+};
+
+// Deletes a resume record and its associated PDF from Cloudinary.
+export const deleteResumeService = async (id: number, userId: number) => {
+    const resume = await findResumeById(id);
+    if (!resume || resume.userId !== userId) {
+        throw new NotFoundError('Resume not found or unauthorized access.');
+    }
+
+    // If there's an exported PDF, delete it from Cloudinary
+    if (resume.pdfUrl) {
+        try {
+            // Extract public ID from Cloudinary URL
+            // Format: https://res.cloudinary.com/cloud_name/image/upload/v1234567/folder/public_id.ext
+            const urlParts = resume.pdfUrl.split('/');
+            const fileNameWithExt = urlParts.pop() || '';
+            const folder = urlParts.pop() || '';
+            const publicId = `${folder}/${fileNameWithExt.split('.')[0]}`;
+            
+            await deleteFromCloudinary(publicId);
+        } catch (error) {
+            console.error('[Delete Resume Service] Cloudinary deletion failed:', error);
+            // We continue even if Cloudinary fails to ensure DB consistency
+        }
+    }
+
+    return await deleteResumeRecord(id);
 };
