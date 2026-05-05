@@ -7,6 +7,8 @@ import {
   StudentNavbar,
 } from "@/components/layout/student";
 
+import { RoleGuard } from "@/components/auth/role-guard";
+
 /**
  * Student area layout shell.
  * Provides the sidebar (desktop + mobile) and top navbar.
@@ -18,21 +20,23 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <TooltipProvider>
-      {/* ── Sidebar ── */}
-      <DesktopSidebar />
-      <MobileSidebar />
+    <RoleGuard allowedRoles={["STUDENT"]}>
+      <TooltipProvider>
+        {/* ── Sidebar ── */}
+        <DesktopSidebar />
+        <MobileSidebar />
 
-      {/* ── Navbar ── */}
-      <StudentNavbar />
+        {/* ── Navbar ── */}
+        <StudentNavbar />
 
-      {/* ── Page content area ──
-           pt-16  → clears the fixed navbar (h-16 = 64px)
-           md:pl-[260px] → clears the fixed sidebar on desktop
-           The value 260 matches SIDEBAR_WIDTH constant             */}
-      <main className="student-main min-h-screen pt-16">
-        {children}
-      </main>
-    </TooltipProvider>
+        {/* ── Page content area ──
+             pt-16  → clears the fixed navbar (h-16 = 64px)
+             md:pl-[260px] → clears the fixed sidebar on desktop
+             The value 260 matches SIDEBAR_WIDTH constant             */}
+        <main className="student-main min-h-screen pt-16">
+          {children}
+        </main>
+      </TooltipProvider>
+    </RoleGuard>
   );
 }
