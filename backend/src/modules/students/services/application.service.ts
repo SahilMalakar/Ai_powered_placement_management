@@ -1,4 +1,4 @@
-import { applyToJobWithTransaction } from '../repositories/application.repository.js';
+import { applyToJobWithTransaction, getApplicationRepo } from '../repositories/application.repository.js';
 import { applicationSnapshotSchema } from '../../../types/students/application.js';
 import type { ApplicationSnapshot } from '../../../types/students/application.js';
 
@@ -43,3 +43,9 @@ export const applyToJobService = async (userId: number, jobId: number) => {
 
     return application;
 };
+
+
+export const getApplicationService = async(userId:number)=>{
+    const application = await getApplicationRepo(userId)
+    return application
+}

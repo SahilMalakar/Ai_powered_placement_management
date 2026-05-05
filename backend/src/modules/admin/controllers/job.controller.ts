@@ -91,11 +91,18 @@ export const getAllJobsController = asyncHandler(async (req, res) => {
         throw new UnauthorizedError('Unauthorized');
     }
 
-    const { search, branch, cgpa, page, limit } = req.query;
+    const { search, branch, branches, backlog, cgpa, page, limit } = req.query;
+    
+    // Parse backlog to boolean if present
+    let backlogAllowed: boolean | undefined = undefined;
+    if (backlog === 'yes') backlogAllowed = true;
+    if (backlog === 'no') backlogAllowed = false;
 
     const filters = {
         search: search as string,
         branch: branch as string,
+        branches: Array.isArray(branches) ? (branches as string[]) : branches ? [branches as string] : undefined,
+        backlogAllowed,
         cgpa: cgpa as string,
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 10,

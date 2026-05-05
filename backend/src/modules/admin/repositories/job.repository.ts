@@ -15,6 +15,8 @@ export const createJob = async (jobData: JobCreateInput) => {
 export const getAllJobs = async (filters: {
     search?: string;
     branch?: string;
+    branches?: string[];
+    backlogAllowed?: boolean;
     cgpa?: string;
     page?: number;
     limit?: number;
@@ -45,10 +47,14 @@ export const getAllJobs = async (filters: {
         };
     }
 
-    if (cgpa) {
-        where.requiredCgpa = {
-            lte: parseFloat(cgpa),
+    if (filters.branches && filters.branches.length > 0) {
+        where.allowedBranches = {
+            hasSome: filters.branches,
         };
+    }
+
+    if (filters.backlogAllowed !== undefined) {
+        where.backlogAllowed = filters.backlogAllowed;
     }
 
     const [jobs, total] = await Promise.all([

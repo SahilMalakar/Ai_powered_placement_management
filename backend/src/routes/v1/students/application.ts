@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { applyToJobController } from '../../../modules/students/controllers/application.controller.js';
+import { applyToJobController, getApplicationsController } from '../../../modules/students/controllers/application.controller.js';
 import { authMiddleware } from '../../../middlewares/auth.middleware.js';
 import { requireStudent } from '../../../middlewares/rbac.middleware.js';
 import {
@@ -59,6 +59,37 @@ router.post(
     applicationRateLimiter,
     validateParams(applyToJobParamsSchema),
     applyToJobController
+);
+
+/**
+ * @swagger
+ * /api/v1/students/application:
+ *   get:
+ *     summary: Get all applications for the authenticated student
+ *     tags: [Applications]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved applications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 message: { type: string }
+ *                 data: 
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Application'
+ */
+router.get(
+    '/',
+    authMiddleware,
+    requireStudent,
+    getApplicationsController
 );
 
 export { router as applicationRouter };

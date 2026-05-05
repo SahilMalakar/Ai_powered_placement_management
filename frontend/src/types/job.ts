@@ -8,12 +8,10 @@ export interface Job {
   backlogAllowed: boolean;
   status: 'ACTIVE' | 'DEACTIVE' | 'DRAFT';
   deadline: string;
-  location?: string;
-  ctc?: string;
-  eligible?: boolean;
-  ineligibilityReason?: string;
+  createdById: number;
   createdAt: string;
   updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface JobPagination {
@@ -30,8 +28,8 @@ export interface JobsResponse {
 
 export interface JobFilters {
   search?: string;
-  branch?: string;
-  cgpa?: string;
+  branches?: string[];
+  backlog?: 'all' | 'yes' | 'no';
   page?: number;
   limit?: number;
 }

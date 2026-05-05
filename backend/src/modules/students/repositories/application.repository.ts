@@ -90,3 +90,35 @@ export const applyToJobWithTransaction = async (
         });
     });
 };
+
+
+export const getApplicationRepo = async(userId:number)=>{
+    return await prisma.application.findMany({
+        where:{
+            userId:userId,
+            deletedAt:null,
+            job:{
+                deletedAt:null
+            }
+        },
+        select:{
+            id:true,
+            userId:true,
+            jobId:true,
+            status:true,
+            createdAt:true,
+            job:{
+                select:{
+                    id:true,
+                    title:true,
+                    company:true,
+                    status:true,
+                    deadline:true,
+                }
+            }
+        },
+        orderBy:{
+            createdAt:"desc"
+        }
+    })
+}

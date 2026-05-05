@@ -4,9 +4,9 @@ import { Job } from "@/types/job";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Calendar, Briefcase, GraduationCap, GitBranch, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isPast } from "date-fns";
 
 import { useApplyJob } from "@/hooks/student/useApplyJob";
 import {
@@ -33,17 +33,16 @@ export function JobCard({ job }: JobCardProps) {
     id,
     title,
     company,
-    location,
-    ctc,
+    description,
     allowedBranches,
     requiredCgpa,
     backlogAllowed,
     deadline,
-    eligible = true,
-    ineligibilityReason = "",
+    status,
   } = job;
 
   const initials = company.charAt(0).toUpperCase();
+  const isExpired = isPast(new Date(deadline));
 
   const handleApply = () => {
     apply(id, {
@@ -56,94 +55,111 @@ export function JobCard({ job }: JobCardProps) {
   return (
     <Card
       className={cn(
-        "relative transition-all duration-200 hover:translate-y-[-2px]",
-        !eligible && "opacity-55 grayscale-[0.2]"
+        "relative transition-all duration-200 hover:translate-y-[-2px] group",
+        isExpired && "opacity-55 grayscale-[0.2]"
       )}
     >
       <CardContent className="pt-6">
+        {/* Header: Icon + Title + Company */}
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-pale font-heading text-xl font-bold text-deep-blue dark:bg-muted dark:text-foreground">
             {initials}
           </div>
-          <div className="flex-1 space-y-1">
-            <h3 className="font-heading text-lg font-semibold leading-none tracking-tight">
+          <div className="flex-1 min-w-0 space-y-1">
+            <h3 className="font-heading text-lg font-semibold leading-tight tracking-tight text-foreground">
               {title}
             </h3>
             <div className="flex items-center gap-1.5 text-sm text-steel dark:text-muted-foreground">
+              <Briefcase className="size-3.5 shrink-0" />
               <span className="font-medium">{company}</span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <MapPin className="size-3" />
-                {location || "Location TBD"}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-mist dark:text-muted-foreground/60 pt-1">
-              <Calendar className="size-3" />
-              <span>Closes {format(new Date(deadline), "d MMM yyyy")}</span>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Badge variant="outline" className="bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
-            {ctc || "As per norms"}
-          </Badge>
-          <Badge variant="outline" className="bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+        {/* Description */}
+        <p className="mt-3 text-sm text-mist dark:text-muted-foreground/70 line-clamp-2 leading-relaxed">
+          {description}
+        </p>
+
+        {/* Badges: Branches, CGPA, Backlog, Deadline */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Badge variant="outline" className="gap-1 bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+            <GitBranch className="size-3" />
             {allowedBranches.join(", ")}
           </Badge>
-          <Badge variant="outline" className="bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+          <Badge variant="outline" className="gap-1 bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+            <GraduationCap className="size-3" />
             CGPA ≥ {requiredCgpa}
           </Badge>
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={cn(
               "bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground",
-              backlogAllowed ? "bg-warning/10 border-warning/20 text-warning" : ""
+              backlogAllowed
+                ? "bg-success/10 border-success/20 text-success dark:bg-success/10 dark:border-success/20 dark:text-success"
+                : ""
             )}
           >
             {backlogAllowed ? "Backlog OK" : "No backlog"}
           </Badge>
         </div>
 
-        <div className="mt-8 flex items-center justify-between border-t pt-4 border-border/50">
-          <div className="space-y-1">
-            {eligible ? (
-              <div className="flex items-center gap-1.5 text-xs font-medium text-success">
-                <CheckCircle2 className="size-3.5" />
-                Eligible to apply
-              </div>
+        {/* Footer: Deadline + Apply */}
+        <div className="mt-6 flex items-center justify-between border-t pt-4 border-border/50">
+          <div className="flex items-center gap-1.5 text-xs text-mist dark:text-muted-foreground/60">
+            {isExpired ? (
+              <>
+                <AlertTriangle className="size-3.5 text-error" />
+                <span className="text-error font-medium">
+                  Closed {format(new Date(deadline), "d MMM yyyy")}
+                </span>
+              </>
             ) : (
-              <div className="flex items-center gap-1.5 text-xs font-medium text-error">
-                <AlertCircle className="size-3.5" />
-                {ineligibilityReason}
-              </div>
+              <>
+                <Calendar className="size-3.5" />
+                <span>Closes {format(new Date(deadline), "d MMM yyyy")}</span>
+              </>
             )}
           </div>
-          
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger 
+            <DialogTrigger
               render={
-                <Button 
-                  disabled={!eligible || isPending}
+                <Button
+                  disabled={isExpired || status !== "ACTIVE" || isPending}
                   className={cn(
                     "min-w-[100px]",
-                    !eligible && "bg-muted text-muted-foreground border-none shadow-none"
+                    (isExpired || status !== "ACTIVE") &&
+                      "bg-muted text-muted-foreground border-none shadow-none"
                   )}
                 />
               }
             >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : (eligible ? "Apply" : "Ineligible")}
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : isExpired ? (
+                "Expired"
+              ) : status !== "ACTIVE" ? (
+                "Unavailable"
+              ) : (
+                "Apply"
+              )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Confirm Application</DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to apply for <strong>{title}</strong> at <strong>{company}</strong>? 
-                  A snapshot of your current profile will be shared with the company.
+                  Are you sure you want to apply for <strong>{title}</strong> at{" "}
+                  <strong>{company}</strong>? A snapshot of your current profile
+                  will be shared with the company.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter className="gap-2 sm:gap-0">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isPending}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={isPending}
+                >
                   Cancel
                 </Button>
                 <Button onClick={handleApply} disabled={isPending}>
