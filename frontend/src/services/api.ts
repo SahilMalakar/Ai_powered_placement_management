@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_URL } from '@/constants/api';
 
 /**
@@ -13,6 +13,20 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 // Request interceptor for logging
 api.interceptors.request.use((config) => {
@@ -30,18 +44,57 @@ api.interceptors.response.use(
     console.log(`%c✅ API [SUCCESS]: ${method?.toUpperCase()} ${url} (${status})`, "color: #1D9E75; font-weight: bold;");
     return response;
   },
-  (error) => {
-    const { method, url } = error.config || {};
+  async (error: AxiosError<any>) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const { method, url } = originalRequest || {};
     const status = error.response?.status;
+    const errorCode = error.response?.data?.errorCode;
     const message = error.response?.data?.message || error.message;
+
     console.log(`%c❌ API [ERROR]: ${method?.toUpperCase()} ${url} (${status}) - ${message}`, "color: #E24B4A; font-weight: bold;");
 
-    if (status === 401) {
+    // Handle 401 Unauthorized / Token Expired
+    if (status === 401 && !originalRequest._retry) {
+      // If the error is specifically about an expired token
+      if (errorCode === 'TOKEN_EXPIRED') {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then(() => {
+              return api(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+          console.log('%c🔄 API [REFRESH]: Attempting to refresh tokens...', "color: #EF9F27; font-weight: bold;");
+          await api.post('/auth/refresh-token');
+          processQueue(null);
+          return api(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      // For other 401 errors (e.g., unauthorized access on non-expired routes)
       const requestUrl = url || '';
       if (!requestUrl.includes('/auth/me') && typeof window !== 'undefined') {
         window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
   }
 );

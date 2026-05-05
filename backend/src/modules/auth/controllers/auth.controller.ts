@@ -1,6 +1,10 @@
 import { sendSuccess } from '../../../utils/ApiResonse.js';
 import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { cookieOption } from '../../../utils/cookieOption.js';
+import {
+    accessTokenCookieOptions,
+    cookieOption,
+    refreshTokenCookieOptions,
+} from '../../../utils/cookieOption.js';
 import { UnauthorizedError } from '../../../utils/errors/httpErrors.js';
 import { HTTP_STATUS } from '../../../utils/httpStatus.js';
 import {
@@ -22,15 +26,12 @@ export const signupController = asyncHandler(async (req, res) => {
         password,
     });
 
-    res.cookie('token', accessToken, cookieOption);
-    res.cookie('refreshToken', refreshToken, {
-        ...cookieOption,
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
+    res.cookie('token', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     return sendSuccess(
         res,
-        user,
+        { user, token: accessToken },
         'Signup successful',
         HTTP_STATUS.CREATED
     );
@@ -46,19 +47,19 @@ export const loginController = asyncHandler(async (req, res) => {
 
     console.log('login token : ', accessToken);
 
-    res.cookie('token', accessToken, cookieOption);
-    res.cookie('refreshToken', refreshToken, {
-        ...cookieOption,
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
+    res.cookie('token', accessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     return sendSuccess(
         res,
         {
-            id: isUserExist.id,
-            email: isUserExist.email,
-            role: isUserExist.role,
-            isProfileCompleted: isUserExist.isProfileCompleted,
+            user: {
+                id: isUserExist.id,
+                email: isUserExist.email,
+                role: isUserExist.role,
+                isProfileCompleted: isUserExist.isProfileCompleted,
+            },
+            token: accessToken,
         },
         'Login successful',
         HTTP_STATUS.OK
@@ -80,10 +81,8 @@ export const meController = asyncHandler(async (req, res) => {
 export const logoutController = asyncHandler(async (req, res) => {
     await logoutService();
 
-    // clear cookie
-    res.clearCookie('token', {
-        ...cookieOption,
-    });
+    res.clearCookie('token', cookieOption);
+    res.clearCookie('refreshToken', cookieOption);
 
     return sendSuccess(res, null, 'Logged out successfully', HTTP_STATUS.OK);
 });
@@ -147,15 +146,12 @@ export const refreshTokenController = asyncHandler(async (req, res) => {
     const { newAccessToken, newRefreshToken } =
         await refreshTokenService(oldRefreshToken);
 
-    res.cookie('token', newAccessToken, cookieOption);
-    res.cookie('refreshToken', newRefreshToken, {
-        ...cookieOption,
-        maxAge: 3 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('token', newAccessToken, accessTokenCookieOptions);
+    res.cookie('refreshToken', newRefreshToken, refreshTokenCookieOptions);
 
     return sendSuccess(
         res,
-        null,
+        { token: newAccessToken },
         'Tokens refreshed successfully',
         HTTP_STATUS.OK
     );

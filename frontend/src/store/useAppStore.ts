@@ -2,10 +2,11 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 interface User {
-  id: string;
-  name: string;
+  id: number;
+  name?: string;
   email: string;
   role: 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN';
+  isProfileCompleted?: boolean;
 }
 
 interface AppState {

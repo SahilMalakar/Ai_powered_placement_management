@@ -16,7 +16,7 @@ export const generateRefreshToken = async (payload: {
     role: string;
     email: string;
 }) => {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET as string, {
+    return jwt.sign(payload, serverConfig.REFRESH_TOKEN_SECRET as string, {
         expiresIn: '3d', // later will update this to 1 day
     });
 };

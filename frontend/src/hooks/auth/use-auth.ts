@@ -34,11 +34,11 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: async (data: AuthFormValues) => {
       const response = await api.post("/auth/login", data)
-      return response.data
+      return response.data.data
     },
-    onSuccess: (response) => {
+    onSuccess: (data) => {
       queryClient.clear()
-      setUser(response.data)
+      setUser(data.user)
       setAuthenticated(true)
       toast.success("Login successful!")
       router.replace("/dashboard")
@@ -55,11 +55,11 @@ export function useAuth() {
   const signupMutation = useMutation({
     mutationFn: async (data: AuthFormValues) => {
       const response = await api.post("/auth/signup", data)
-      return response.data
+      return response.data.data
     },
-    onSuccess: (response) => {
+    onSuccess: (data) => {
       queryClient.clear()
-      setUser(response.data)
+      setUser(data.user)
       setAuthenticated(true)
       toast.success("Signup successful!")
       router.replace("/dashboard")
