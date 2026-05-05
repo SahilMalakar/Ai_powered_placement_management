@@ -14,7 +14,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <h1 className="text-2xl font-bold mb-4">Welcome to Dashboard</h1>
       <p className="mb-4">You are now logged in.</p>
       <Button onClick={handleLogout}>Logout</Button>
