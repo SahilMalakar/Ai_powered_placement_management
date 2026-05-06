@@ -1,5 +1,5 @@
 import { useApplications } from "@/hooks/student/useApplications";
-import { ApplicationStatus } from "@/types/application";
+import { ApplicationStatus } from "@/types/student/application";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";

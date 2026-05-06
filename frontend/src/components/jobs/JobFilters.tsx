@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Search, X, ChevronDown, GitBranch, ShieldCheck, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { JobFilters as IJobFilters } from "@/types/job";
+import { JobFilters as IJobFilters } from "@/types/student/job";
 
 const ALL_BRANCHES = [
   "CSE", "ETE", "EE", "ME", "IE", "CE", "CHE", "IPE", "MCA",

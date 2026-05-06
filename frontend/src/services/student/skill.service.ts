@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { SkillInput, UpdateSkillInput, Skill } from "@/types/profile";
+import { SkillInput, UpdateSkillInput, Skill } from "@/types/student/profile";
 
 export const getSkills = async (): Promise<Skill[]> => {
   return api.get("/students/profile/skill").then((r) => r.data.data);

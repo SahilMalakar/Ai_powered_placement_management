@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, ExternalLink, GitFork } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProjectDialog } from "./project-dialog"
-import { Project } from "@/types/profile"
+import { Project } from "@/types/student/profile"
 
 interface ProjectsTabProps {
   onNext: () => void

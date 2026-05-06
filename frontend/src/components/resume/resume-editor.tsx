@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { resumeJsonSchema, ResumeJson, Resume } from '@/types/resume';
+import { resumeJsonSchema, ResumeJson, Resume } from '@/types/student/resume';
 import { useUpdateResume, useExportResume } from '@/hooks/student/use-resume';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';

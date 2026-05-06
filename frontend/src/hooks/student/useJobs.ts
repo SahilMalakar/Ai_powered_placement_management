@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getJobs } from "@/services/student/job.service";
-import { JobFilters } from "@/types/job";
+import { JobFilters } from "@/types/student/job";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
 export const useJobs = (filters: JobFilters) => {

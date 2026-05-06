@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AdditionalDetailDialog } from "./additional-detail-dialog"
-import { AdditionalDetail } from "@/types/profile"
+import { AdditionalDetail } from "@/types/student/profile"
 
 interface AdditionalDetailsTabProps {
   onPrev: () => void

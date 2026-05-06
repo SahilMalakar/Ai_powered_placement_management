@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getJobById } from "@/services/student/job.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
-import { Job } from "@/types/job";
+import { Job } from "@/types/student/job";
 
 export const useJob = (id: number) => {
   return useQuery<Job>({

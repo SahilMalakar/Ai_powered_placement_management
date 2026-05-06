@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { resumeService } from "@/services/student/resume.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
 import { toast } from "sonner";
-import { ResumeJson } from "@/types/resume";
+import { ResumeJson } from "@/types/student/resume";
 
 /**
  * Hook for fetching all resumes of the student.

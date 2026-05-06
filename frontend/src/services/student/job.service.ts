@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { JobFilters, JobsResponse } from "@/types/job";
+import { JobFilters, JobsResponse } from "@/types/student/job";
 
 export const getJobs = async (filters: JobFilters): Promise<JobsResponse> => {
   const response = await api.get('/admin/job', { params: filters });

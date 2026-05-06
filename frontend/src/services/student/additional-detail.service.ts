@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { AdditionalDetailInput, UpdateAdditionalDetailInput, AdditionalDetail } from "@/types/profile";
+import { AdditionalDetailInput, UpdateAdditionalDetailInput, AdditionalDetail } from "@/types/student/profile";
 
 export const getAdditionalDetails = async (): Promise<AdditionalDetail[]> => {
   return api.get("/students/profile/additionalDetail").then((r) => r.data.data);

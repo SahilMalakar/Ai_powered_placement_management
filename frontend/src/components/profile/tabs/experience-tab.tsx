@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ExperienceDialog } from "./experience-dialog"
-import { Experience } from "@/types/profile"
+import { Experience } from "@/types/student/profile"
 
 interface ExperienceTabProps {
   onNext: () => void

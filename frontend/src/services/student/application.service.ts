@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { ApplicationsResponse } from "@/types/application";
+import { ApplicationsResponse } from "@/types/student/application";
 
 export const getMyApplications = async (): Promise<ApplicationsResponse> => {
   const response = await api.get('/students/application');

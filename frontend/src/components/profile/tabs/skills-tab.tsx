@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, X, Edit2, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SkillDialog } from "./skill-dialog"
-import { Skill } from "@/types/profile"
+import { Skill } from "@/types/student/profile"
 
 interface SkillsTabProps {
   onNext: () => void

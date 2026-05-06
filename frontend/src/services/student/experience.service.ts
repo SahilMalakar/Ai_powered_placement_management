@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { ExperienceInput, UpdateExperienceInput, Experience } from "@/types/profile";
+import { ExperienceInput, UpdateExperienceInput, Experience } from "@/types/student/profile";
 
 export const getExperiences = async (): Promise<Experience[]> => {
   return api.get("/students/profile/experience").then((r) => r.data.data);

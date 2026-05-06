@@ -1,5 +1,5 @@
 import api from '../api';
-import { Resume, ResumeJson } from '@/types/resume';
+import { Resume, ResumeJson } from '@/types/student/resume';
 
 /**
  * Service for student resume management.

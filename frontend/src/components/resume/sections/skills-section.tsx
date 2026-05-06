@@ -1,7 +1,7 @@
 'use client';
 
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
-import { ResumeJson } from '@/types/resume';
+import { ResumeJson } from '@/types/student/resume';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

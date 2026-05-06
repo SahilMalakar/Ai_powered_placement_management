@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { SocialLinkInput, UpdateSocialLinkInput, SocialLink } from "@/types/profile";
+import { SocialLinkInput, UpdateSocialLinkInput, SocialLink } from "@/types/student/profile";
 
 export const getSocialLinks = async (): Promise<SocialLink[]> => {
   return api.get("/students/profile/socialLink").then((r) => r.data.data);

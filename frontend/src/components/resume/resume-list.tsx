@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Download, Edit2, FileText, Loader2, AlertCircle, RefreshCw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { Resume } from "@/types/resume";
+import { Resume } from "@/types/student/resume";
 import {
   AlertDialog,
   AlertDialogAction,

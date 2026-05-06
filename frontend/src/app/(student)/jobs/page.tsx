@@ -4,7 +4,7 @@ import { JobCard } from "@/components/jobs/JobCard";
 import { JobFilters } from "@/components/jobs/JobFilters";
 import { JobPagination } from "@/components/jobs/JobPagination";
 import { useJobs } from "@/hooks/student/useJobs";
-import { JobFilters as IJobFilters } from "@/types/job";
+import { JobFilters as IJobFilters } from "@/types/student/job";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";

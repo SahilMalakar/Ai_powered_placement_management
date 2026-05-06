@@ -1,5 +1,5 @@
 import api from "@/services/api";
-import { ProjectInput, UpdateProjectInput, Project } from "@/types/profile";
+import { ProjectInput, UpdateProjectInput, Project } from "@/types/student/profile";
 
 export const getProjects = async (): Promise<Project[]> => {
   return api.get("/students/profile/project").then((r) => r.data.data);

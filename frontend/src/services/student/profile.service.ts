@@ -1,5 +1,5 @@
 import api from "@/services/api"
-import { CreateProfileInput, UpdateProfileInput, StudentProfileData } from "@/types/profile"
+import { CreateProfileInput, UpdateProfileInput, StudentProfileData } from "@/types/student/profile"
 
 /**
  * Student Profile Service

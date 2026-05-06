@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit2, Trash2, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { SocialLink } from "@/types/profile"
+import { SocialLink } from "@/types/student/profile"
 
 interface SocialLinksTabProps {
   onNext: () => void
