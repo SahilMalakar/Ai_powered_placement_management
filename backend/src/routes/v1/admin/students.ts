@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getAllStudentsController, getStudentByIdController } from '../../../modules/admin/controllers/students.controller.js';
+import { getAllStudentsController, getStudentByIdController, softDeleteStudentController } from '../../../modules/admin/controllers/students.controller.js';
 import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireAdmin } from '../../../middlewares/rbac.middleware.js';
+import { requireAdmin, requireSuperAdmin } from '../../../middlewares/rbac.middleware.js';
 import { validateParams } from '../../../middlewares/validate.middlware.js';
 import { idSchema } from '../../../types/auth.js';
 
@@ -99,5 +99,31 @@ studentRouter.get("/:id",
     requireAdmin,
     getStudentByIdController
 );
+
+
+/**
+ * @swagger
+ * /v1/admin/students/{id}:
+ *   delete:
+ *     summary: Soft delete/Ban a student account (Super Admin Only)
+ *     tags: [Admin - Student Management]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Student account deactivated successfully
+ */
+studentRouter.delete("/:id",
+    validateParams(idSchema),
+    authMiddleware,
+    requireSuperAdmin,
+    softDeleteStudentController
+)
 
 export default studentRouter;

@@ -30,7 +30,7 @@ const jobRouter: Router = Router();
  * /api/v1/admin/job:
  *   get:
  *     summary: Fetch all available jobs
- *     tags: [Jobs]
+ *     tags: [Admin Jobs]
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []

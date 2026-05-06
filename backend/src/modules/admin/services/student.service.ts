@@ -2,7 +2,7 @@ import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
 import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
 import type { GetAllStudentsQueryInput } from "../../../types/admin/student.js";
 import { NotFoundError } from "../../../utils/errors/httpErrors.js";
-import { getAllStudentRepository, getStudentByIdRepository } from "../repositories/students.repository.js";
+import { getAllStudentRepository, getStudentByIdRepository, softDeleteStudentRepository } from "../repositories/students.repository.js";
 
 export const getAllStudentService = async (query: GetAllStudentsQueryInput) => {
     // get all the students from the database
@@ -115,4 +115,15 @@ export const getStudentByIdService = async (studentId: number) => {
 
         return student;
     }
+}
+
+
+export const softDeleteStudentService = async (studentId:number)=>{
+    const student = await softDeleteStudentRepository(studentId);
+
+    if(!student){
+        throw new NotFoundError("Student not Found")
+    }
+
+    return student;
 }

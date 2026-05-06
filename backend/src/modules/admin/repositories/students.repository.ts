@@ -107,3 +107,49 @@ export const getStudentByIdRepository = async (studentId: number) => {
         }
     })
 }
+
+export const softDeleteStudentRepository = async (studentId: number) => {
+    return await prisma.user.update({
+        where: {
+            id: studentId,
+            role: "STUDENT"
+        },
+        data: {
+            deletedAt: new Date(),
+            profile: {
+                update: {
+                    deletedAt: new Date()
+                }
+            },
+            documents: {
+                updateMany: {
+                    where: { deletedAt: null },
+                    data: { deletedAt: new Date() }
+                }
+            },
+            applications: {
+                updateMany: {
+                    where: { deletedAt: null },
+                    data: { deletedAt: new Date() }
+                }
+            },
+            resumes: {
+                updateMany: {
+                    where: { deletedAt: null },
+                    data: { deletedAt: new Date() }
+                }
+            },
+            atsResults: {
+                updateMany: {
+                    where: { deletedAt: null },
+                    data: { deletedAt: new Date() }
+                }
+            }
+        },
+        select: {
+            id: true,
+            email: true,
+            deletedAt: true,
+        }
+    })
+}

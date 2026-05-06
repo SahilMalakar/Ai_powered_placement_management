@@ -28,6 +28,24 @@ export const requireAdmin = (
     next();
 };
 
+export const requireSuperAdmin = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    // ensure authenticated
+    if (!req.user) {
+        return next(new UnauthorizedError('Unauthorized: No user found'));
+    }
+
+    // check role
+    if (req.user.role !== 'SUPER_ADMIN') {
+        return next(new ForbiddenError('Forbidden: Super Admin access required'));
+    }
+
+    next();
+}
+
 export const requireStudent = (
     req: Request,
     res: Response,
