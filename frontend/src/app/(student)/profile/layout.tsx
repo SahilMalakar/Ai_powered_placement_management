@@ -2,9 +2,9 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { ProfileHeader } from "@/components/profile/profile-header"
+import { ProfileHeader } from "@/components/student/profile/profile-header"
 import { cn } from "@/lib/utils"
-import { CoreInfoTab } from "@/components/profile/tabs/core-info-tab"
+import { CoreInfoTab } from "@/components/student/profile/tabs/core-info-tab"
 import { useProfileStore } from "@/store/useProfileStore"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { useCreateProfile } from "@/hooks/student/use-create-profile"
@@ -59,7 +59,7 @@ export default function ProfileLayout({
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <ProfileHeader />
-      
+
       {/* ── Profile Wizard Card ── */}
       <div className="space-y-4">
         <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-1 shadow-button inline-flex w-full overflow-x-auto no-scrollbar">
@@ -86,11 +86,11 @@ export default function ProfileLayout({
             children
           ) : (
             /* Default Wizard View */
-            <CoreInfoTab 
-              onNext={(data) => handleNext(data, "/profile/social")} 
-              onSave={handleSave} 
-              initialData={formData} 
-              isSaving={isSaving} 
+            <CoreInfoTab
+              onNext={(data) => handleNext(data, "/profile/social")}
+              onSave={handleSave}
+              initialData={formData}
+              isSaving={isSaving}
             />
           )}
         </div>

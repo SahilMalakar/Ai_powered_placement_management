@@ -1,6 +1,6 @@
 "use client"
 
-import { AdditionalDetailsTab } from "@/components/profile/tabs/additional-details-tab"
+import { AdditionalDetailsTab } from "@/components/student/profile/tabs/additional-details-tab"
 import { useProfileStore } from "@/store/useProfileStore"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { useCreateProfile } from "@/hooks/student/use-create-profile"
@@ -24,10 +24,10 @@ export default function AdditionalPage() {
   }
 
   return (
-    <AdditionalDetailsTab 
-      onPrev={() => router.push("/profile/skills")} 
-      onSave={handleSave} 
-      isSaving={isUpdating || isCreating} 
+    <AdditionalDetailsTab
+      onPrev={() => router.push("/profile/skills")}
+      onSave={handleSave}
+      isSaving={isUpdating || isCreating}
     />
   )
 }

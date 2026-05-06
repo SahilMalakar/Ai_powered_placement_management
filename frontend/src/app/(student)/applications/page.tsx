@@ -1,6 +1,6 @@
 "use client";
 
-import { ApplicationList } from "@/components/applications/application-list";
+import { ApplicationList } from "@/components/student/applications/application-list";
 
 export default function ApplicationsPage() {
   return (

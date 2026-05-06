@@ -6,13 +6,14 @@ import { CreateJobInput, UpdateJobInput } from "@/types/admin/job";
 // Centralized Query Keys
 export const ADMIN_JOB_KEYS = {
   all: ["admin-jobs"] as const,
-  detail: (id: string) => ["admin-jobs", id] as const,
+  list: (filters: any) => ["admin-jobs", "list", filters] as const,
+  detail: (id: string) => ["admin-jobs", "detail", id] as const,
 };
 
-export const useAdminJobs = () => {
+export const useAdminJobs = (filters: any = {}) => {
   return useQuery({
-    queryKey: ADMIN_JOB_KEYS.all,
-    queryFn: adminJobService.getAllJobs,
+    queryKey: ADMIN_JOB_KEYS.list(filters),
+    queryFn: () => adminJobService.getAllJobs(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };
@@ -74,6 +75,22 @@ export const useToggleJobStatus = () => {
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || "Status update failed.";
+      toast.error(message);
+    },
+  });
+};
+
+export const useDeleteJob = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => adminJobService.deleteJob(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_JOB_KEYS.all });
+      toast.success(response.message || "Job deleted successfully.");
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || "Failed to delete job.";
       toast.error(message);
     },
   });

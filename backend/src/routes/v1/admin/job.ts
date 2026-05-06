@@ -13,6 +13,7 @@ import {
     deactivateJobController,
     getAllJobsController,
     getJobByIdController,
+    deleteJobByIdController,
 } from '../../../modules/admin/controllers/job.controller.js';
 import { idSchema } from '../../../types/auth.js';
 
@@ -262,6 +263,35 @@ jobRouter.post(
     requireAdmin,
     validateParams(idSchema),
     deactivateJobController
+);
+
+/**
+ * @swagger
+ * /api/v1/admin/job/{id}:
+ *   delete:
+ *     summary: Delete a job posting
+ *     tags: [Admin Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Job deleted successfully
+ *       404:
+ *         description: Job not found
+ */
+jobRouter.delete(
+    '/:id',
+    authMiddleware,
+    requireAdmin,
+    validateParams(idSchema),
+    deleteJobByIdController
 );
 
 export { jobRouter };

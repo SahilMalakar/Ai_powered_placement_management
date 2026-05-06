@@ -1,14 +1,14 @@
 "use client"
 
-import { DocumentsTab } from "@/components/profile/tabs/documents-tab"
+import { DocumentsTab } from "@/components/student/profile/tabs/documents-tab"
 import { useRouter } from "next/navigation"
 
 export default function DocumentsPage() {
   const router = useRouter()
   return (
-    <DocumentsTab 
-      onNext={() => router.push("/profile/experience")} 
-      onPrev={() => router.push("/profile/academic")} 
+    <DocumentsTab
+      onNext={() => router.push("/profile/experience")}
+      onPrev={() => router.push("/profile/academic")}
     />
   )
 }

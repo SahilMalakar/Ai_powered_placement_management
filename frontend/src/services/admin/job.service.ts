@@ -7,8 +7,8 @@ import {
 import api from "@/services/api";
 
 export const adminJobService = {
-  getAllJobs: async (): Promise<AdminJobResponse> => {
-    const response = await api.get("/admin/job");
+  getAllJobs: async (filters: any = {}): Promise<AdminJobResponse> => {
+    const response = await api.get("/admin/job", { params: filters });
     return response.data;
   },
 
@@ -43,6 +43,11 @@ export const adminJobService = {
 
   deactivateJob: async (id: string): Promise<SingleJobResponse> => {
     const response = await api.post(`/admin/job/${id}/deactivate`);
+    return response.data;
+  },
+
+  deleteJob: async (id: string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete(`/admin/job/${id}`);
     return response.data;
   },
 };

@@ -11,25 +11,17 @@ import {
   Download,
   UserPlus,
   Settings,
-  ChevronRight,
   LogOut,
-  Mic,
 } from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useAppStore } from "@/store/useAppStore"
@@ -85,11 +77,6 @@ const data: { navMain: NavGroup[] } = {
           title: "Applications",
           url: "/admin/applications",
           icon: FileText,
-        },
-        {
-          title: "Mock Interviews",
-          url: "/admin/interviews",
-          icon: Mic,
         },
       ],
     },

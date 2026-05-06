@@ -110,6 +110,13 @@ export const updateJobStatus = async (jobId: number, status: JobStatus) => {
     });
 };
 
+export const deleteJob = async (jobId: number) => {
+    return await prisma.job.update({
+        where: { id: jobId },
+        data: { deletedAt: new Date() },
+    });
+};
+
 export const getStudentsForJobNotification = async () => {
     return await prisma.user.findMany({
         where: {

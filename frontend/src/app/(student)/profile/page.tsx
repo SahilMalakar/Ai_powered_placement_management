@@ -1,6 +1,6 @@
 "use client"
 
-import { CoreInfoTab } from "@/components/profile/tabs/core-info-tab"
+import { CoreInfoTab } from "@/components/student/profile/tabs/core-info-tab"
 import { useProfileStore } from "@/store/useProfileStore"
 import { useUpdateProfile } from "@/hooks/student/use-update-profile"
 import { useCreateProfile } from "@/hooks/student/use-create-profile"
@@ -31,11 +31,11 @@ export default function CoreInfoPage() {
   }
 
   return (
-    <CoreInfoTab 
-      onNext={handleNext} 
-      onSave={handleSave} 
-      initialData={formData} 
-      isSaving={isSaving} 
+    <CoreInfoTab
+      onNext={handleNext}
+      onSave={handleSave}
+      initialData={formData}
+      isSaving={isSaving}
     />
   )
 }

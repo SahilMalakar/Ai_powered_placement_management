@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useResume, useDeleteResume } from "@/hooks/student/use-resume";
-import { ResumeEditor } from "@/components/resume/resume-editor";
+import { ResumeEditor } from "@/components/student/resume/resume-editor";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Loader2, AlertCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export default function ResumeDetailPage() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="bg-secondary text-secondary-foreground border-border hover:bg-secondary/80">Cancel</AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 onClick={handleDelete}
                 className="bg-error text-white hover:bg-error/90"
                 disabled={deleteMutation.isPending}
@@ -107,7 +107,7 @@ export default function ResumeDetailPage() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-      
+
       <ResumeEditor resume={resume} />
     </div>
   );

@@ -9,6 +9,7 @@ import {
     deactivateJobService,
     getAllJobsService,
     getJobByIdService,
+    deleteJobService,
 } from '../services/job.service.js';
 import { getAllJobsQuerySchema } from '../../../types/admin/job.js';
 
@@ -121,5 +122,16 @@ export const getJobByIdController = asyncHandler(async (req, res) => {
     const job = await getJobByIdService(jobId, req.user.role);
 
     return sendSuccess(res, job, 'Job fetched successfully', HTTP_STATUS.OK);
+});
+
+export const deleteJobByIdController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    const jobId = Number(req.params.id);
+    await deleteJobService(jobId);
+
+    return sendSuccess(res, null, 'Job deleted successfully', HTTP_STATUS.OK);
 });
 

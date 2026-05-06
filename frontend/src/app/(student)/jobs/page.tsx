@@ -1,8 +1,8 @@
 'use client';
 
-import { JobCard } from "@/components/jobs/JobCard";
-import { JobFilters } from "@/components/jobs/JobFilters";
-import { JobPagination } from "@/components/jobs/JobPagination";
+import { JobCard } from "@/components/student/jobs/JobCard";
+import { JobFilters } from "@/components/student/jobs/JobFilters";
+import { JobPagination } from "@/components/student/jobs/JobPagination";
 import { useJobs } from "@/hooks/student/useJobs";
 import { JobFilters as IJobFilters } from "@/types/student/job";
 import { useState } from "react";

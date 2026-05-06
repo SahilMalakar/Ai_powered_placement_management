@@ -1,4 +1,4 @@
-import { ResumeList } from "@/components/resume/resume-list";
+import { ResumeList } from "@/components/student/resume/resume-list";
 
 export default function ResumePage() {
   return (

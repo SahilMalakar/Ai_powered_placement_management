@@ -5,6 +5,7 @@ import {
     updateJobStatus,
     getStudentsForJobNotification,
     getAllJobs,
+    deleteJob,
 } from '../repositories/job.repository.js';
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import type {
@@ -249,4 +250,26 @@ export const getJobByIdService = async (jobId: number, userRole?: string) => {
         }
         return job;
     }
+};
+
+export const deleteJobService = async (jobId: number) => {
+    const job = await getJobById(jobId);
+    if (!job) {
+        throw new BadRequestError('Job not found');
+    }
+
+    const deletedJob = await deleteJob(jobId);
+
+    // Cache Invalidation
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
+        if (listKeys.length > 0) await cacheClient.del(listKeys);
+        await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
+        console.log(`🧹 Cache Invalidated: ${CACHE_KEYS.JOBS_LIST} & ${CACHE_KEYS.JOB_DETAILS(jobId)}`);
+    } catch (error) {
+        console.error('⚠️ Cache Invalidation Failed (Delete):', error);
+    }
+
+    return deletedJob;
 };
