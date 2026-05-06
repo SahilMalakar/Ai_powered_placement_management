@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { Building2, Calendar, CheckCircle2, Clock } from "lucide-react";
+import { Building2, Calendar, CheckCircle2, Clock, XCircle } from "lucide-react";
 
 const StatusBadge = ({ status }: { status: ApplicationStatus }) => {
   switch (status) {
@@ -14,6 +14,8 @@ const StatusBadge = ({ status }: { status: ApplicationStatus }) => {
       return <Badge variant="warning" className="gap-1"><Clock className="w-3 h-3" /> Shortlisted</Badge>;
     case "SELECTED":
       return <Badge variant="success" className="gap-1"><CheckCircle2 className="w-3 h-3" /> Selected</Badge>;
+    case "REJECTED":
+      return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" /> Rejected</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }

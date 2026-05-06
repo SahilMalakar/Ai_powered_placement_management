@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const applicationStatusSchema = z.enum(["APPLIED", "SHORTLISTED", "SELECTED"]);
+export const applicationStatusSchema = z.enum(["APPLIED", "SHORTLISTED", "SELECTED", "REJECTED"]);
 
 export const applicationJobSchema = z.object({
   id: z.number(),

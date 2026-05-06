@@ -12,6 +12,7 @@ import { addBulkEmailsToQueue } from "../../../queues/notification.queue.js";
 const VALID_TRANSITIONS: Record<string, ApplicationStatus[]> = {
     SHORTLISTED: ["APPLIED"],
     SELECTED: ["SHORTLISTED"],
+    REJECTED: ["APPLIED", "SHORTLISTED"],
 };
 
 /**
@@ -49,22 +50,34 @@ export const updateApplicationStatusService = async (data: UpdateApplicationStat
     }
 
     // 3. Queue email notifications AFTER successful commit (fire-and-forget)
-    const notifications: NotificationTypes[] = result.apps.map((app) => ({
-        to: app.user.email,
-        subject: status === "SHORTLISTED"
-            ? `Congratulations! You've been shortlisted for ${app.job.title}`
-            : `Congratulations! You've been selected for ${app.job.title}`,
-        templateId: "application-status",
-        params: {
-            studentName: app.user.profile?.fullName ?? "Student",
-            jobTitle: app.job.title,
-            companyName: app.job.company,
-            status: status,
-            statusMessage: status === "SHORTLISTED"
-                ? "You have been shortlisted for the next round."
-                : "You have been selected! Please check the portal for further instructions.",
-        },
-    }));
+    const notifications: NotificationTypes[] = result.apps.map((app) => {
+        let subject = "";
+        let statusMessage = "";
+
+        if (status === "SHORTLISTED") {
+            subject = `Congratulations! You've been shortlisted for ${app.job.title}`;
+            statusMessage = "You have been shortlisted for the next round.";
+        } else if (status === "SELECTED") {
+            subject = `Congratulations! You've been selected for ${app.job.title}`;
+            statusMessage = "You have been selected! Please check the portal for further instructions.";
+        } else if (status === "REJECTED") {
+            subject = `Update regarding your application for ${app.job.title}`;
+            statusMessage = `Thank you for your interest in ${app.job.company}. After careful consideration, we will not be moving forward with your application at this time.`;
+        }
+
+        return {
+            to: app.user.email,
+            subject,
+            templateId: "application-status",
+            params: {
+                studentName: app.user.profile?.fullName ?? "Student",
+                jobTitle: app.job.title,
+                companyName: app.job.company,
+                status: status,
+                statusMessage,
+            },
+        };
+    });
 
     addBulkEmailsToQueue(notifications).catch((err) =>
         console.error("⚠️ Failed to queue status notification emails:", err)

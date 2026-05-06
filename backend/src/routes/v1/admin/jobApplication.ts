@@ -67,7 +67,7 @@ jobApplicationRouter.get("/:id/applicants",
  *                 example: [1, 2, 3]
  *               status:
  *                 type: string
- *                 enum: [SHORTLISTED, SELECTED]
+ *                 enum: [SHORTLISTED, SELECTED, REJECTED]
  *                 example: SHORTLISTED
  *     responses:
  *       200:

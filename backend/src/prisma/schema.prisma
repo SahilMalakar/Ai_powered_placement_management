@@ -265,6 +265,7 @@ enum ApplicationStatus {
   APPLIED
   SHORTLISTED
   SELECTED
+  REJECTED
 }
 
 enum DocumentType {
