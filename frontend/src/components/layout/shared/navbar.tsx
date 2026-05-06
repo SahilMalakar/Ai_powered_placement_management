@@ -13,15 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Settings } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { useAppStore } from "@/store/useAppStore";
 
 /**
- * Student-area top navbar.
+ * Shared top navbar for both Admin and Student portals.
  * Sticky at top, flex layout within SidebarInset.
  */
-export function StudentNavbar() {
+export function Navbar() {
   const { user, setAuthenticated, setUser } = useAppStore();
   const router = useRouter();
 
@@ -47,6 +47,8 @@ export function StudentNavbar() {
     setUser(null);
     router.push("/login");
   };
+
+  const isAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-6 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-30">
@@ -100,26 +102,41 @@ export function StudentNavbar() {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none text-foreground truncate">
-                    {user?.name || "Student User"}
+                    {user?.name || "User"}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground truncate">
-                    {user?.email || "student@example.com"}
+                    {user?.email || "user@example.com"}
                   </p>
                 </div>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => router.push("/profile")}
-            >
-              <User className="mr-2 size-4" />
-              <span>My Profile</span>
-            </DropdownMenuItem>
+            
+            {isAdmin ? (
+              <>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/admin/settings")}>
+                  <User className="mr-2 size-4" />
+                  <span>Profile Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/admin/settings")}>
+                  <Settings className="mr-2 size-4" />
+                  <span>System Preferences</span>
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => router.push("/profile")}
+              >
+                <User className="mr-2 size-4" />
+                <span>My Profile</span>
+              </DropdownMenuItem>
+            )}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               variant="destructive"
-              className="cursor-pointer"
+              className="cursor-pointer text-error focus:text-error focus:bg-error/10"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 size-4" />

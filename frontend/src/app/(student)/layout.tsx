@@ -3,8 +3,8 @@
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   StudentSidebar,
-  StudentNavbar,
 } from "@/components/layout/student";
+import { Navbar } from "@/components/layout/shared/navbar";
 
 import { RoleGuard } from "@/components/auth/role-guard";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -28,7 +28,7 @@ export default function StudentLayout({
 
           <SidebarInset className="bg-background">
             {/* ── Navbar ── */}
-            <StudentNavbar />
+            <Navbar />
 
             {/* ── Page content area ── */}
             <main className="flex-1 p-6 lg:p-8 overflow-auto relative min-h-screen">

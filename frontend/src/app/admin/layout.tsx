@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAppStore } from "@/store/useAppStore"
 import { AdminSidebar } from "@/components/layout/admin/sidebar"
-import { AdminNavbar } from "@/components/layout/admin/navbar"
+import { Navbar } from "@/components/layout/shared/navbar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 
 export default function AdminLayout({
@@ -48,7 +48,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset className="bg-background">
-        <AdminNavbar />
+        <Navbar />
 
         {/* Main Content Area */}
         <main className="flex-1 p-6 lg:p-8 overflow-auto relative">
