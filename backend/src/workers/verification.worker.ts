@@ -4,7 +4,7 @@ import {
     VERIFICATION_QUEUE_NAME,
     type VerificationJobPayload,
 } from '../queues/verification.queue.js';
-import {  getProfileRepo } from '../modules/students/repositories/student.repository.js';
+import { getProfileRepo } from '../modules/students/repositories/profile.repository.js';
 import {
     getStudentSgpaDocuments,
     updateVerificationStatus,
@@ -180,8 +180,8 @@ export const initializeVerificationWorker = async () => {
                         mismatchDetails.length > 0
                             ? mismatchDetails.join(' ')
                             : !allDocsProcessed
-                              ? 'Some documents could not be read. Please ensure all uploads are clear PDFs.'
-                              : 'No valid academic data could be extracted.';
+                                ? 'Some documents could not be read. Please ensure all uploads are clear PDFs.'
+                                : 'No valid academic data could be extracted.';
 
                     await updateVerificationStatus(
                         userId,
@@ -211,7 +211,7 @@ export const initializeVerificationWorker = async () => {
                     console.warn(`[Verification Worker] Rate limit reached. Marking job as permanently failed.`);
                     throw new UnrecoverableError(`Rate limit reached: ${message}`);
                 }
-                
+
                 // Job will retry automatically via BullMQ attempts
                 throw error;
             }

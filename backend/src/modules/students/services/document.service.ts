@@ -14,12 +14,12 @@ import {
     ForbiddenError,
     NotFoundError,
 } from '../../../utils/errors/httpErrors.js';
-import { getProfileRepo } from '../repositories/student.repository.js';
+import { getProfileRepo } from '../repositories/profile.repository.js';
 import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
 import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
-import { 
-    invalidateDocumentCache, 
-    invalidateStudentCache 
+import {
+    invalidateDocumentCache,
+    invalidateStudentCache
 } from '../../../utils/cacheInvalidation.js';
 import type { UploadDocumentInput } from '../../../types/students/document.js';
 

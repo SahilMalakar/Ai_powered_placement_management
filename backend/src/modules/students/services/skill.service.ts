@@ -1,11 +1,11 @@
-import { 
-    addSkillRepo, 
-    deleteSkillRepo, 
-    findSkillByIdRepo, 
-    getSkillsByProfileIdRepo, 
-    updateSkillRepo 
+import {
+    addSkillRepo,
+    deleteSkillRepo,
+    findSkillByIdRepo,
+    getSkillsByProfileIdRepo,
+    updateSkillRepo
 } from "../repositories/skill.repository.js";
-import { getProfileRepo } from "../repositories/student.repository.js";
+import { getProfileRepo } from "../repositories/profile.repository.js";
 import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 import type { SkillInput, UpdateSkillInput } from "../../../types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";

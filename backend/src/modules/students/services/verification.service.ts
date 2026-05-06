@@ -3,7 +3,7 @@ import {
     updateVerificationStatus,
     transitionToProcessing,
 } from '../repositories/verification.repository.js';
-import { getProfileRepo } from '../repositories/student.repository.js';
+import { getProfileRepo } from '../repositories/profile.repository.js';
 import { addVerificationJob } from '../../../queues/verification.queue.js';
 import {
     BadRequestError,
@@ -42,7 +42,7 @@ export const initiateVerificationService = async (userId: number) => {
     try {
         // Dispatch the background job to start PDF text extraction and Regex matching
         await addVerificationJob(userId);
-        
+
         // 4. Invalidate Cache so the frontend sees the PROCESSING status immediately
         await invalidateStudentCache(userId);
     } catch (error) {

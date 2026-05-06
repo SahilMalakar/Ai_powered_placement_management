@@ -7,7 +7,7 @@ import {
     getProfileRepo,
     updateStudentProfileRepo,
     getAcademicRecordRepo,
-} from '../repositories/student.repository.js';
+} from '../repositories/profile.repository.js';
 import {
     BadRequestError,
     ConflictError,

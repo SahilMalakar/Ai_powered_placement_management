@@ -1,6 +1,6 @@
 import { sendSuccess } from '../../../utils/ApiResonse.js';
 import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { UnauthorizedError } from '../../../utils/errors/httpErrors.js';
+import { BadRequestError, UnauthorizedError } from '../../../utils/errors/httpErrors.js';
 import { HTTP_STATUS } from '../../../utils/httpStatus.js';
 import {
     createJobService,
@@ -10,6 +10,7 @@ import {
     getAllJobsService,
     getJobByIdService,
 } from '../services/job.service.js';
+import { getAllJobsQuerySchema } from '../../../types/admin/job.js';
 
 export const createJobController = asyncHandler(async (req, res) => {
     if (!req.user) {
@@ -92,22 +93,15 @@ export const getAllJobsController = asyncHandler(async (req, res) => {
         throw new UnauthorizedError('Unauthorized');
     }
 
-    const { search, branch, branches, backlog, cgpa, page, limit } = req.query;
+    // Use safeParse to handle validation errors gracefully
+    const result = getAllJobsQuerySchema.safeParse(req.query);
     
-    // Parse backlog to boolean if present
-    let backlogAllowed: boolean | undefined = undefined;
-    if (backlog === 'yes') backlogAllowed = true;
-    if (backlog === 'no') backlogAllowed = false;
+    if (!result.success) {
+        const message = result.error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+        throw new BadRequestError(`Invalid query parameters: ${message}`);
+    }
 
-    const filters = {
-        search: search as string,
-        branch: branch as string,
-        branches: Array.isArray(branches) ? (branches as string[]) : branches ? [branches as string] : undefined,
-        backlogAllowed,
-        cgpa: cgpa as string,
-        page: page ? Number(page) : 1,
-        limit: limit ? Number(limit) : 10,
-    };
+    const filters = result.data;
 
     const jobsData = await getAllJobsService(filters, req.user.role);
     return sendSuccess(

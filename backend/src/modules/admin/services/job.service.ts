@@ -9,6 +9,7 @@ import {
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import type {
     CreateJobInput,
+    GetAllJobsQueryInput,
     UpdateJobInput,
 } from '../../../types/admin/job.js';
 import type { JobCreateInput } from '../../../prisma/generated/prisma/models/Job.js';
@@ -16,6 +17,7 @@ import type { NotificationTypes } from '../../../types/admin/notification.js';
 import { addBulkEmailsToQueue } from '../../../queues/notification.queue.js';
 import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
 import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import { JobStatus, Branch } from '../../../prisma/generated/prisma/enums.js';
 
 export const createJobService = async (jobData: CreateJobInput) => {
     const job = await createJob(jobData as JobCreateInput);
@@ -164,14 +166,7 @@ export const deactivateJobService = async (jobId: number) => {
 };
 
 export const getAllJobsService = async (
-    filters: {
-        search?: string;
-        branch?: string;
-        cgpa?: string;
-        page?: number;
-        limit?: number;
-        status?: any;
-    },
+    filters: GetAllJobsQueryInput,
     userRole?: string
 ) => {
     // If student, force ACTIVE status

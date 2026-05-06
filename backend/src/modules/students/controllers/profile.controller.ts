@@ -7,7 +7,7 @@ import {
     getStudentProfileService,
     updateStudentProfileService,
     getAcademicRecordService,
-} from '../services/student.service.js';
+} from '../services/profile.service.js';
 
 //  Returns the full merged data: User + Profile + Relations + Semesters
 

@@ -1,11 +1,11 @@
-import { 
-    addExperienceRepo, 
-    deleteExperienceRepo, 
-    findExperienceByIdRepo, 
-    getExperiencesByProfileIdRepo, 
-    updateExperienceRepo 
+import {
+    addExperienceRepo,
+    deleteExperienceRepo,
+    findExperienceByIdRepo,
+    getExperiencesByProfileIdRepo,
+    updateExperienceRepo
 } from "../repositories/experience.repository.js";
-import { getProfileRepo } from "../repositories/student.repository.js";
+import { getProfileRepo } from "../repositories/profile.repository.js";
 import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
 import type { ExperienceInput, UpdateExperienceInput } from "../../../types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";

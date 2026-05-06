@@ -36,3 +36,14 @@ export const updateJobSchema = createJobSchema.omit({ status: true }).partial();
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 export type UpdateJobInput = z.infer<typeof updateJobSchema>;
+
+export const getAllJobsQuerySchema = z.object({
+    search: z.string().optional(),
+    branch: z.enum(Branch).optional(),
+    cgpa: z.string().optional(),
+    page: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().positive().max(100).default(10),
+    status: z.enum(JobStatus).optional(),
+});
+
+export type GetAllJobsQueryInput = z.infer<typeof getAllJobsQuerySchema>;

@@ -8,7 +8,7 @@ import {
     getStudentProfileController,
     updateStudentProfileController,
     getAcademicRecordController,
-} from '../../../modules/students/controllers/student.controller.js';
+} from '../../../modules/students/controllers/profile.controller.js';
 
 /**
  * @swagger

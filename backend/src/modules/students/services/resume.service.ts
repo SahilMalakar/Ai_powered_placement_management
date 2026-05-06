@@ -1,4 +1,4 @@
-import { getFullStudentData } from '../repositories/student.repository.js';
+import { getFullStudentData } from '../repositories/profile.repository.js';
 import {
     countUserResumes,
     findResumesByUserId,
@@ -60,7 +60,7 @@ export const generateResumeService = async (userId: number) => {
             `Your profile is currently ${status}. Only verified students can generate resumes.`
         );
     }
-    
+
     // 4. Validation Guard: Ensure mandatory sections are populated for a professional resume
     const profile = fullProfile.profile;
     const missingSections: string[] = [];
@@ -103,7 +103,7 @@ export const generateResumeService = async (userId: number) => {
 
     // 6. En-queue for background AI analysis
     console.log(`[Resume Service] En-queueing GENERATE_RESUME for user ${userId}. Profile data keys:`, Object.keys(fullProfile));
-    
+
     const job = await addResumeJobToQueue({
         type: 'GENERATE_RESUME',
         userId,
@@ -211,7 +211,7 @@ export const deleteResumeService = async (id: number, userId: number) => {
             const fileNameWithExt = urlParts.pop() || '';
             const folder = urlParts.pop() || '';
             const publicId = `${folder}/${fileNameWithExt.split('.')[0]}`;
-            
+
             await deleteFromCloudinary(publicId);
         } catch (error) {
             console.error('[Delete Resume Service] Cloudinary deletion failed:', error);

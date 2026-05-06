@@ -1,8 +1,9 @@
 import type {
     JobCreateInput,
     JobUpdateInput,
+    JobWhereInput,
 } from '../../../prisma/generated/prisma/models/Job.js';
-import { JobStatus } from '../../../prisma/generated/prisma/enums.js';
+import { JobStatus, Branch } from '../../../prisma/generated/prisma/enums.js';
 import { prisma } from '../../../prisma/prisma.js';
 import type { UpdateJobInput } from '../../../types/admin/job.js';
 
@@ -13,19 +14,19 @@ export const createJob = async (jobData: JobCreateInput) => {
 };
 
 export const getAllJobs = async (filters: {
-    search?: string;
-    branch?: string;
-    branches?: string[];
-    backlogAllowed?: boolean;
-    cgpa?: string;
-    page?: number;
-    limit?: number;
-    status?: JobStatus;
+    search?: string | undefined;
+    branch?: Branch | undefined;
+    branches?: Branch[] | undefined;
+    backlogAllowed?: boolean | undefined;
+    cgpa?: string | undefined;
+    page?: number | undefined;
+    limit?: number | undefined;
+    status?: JobStatus | undefined;
 }) => {
     const { search, branch, cgpa, page = 1, limit = 10, status } = filters;
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: JobWhereInput = {
         deletedAt: null,
     };
 
