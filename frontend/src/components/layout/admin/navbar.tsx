@@ -13,7 +13,8 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-import { Bell, Search, Settings, User } from "lucide-react"
+import { Settings, User, LogOut as LogOutIcon } from "lucide-react"
+import { ThemeToggle } from "@/components/layout/student/theme-toggle"
 
 export function AdminNavbar() {
   const { user } = useAppStore()
@@ -23,24 +24,10 @@ export function AdminNavbar() {
       <div className="flex items-center gap-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-3 size-4 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Search jobs, students, applications..." 
-            className="pl-10 pr-4 py-2 bg-muted/50 border-none rounded-lg text-sm w-80 focus:ring-1 focus:ring-primary/20 transition-all outline-none"
-          />
-          <div className="absolute right-3 px-1.5 py-0.5 rounded border border-sidebar-border bg-card text-[10px] text-muted-foreground font-mono">
-            ⌘K
-          </div>
-        </div>
       </div>
       
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors">
-          <Bell className="size-5" />
-          <span className="absolute top-1.5 right-1.5 size-2 bg-error rounded-full border-2 border-card"></span>
-        </button>
+        <ThemeToggle />
         
         <DropdownMenu>
           <DropdownMenuTrigger 
@@ -49,10 +36,6 @@ export function AdminNavbar() {
             }
           >
             <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-semibold text-foreground leading-tight">{user?.name || "Admin User"}</p>
-                <p className="text-[10px] text-primary font-bold uppercase tracking-wider">{user?.role}</p>
-              </div>
               <Avatar className="size-9 border-2 border-primary/10 group-hover:border-primary/30 transition-all shadow-subtle">
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">

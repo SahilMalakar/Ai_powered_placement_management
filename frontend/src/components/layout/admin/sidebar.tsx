@@ -158,8 +158,8 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border shadow-sidebar rounded-r-2xl overflow-hidden" {...props}>
-      <SidebarHeader className="h-16 flex flex-row items-center gap-2.5 px-5 border-b border-sidebar-border bg-sidebar/50">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary shrink-0">
+      <SidebarHeader className="h-16 flex flex-row items-center gap-2.5 px-5 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center border-b border-sidebar-border bg-sidebar/50">
+        <div className="flex size-8 group-data-[collapsible=icon]:size-7 items-center justify-center rounded-lg bg-primary shrink-0">
           <svg
             width="16"
             height="16"
@@ -185,7 +185,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
             />
           </svg>
         </div>
-        <div className="flex flex-col gap-0.5 overflow-hidden group-data-[collapsible=icon]:hidden">
+        <div className="flex flex-col gap-1.5 overflow-hidden group-data-[collapsible=icon]:hidden">
           <span className="font-heading text-lg font-bold tracking-tight text-sidebar-foreground leading-none">
             PlacementCube
           </span>

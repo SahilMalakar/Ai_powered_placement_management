@@ -2,12 +2,12 @@
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
-  DesktopSidebar,
-  MobileSidebar,
+  StudentSidebar,
   StudentNavbar,
 } from "@/components/layout/student";
 
 import { RoleGuard } from "@/components/auth/role-guard";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 /**
  * Student area layout shell.
@@ -22,20 +22,22 @@ export default function StudentLayout({
   return (
     <RoleGuard allowedRoles={["STUDENT"]}>
       <TooltipProvider>
-        {/* ── Sidebar ── */}
-        <DesktopSidebar />
-        <MobileSidebar />
+        <SidebarProvider>
+          {/* ── Sidebar ── */}
+          <StudentSidebar />
 
-        {/* ── Navbar ── */}
-        <StudentNavbar />
+          <SidebarInset className="bg-background">
+            {/* ── Navbar ── */}
+            <StudentNavbar />
 
-        {/* ── Page content area ──
-             pt-16  → clears the fixed navbar (h-16 = 64px)
-             md:pl-[260px] → clears the fixed sidebar on desktop
-             The value 260 matches SIDEBAR_WIDTH constant             */}
-        <main className="student-main min-h-screen pt-16">
-          {children}
-        </main>
+            {/* ── Page content area ── */}
+            <main className="flex-1 p-6 lg:p-8 overflow-auto relative min-h-screen">
+              <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+                {children}
+              </div>
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
       </TooltipProvider>
     </RoleGuard>
   );

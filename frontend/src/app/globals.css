@@ -286,12 +286,6 @@
 }
 
 /* ─────────────────────────────────────────────────────── */
-/*  STUDENT LAYOUT                                         */
-/*  Sidebar offset — keep in sync with SIDEBAR_WIDTH=260px */
-/*  in components/layout/student/sidebar.tsx              */
+/*  STUDENT LAYOUT (Deprecated)                            */
+/*  Sidebar offset handled by SidebarInset                 */
 /* ─────────────────────────────────────────────────────── */
-@media (min-width: 768px) {
-  .student-main {
-    padding-left: 260px;
-  }
-}
