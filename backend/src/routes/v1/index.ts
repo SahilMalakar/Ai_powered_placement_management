@@ -13,10 +13,13 @@ import { documentRouter } from './students/document.js';
 import { verificationRouter } from './students/verification.js';
 import { applicationRouter } from './students/application.js';
 import studentRouter from './admin/students.js';
+import jobApplicationRouter from './admin/jobApplication.js';
 
 const router: Router = Router();
 
 router.use('/v1/auth', authRouter);
+
+
 router.use('/v1/students/profile', profileRouter);
 router.use('/v1/students/profile/experience', experienceRouter);
 router.use('/v1/students/profile/socialLink', socialLinkRouter);
@@ -28,7 +31,10 @@ router.use('/v1/students/ats', atsRouter);
 router.use('/v1/students/document', documentRouter);
 router.use('/v1/students/verification', verificationRouter);
 router.use('/v1/students/application', applicationRouter);
+
+
 router.use('/v1/admin/job', jobRouter);
+router.use("/v1/admin/job",jobApplicationRouter)
 router.use("/v1/admin/students",studentRouter)
 
 export { router };
