@@ -1,127 +1,85 @@
-import { 
-  Users, 
-  Search, 
-  Filter,
-  UserCheck,
-  UserX,
-  GraduationCap,
-  MapPin,
-  ExternalLink
-} from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+'use client';
+
+import { useState } from "react";
+import { useAdminStudents } from "@/hooks/admin/useStudents";
+import { GetAllStudentsQueryInput } from "@/types/admin/student";
+import { StudentFilters } from "@/components/admin/students/StudentFilters";
+import { StudentTable } from "@/components/admin/students/StudentTable";
+import { StudentPagination } from "@/components/admin/students/StudentPagination";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Users, FileDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function AdminStudentsPage() {
-  const students = [
-    {
-      id: "1",
-      name: "Sahil Malakar",
-      branch: "Computer Science",
-      batch: "2025",
-      cgpa: "9.2",
-      status: "VERIFIED",
-    },
-    {
-      id: "2",
-      name: "Ananya Sharma",
-      branch: "Information Technology",
-      batch: "2025",
-      cgpa: "8.5",
-      status: "PENDING",
-    },
-    {
-      id: "3",
-      name: "Rahul Verma",
-      branch: "Electronics",
-      batch: "2024",
-      cgpa: "7.8",
-      status: "FAILED",
-    },
-  ]
+  const [filters, setFilters] = useState<GetAllStudentsQueryInput>({
+    page: 1,
+    limit: 10,
+  });
+
+  const { data, isLoading, isError, error } = useAdminStudents(filters);
+
+  const handleFilterChange = (newFilters: Partial<GetAllStudentsQueryInput>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters, page: newFilters.page ?? 1 }));
+  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-foreground">Student Directory</h1>
-          <p className="text-muted-foreground mt-1">Manage and verify student profiles and academic records.</p>
+          <h1 className="text-3xl font-heading font-bold text-foreground flex items-center gap-3">
+            <Users className="size-8 text-primary" /> Student Directory
+          </h1>
+          <p className="text-muted-foreground mt-1">Manage, verify, and monitor student academic profiles.</p>
         </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input placeholder="Search by name, roll number, or branch..." className="pl-10 h-11 border-none shadow-subtle bg-card" />
-        </div>
-        <Button variant="secondary" className="h-11 shadow-subtle">
-          <Filter className="size-4 mr-2" /> Filters
+        <Button variant="outline" className="h-10 bg-card shadow-subtle font-bold text-xs gap-2">
+          <FileDown className="size-4" /> Export Data
         </Button>
       </div>
 
-      <div className="bg-card rounded-xl shadow-heavy overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-muted/50 border-b border-sidebar-border">
-                <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Student</th>
-                <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Branch & Batch</th>
-                <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Academic Info</th>
-                <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Verification</th>
-                <th className="px-6 py-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-sidebar-border">
-              {students.map((student) => (
-                <tr key={student.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="size-10 border-2 border-primary/10">
-                        <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                          {student.name.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-bold text-foreground">{student.name}</p>
-                        <p className="text-xs text-muted-foreground">ID: #{student.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium flex items-center gap-1.5 text-foreground">
-                        <GraduationCap className="size-3.5 text-primary" /> {student.branch}
-                      </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5 pl-5">
-                         Batch {student.batch}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <p className="font-semibold text-foreground">{student.cgpa} CGPA</p>
-                    <p className="text-xs text-muted-foreground">0 active backlogs</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <Badge variant={
-                      student.status === "VERIFIED" ? "success" : 
-                      student.status === "PENDING" ? "warning" : "error" as any
-                    } className="px-2.5 py-0.5">
-                      {student.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/5 gap-1.5 font-bold">
-                      View Profile <ExternalLink className="size-3" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <StudentFilters filters={filters} onFilterChange={handleFilterChange} />
+
+      {isLoading ? (
+        <div className="bg-card rounded-xl shadow-heavy border border-border/50 p-6 space-y-4">
+          <div className="flex gap-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-lg" />
+          ))}
         </div>
-      </div>
+      ) : isError ? (
+        <div className="py-12 text-center space-y-4 bg-error/5 rounded-xl border border-error/20">
+          <p className="text-error font-bold">Failed to load student records</p>
+          <p className="text-sm text-muted-foreground">{(error as any)?.response?.data?.message || "Internal Server Error"}</p>
+        </div>
+      ) : data?.data.students.length === 0 ? (
+        <div className="py-20 text-center space-y-4 bg-card rounded-xl border border-dashed border-border/60 shadow-heavy">
+          <div className="size-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="size-8 text-muted-foreground opacity-20" />
+          </div>
+          <p className="text-steel dark:text-muted-foreground font-bold text-xl">No students found</p>
+          <p className="text-sm text-mist max-w-xs mx-auto">Try adjusting your search criteria or clearing filters to find more students.</p>
+          <Button 
+            variant="ghost" 
+            className="text-primary hover:bg-primary/5 font-bold"
+            onClick={() => handleFilterChange({ search: undefined, branch: undefined, verificationStatus: undefined, backlogAllowed: undefined })}
+          >
+            Clear all filters
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <StudentTable students={data?.data.students || []} />
+          
+          <StudentPagination 
+            page={filters.page || 1} 
+            totalPages={data?.data.pagination.totalPages || 0} 
+            onPageChange={(page) => handleFilterChange({ page })} 
+          />
+        </div>
+      )}
     </div>
-  )
+  );
 }

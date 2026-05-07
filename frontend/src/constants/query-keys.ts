@@ -12,4 +12,6 @@ export const QUERY_KEYS = {
   ADMIN_JOBS: "admin-jobs",
   ADMIN_JOB_DETAIL: "admin-job-detail",
   ADMIN_JOB_APPLICANTS: "admin-job-applicants",
+  ADMIN_STUDENTS: "admin-students",
+  ADMIN_STUDENT_DETAIL: "admin-student-detail",
 } as const;
