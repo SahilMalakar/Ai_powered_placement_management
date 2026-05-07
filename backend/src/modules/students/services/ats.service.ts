@@ -3,11 +3,15 @@ import { extractTextFromDocx } from '../../../utils/fileHandler/docxParser.js';
 import { addAtsJobToQueue } from '../../../queues/ats.queue.js';
 import {
     countAtsAnalysesToday,
-    findLatestAtsResultByUserId,
+    createAtsResult,
+    findAtsResultById,
+    deleteAtsResult,
+    findAtsResultsByUserId,
 } from '../repositories/ats.repository.js';
 import {
     BadRequestError,
     ForbiddenError,
+    NotFoundError,
 } from '../../../utils/errors/httpErrors.js';
 import path from 'path';
 
@@ -15,7 +19,7 @@ import path from 'path';
 export const requestAtsAnalysisService = async (
     userId: number,
     filePath: string,
-    jobDescription: string
+    jobDescription: string | null
 ) => {
     // Rate Limiting: Check if the user has reached the 5/day limit
     const todayCount = await countAtsAnalysesToday(userId);
@@ -45,21 +49,53 @@ export const requestAtsAnalysisService = async (
         );
     }
 
-    // En-queue for AI Analysis: Background processing via BullMQ
-    const job = await addAtsJobToQueue({
-        userId,
-        resumeText,
-        jobDescription,
-    });
+    // Determine analysis mode
+    const analysisMode = jobDescription ? 'JD_MATCHED' : 'GENERIC';
+
+    // 1. Create a placeholder record in the database
+    const atsResult = await createAtsResult(userId, jobDescription, analysisMode);
+
+    try {
+        // 2. En-queue for AI Analysis: Background processing via BullMQ
+        await addAtsJobToQueue({
+            atsResultId: atsResult.id,
+            userId,
+            resumeText,
+            jobDescription: jobDescription || '',
+        });
+    } catch (error: unknown) {
+        // CLEANUP: If queueing fails, delete the record so it doesn't count against daily limit
+        await deleteAtsResult(atsResult.id).catch(() => { });
+        throw error;
+    }
 
     return {
-        message:
-            'ATS analysis is being processed. It will appear in your history shortly.',
-        jobId: job.id,
+        atsResultId: atsResult.id,
+        message: 'ATS analysis is being processed.',
     };
 };
 
-// Service to fetch the latest analysis result for a student.
-export const getAtsResultsService = async (userId: number) => {
-    return await findLatestAtsResultByUserId(userId);
+// Service to fetch the status and basic info of a specific analysis.
+export const getAtsStatusService = async (id: number, userId: number) => {
+    const result = await findAtsResultById(id, userId);
+    if (!result) {
+        throw new NotFoundError('ATS analysis report not found.');
+    }
+    return {
+        id: result.id,
+        status: result.status,
+        score: result.score,
+        analysisMode: result.analysisMode,
+    };
 };
+
+// Service to fetch paginated analysis results for a student.
+export const getAtsResultsService = async (
+    userId: number,
+    page: number = 1,
+    limit: number = 10
+) => {
+    return await findAtsResultsByUserId(userId, page, limit);
+};
+
+

@@ -8,127 +8,123 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      Role     @default(STUDENT)
+  id                 Int     @id @default(autoincrement())
+  email              String  @unique
+  password           String
+  role               Role    @default(STUDENT)
   isProfileCompleted Boolean @default(false) //isBasicInfoCompleted 
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   // Relations
-  profile       StudentProfile?
-  documents     Document[]
-  applications  Application[]
-  resumes       Resume[]
-  atsResults    ATSResult[]
-  semesters     SemesterResult[]
-  jobsCreated   Job[] 
+  profile      StudentProfile?
+  documents    Document[]
+  applications Application[]
+  resumes      Resume[]
+  atsResults   ATSResult[]
+  semesters    SemesterResult[]
+  jobsCreated  Job[]
 
   @@index([role])
 }
 
-
 model StudentProfile {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @unique
-  fullName    String
-  branch      Branch
+  id       Int    @id @default(autoincrement())
+  userId   Int    @unique
+  fullName String
+  branch   Branch
 
-  cgpa        Float?
-  rollNo      String
-  astuRollNo  String?
-  dob         DateTime
+  cgpa            Float?
+  rollNo          String
+  astuRollNo      String?
+  dob             DateTime
   backlog         Boolean? @default(false)
   backlogSubjects String[] @default([])
 
-  
-  phoneNumber String?  
-  summary     String?
-  university  String?
-  degree      String?
+  phoneNumber    String?
+  summary        String?
+  university     String?
+  degree         String?
   graduationYear Int?
 
-  verificationStatus  VerificationStatus @default(NOT_VERIFIED)
-  verificationReason  String?
+  verificationStatus VerificationStatus @default(NOT_VERIFIED)
+  verificationReason String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   user User @relation(fields: [userId], references: [id])
 
   // Relations
-  socialLinks  SocialLink[]
-  experiences  Experience[]
-  projects     Project[]
-  skills       Skill[]
+  socialLinks       SocialLink[]
+  experiences       Experience[]
+  projects          Project[]
+  skills            Skill[]
   additionalDetails AdditionalDetail[]
 
   @@index([branch])
   @@index([cgpa])
 }
 
-
 model SocialLink {
-  id        Int      @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   profileId Int
-  platform  String   // e.g. "LinkedIn", "GitHub", "Portfolio"
+  platform  String // e.g. "LinkedIn", "GitHub", "Portfolio"
   url       String
   profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Experience {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   profileId   Int
   role        String
   company     String
   location    String?
   startDate   DateTime
   endDate     DateTime? // Null means "Present"
-  description String[]  
-  toolsUsed   String?   
+  description String[]
+  toolsUsed   String?
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  profileId   Int
-  title       String
-  description String[]
-  keyTools    String?   // Unified generic field
-  link        String?
+  id            Int            @id @default(autoincrement())
+  profileId     Int
+  title         String
+  description   String[]
+  keyTools      String? // Unified generic field
+  link          String?
   secondaryLink String?
-  startDate   DateTime?
-  endDate     DateTime?
-  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  startDate     DateTime?
+  endDate       DateTime?
+  profile       StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Skill {
-  id        Int      @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   profileId Int
-  category  String   // e.g. "Languages", "Tools", "Engineering Tools"
+  category  String // e.g. "Languages", "Tools", "Engineering Tools"
   skills    String[] // e.g. ["JavaScript", "TypeScript", "Python"]
   profile   StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model AdditionalDetail {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   profileId   Int
-  title       String   // e.g. "OpenSource Contribution", "Achievement"
+  title       String // e.g. "OpenSource Contribution", "Achievement"
   description String[] // Detailed bullets
   date        DateTime?
   profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
-
 model SemesterResult {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  semester  Int      // 1–8
-  sgpa      Float
+  id       Int   @id @default(autoincrement())
+  userId   Int
+  semester Int // 1–8
+  sgpa     Float
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -140,7 +136,6 @@ model SemesterResult {
   @@unique([userId, semester])
   @@index([userId])
 }
-
 
 model Document {
   id        Int          @id @default(autoincrement())
@@ -159,25 +154,24 @@ model Document {
   @@unique([userId, type, semester])
 }
 
-
 model Job {
-  id               Int       @id @default(autoincrement())
-  title            String
-  company          String
-  description      String
-  requiredCgpa     Float
-  allowedBranches  Branch[]
-  backlogAllowed   Boolean
-  status           JobStatus @default(DRAFT)
-  deadline         DateTime
+  id              Int       @id @default(autoincrement())
+  title           String
+  company         String
+  description     String
+  requiredCgpa    Float
+  allowedBranches Branch[]
+  backlogAllowed  Boolean
+  status          JobStatus @default(DRAFT)
+  deadline        DateTime
 
   createdById Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
   // Relations
-  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdBy    User          @relation(fields: [createdById], references: [id])
   applications Application[]
 
   @@index([status])
@@ -185,62 +179,88 @@ model Job {
 }
 
 model Application {
-  id        Int               @id @default(autoincrement())
-  userId    Int
-  jobId     Int
-  status    ApplicationStatus @default(APPLIED)
-  snapshot  Json              
+  id       Int               @id @default(autoincrement())
+  userId   Int
+  jobId    Int
+  status   ApplicationStatus @default(APPLIED)
+  snapshot Json
 
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job     Job     @relation(fields: [jobId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id])
 
   // Prevent duplicate applications
   @@unique([userId, jobId])
-
   @@index([jobId])
   @@index([userId])
 }
 
-
 model Resume {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   userId    Int
   version   Int
   jsonData  Json
   pdfUrl    String?
   status    ResumeStatus @default(GENERATING)
-  createdAt DateTime @default(now())
+  createdAt DateTime     @default(now())
   deletedAt DateTime?
 
   // Relations
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, version])
   @@index([userId])
 }
 
-
 model ATSResult {
-  id                 Int      @id @default(autoincrement())
+  id                 Int             @id @default(autoincrement())
   userId             Int
-  jobDescription     String?
+  jobDescriptionText String?
+  detectedRole       String?
+  analysisMode       ATSAnalysisType @default(GENERIC)
   score              Float
-  strengths          String[]
-  weaknesses         String[]
-  suggestions        String[]
-  createdAt          DateTime @default(now())
-  deletedAt          DateTime?
+
+  // Section-level scores (ATS weighs these differently)
+  keywordScore           Float? // keyword match %
+  formatScore            Float? // parseability, structure
+  experienceScore        Float? // work history relevance
+  projectScore           Float? // how many bullets have numbers
+  skillsScore            Float? // skills section match
+  additionalDetailsScore Float? // additional details match
+
+  // Keyword detail
+  matchedKeywords String[] // keywords found in resume
+  missingKeywords String[] // keywords in JD but absent in resume
+
+  //status
+  status ATSStatus @default(PENDING)
+
+  strengths   String[]
+  weaknesses  String[]
+  suggestions String[]
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
+enum ATSAnalysisType {
+  GENERIC // analyzed against general backend/role template
+  JD_MATCHED // analyzed against a specific job description
+}
+
+enum ATSStatus {
+  PENDING // BullMQ job queued
+  PROCESSING // worker picked it up
+  COMPLETED // result ready
+  FAILED // analysis failed — show error to student
+}
 
 enum Role {
   SUPER_ADMIN

@@ -20,6 +20,7 @@ export const atsQueue = new Queue(ATS_QUEUE_NAME, {
 
 // Interface for ATS job payload.
 export interface ATSJobPayload {
+    atsResultId: number;
     userId: number;
     resumeText: string;
     jobDescription: string;

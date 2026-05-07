@@ -5,22 +5,24 @@ import { atsUpload } from '../../../utils/fileHandler/multer.js';
 import {
     requestAtsAnalysisController,
     getAtsResultsController,
+    getAtsStatusController,
 } from '../../../modules/students/controllers/ats.controller.js';
 
 /**
  * @swagger
  * tags:
  *   name: ATS
- *   description: ATS analysis management
+ *   description: ATS analysis management (Resume vs JD comparison)
  */
 
 const atsRouter: Router = Router();
 
 /**
  * @swagger
- * /api/v1/students/ats:
+ * /api/v1/students/ats/analyze:
  *   post:
- *     summary: Initiate an ATS Analysis
+ *     summary: Initiate a new ATS Analysis
+ *     description: Uploads a resume and optionally a job description. Triggers background processing.
  *     tags: [ATS]
  *     security:
  *       - bearerAuth: []
@@ -31,28 +33,40 @@ const atsRouter: Router = Router();
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required: [resume, jobDescription]
+ *             required: [resume]
  *             properties:
  *               resume:
  *                 type: string
  *                 format: binary
+ *                 description: Resume file (PDF, DOCX) - Max 2MB
  *               jobDescription:
  *                 type: string
- *                 example: "We are looking for a Node.js developer with 2+ years of experience in Express and PostgreSQL."
+ *                 description: The text of the job description to analyze against. If omitted, performs a general domain analysis.
+ *                 example: "We are looking for a Full Stack Developer proficient in React, Node.js, and PostgreSQL..."
  *     responses:
  *       202:
- *         description: ATS analysis successfully queued
+ *         description: ATS analysis successfully queued.
  *         content:
  *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "ATS analysis successfully queued",
- *                 "data": null
- *               }
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     atsResultId:
+ *                       type: integer
+ *       400:
+ *         description: Invalid file format or missing resume.
+ *       403:
+ *         description: Daily analysis limit reached (5/day).
  */
 atsRouter.post(
-    '/ats',
+    '/analyze',
     authMiddleware,
     requireStudent,
     atsUpload.single('resume'),
@@ -61,33 +75,97 @@ atsRouter.post(
 
 /**
  * @swagger
- * /api/v1/students/ats:
+ * /api/v1/students/ats/status/{id}:
  *   get:
- *     summary: Fetch student's own ATS analysis history
+ *     summary: Poll ATS analysis status
+ *     description: Get the current status (PENDING, PROCESSING, COMPLETED, FAILED) of a specific analysis.
  *     tags: [ATS]
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the ATSResult record.
  *     responses:
  *       200:
- *         description: ATS results fetched successfully
+ *         description: Status fetched successfully.
  *         content:
  *           application/json:
- *             example:
- *               {
- *                 "success": true,
- *                 "message": "ATS results fetched successfully",
- *                 "data": [
- *                   {
- *                     "id": 1,
- *                     "score": 85,
- *                     "feedback": "Good resume",
- *                     "jobDescription": "...",
- *                     "createdAt": "2024-04-29T12:00:00Z"
- *                   }
- *                 ]
- *               }
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     status:
+ *                       type: string
+ *                       enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+ *                     score:
+ *                       type: number
+ *                     analysisMode:
+ *                       type: string
+ *                       enum: [GENERIC, JD_MATCHED]
+ *       404:
+ *         description: Analysis report not found.
+ */
+atsRouter.get(
+    '/status/:id',
+    authMiddleware,
+    requireStudent,
+    getAtsStatusController
+);
+
+/**
+ * @swagger
+ * /api/v1/students/ats:
+ *   get:
+ *     summary: Fetch COMPLETED ATS analysis history
+ *     description: Returns a paginated list of all successful ATS reports for the student.
+ *     tags: [ATS]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: Paginated history fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     results:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/ATSResult'
+ *                     total:
+ *                       type: integer
  */
 atsRouter.get('/', authMiddleware, requireStudent, getAtsResultsController);
 
 export { atsRouter };
+
+

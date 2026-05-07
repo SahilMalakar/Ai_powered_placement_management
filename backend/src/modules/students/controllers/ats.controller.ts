@@ -5,56 +5,46 @@ import { HTTP_STATUS } from '../../../utils/httpStatus.js';
 import {
     requestAtsAnalysisService,
     getAtsResultsService,
+    getAtsStatusService,
 } from '../services/ats.service.js';
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import fs from 'fs/promises';
 
-// Controller to handle POST /students/ats
-// Initiates the multi-step ATS Analysis flow.
+// Controller to handle POST /students/ats/analyze
 export const requestAtsAnalysisController = asyncHandler(
     async (req: Request, res: Response) => {
         if (!req.user) {
             throw new BadRequestError('Unauthorized user session.');
         }
 
-        // 1. File availability check (Multer middleware handles the upload first)
         if (!req.file) {
             throw new BadRequestError(
                 'Please upload a resume file (PDF/DOCX).'
             );
         }
 
+        // Job Description is now optional (triggers GENERIC mode if missing)
         const { jobDescription } = req.body;
-        if (!jobDescription) {
-            // Multer creates a file even if JD is missing, so we must clean it up
-            await fs.unlink(req.file.path);
-            throw new BadRequestError(
-                'Job Description text is required for ATS comparison.'
-            );
-        }
 
         try {
             const userId = req.user.userId;
             const filePath = req.file.path;
 
-            // 2. Delegate logic to the service
-            const status = await requestAtsAnalysisService(
+            const { atsResultId, message } = await requestAtsAnalysisService(
                 userId,
                 filePath,
-                jobDescription
+                jobDescription || null
             );
 
-            // 3. Cleanup local buffer storage as requested
             await fs.unlink(filePath);
 
             return sendSuccess(
                 res,
-                status,
-                "ATS Analysis successfully queued. We'll update your results in a moment.",
+                { atsResultId },
+                message,
                 HTTP_STATUS.ACCEPTED
             );
         } catch (error: unknown) {
-            // Ensure local file cleanup if service execution fails
             if (req.file) {
                 await fs.unlink(req.file.path).catch(() => {});
             }
@@ -63,15 +53,40 @@ export const requestAtsAnalysisController = asyncHandler(
     }
 );
 
-// Controller to fetch all ATS analysis reports for the authenticated student.
+// Controller to fetch status of a specific ATS analysis.
+export const getAtsStatusController = asyncHandler(
+    async (req: Request, res: Response) => {
+        if (!req.user) {
+            throw new BadRequestError('Unauthorized user session.');
+        }
+
+        const { id } = req.params;
+        const numericId = Number(id);
+
+        if (isNaN(numericId)) {
+            throw new BadRequestError('Invalid analysis ID provided.');
+        }
+
+        const status = await getAtsStatusService(numericId, req.user.userId);
+
+        return sendSuccess(res, status, 'ATS analysis status fetched successfully.');
+    }
+);
+
+// Controller to fetch paginated COMPLETED ATS analysis reports for the authenticated student.
 export const getAtsResultsController = asyncHandler(
     async (req: Request, res: Response) => {
         if (!req.user) {
             throw new BadRequestError('Unauthorized user session.');
         }
 
-        const results = await getAtsResultsService(req.user.userId);
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        const results = await getAtsResultsService(req.user.userId, page, limit);
 
         return sendSuccess(res, results, 'ATS reports fetched successfully.');
     }
 );
+
+

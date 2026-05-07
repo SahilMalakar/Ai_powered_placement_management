@@ -4,11 +4,10 @@ import { ATS_QUEUE_NAME, type ATSJobPayload } from '../queues/ats.queue.js';
 import { llm } from '../configs/langchain.config.js';
 import { ATS_ANALYSIS_PROMPT } from '../utils/prompts/atsPrompts.js';
 import { ATSResultSchema } from '../types/students/ats.js';
-import { createAtsResult } from '../modules/students/repositories/ats.repository.js';
+import { updateAtsResult } from '../modules/students/repositories/ats.repository.js';
 import { InternalServerError } from '../utils/errors/httpErrors.js';
 
 // Initialize the ATS Worker.
-// Listens for jobs on the 'atsQueue' and performs LLM-based analysis.
 export const initializeAtsWorker = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const structuredLlm = llm.withStructuredOutput(ATSResultSchema as any);
@@ -16,38 +15,48 @@ export const initializeAtsWorker = async () => {
     const atsWorker = new Worker(
         ATS_QUEUE_NAME,
         async (job: Job<ATSJobPayload>) => {
+            const { atsResultId, userId, resumeText, jobDescription } = job.data;
+
             console.log(
-                `[ATS Worker] Processing job ${job.id} for user ${job.data.userId}...`
+                `[ATS Worker] Processing job ${job.id} for analysis ${atsResultId}...`
             );
 
-            const { userId, resumeText, jobDescription } = job.data;
-
             try {
-                // Build and invoke the LangChain analysis chain
+                // 1. Mark as PROCESSING
+                await updateAtsResult(atsResultId, { status: 'PROCESSING' });
+
+                // 2. Build and invoke the LangChain analysis chain
                 const chain = ATS_ANALYSIS_PROMPT.pipe(structuredLlm);
                 const result = await chain.invoke({
                     resumeText,
-                    jobDescription,
+                    jobDescription: jobDescription || 'General domain analysis',
                 });
 
-                // Save the structured result to the database
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await createAtsResult(userId, jobDescription, result as any);
+                // 3. Save the structured result and mark as COMPLETED
+                await updateAtsResult(atsResultId, {
+                    ...(result as any),
+                    status: 'COMPLETED',
+                });
 
                 console.log(
-                    `[ATS Worker] Successfully processed job ${job.id}`
+                    `[ATS Worker] Successfully processed analysis ${atsResultId}`
                 );
             } catch (error: any) {
                 const message = error?.message || 'Unknown error';
                 const isRateLimit = message.includes('429');
 
                 console.error(
-                    `[ATS Worker] Failed to process job ${job.id}:`,
+                    `[ATS Worker] Failed to process analysis ${atsResultId}:`,
                     message
                 );
 
+                // Mark as FAILED in database
+                await updateAtsResult(atsResultId, { status: 'FAILED' }).catch(
+                    () => {}
+                );
+
                 if (isRateLimit) {
-                    console.warn(`[ATS Worker] Rate limit reached. Marking job as permanently failed to avoid token waste.`);
+                    console.warn(`[ATS Worker] Rate limit reached.`);
                     throw new UnrecoverableError(`Rate limit reached: ${message}`);
                 }
 
@@ -59,7 +68,7 @@ export const initializeAtsWorker = async () => {
         {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             connection: getRedisConnection() as any,
-            concurrency: 2, // Process up to 2 analyses in parallel
+            concurrency: 2,
         }
     );
 
@@ -78,3 +87,4 @@ export const initializeAtsWorker = async () => {
 
     console.log(`[ATS Worker] Initialized worker for queue: ${ATS_QUEUE_NAME}`);
 };
+
