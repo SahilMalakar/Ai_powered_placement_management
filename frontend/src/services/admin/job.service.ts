@@ -50,9 +50,4 @@ export const adminJobService = {
     const response = await api.delete(`/admin/job/${id}`);
     return response.data;
   },
-
-  getApplicationDashboard: async (): Promise<any> => {
-    const response = await api.get("/admin/job/dashboard");
-    return response.data;
-  },
 };

@@ -54,14 +54,19 @@ export const getAllStudentRepository = async (params: GetAllStudentsQueryInput &
 }
 
 export const getStudentByIdRepository = async (studentId: number) => {
-    return await prisma.user.findUnique({
+    return await prisma.user.findFirst({
         where: {
             id: studentId,
             role: "STUDENT"
         },
+
         select: {
             id: true,
             email: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+
             profile: {
                 select: {
                     id: true,
@@ -79,22 +84,41 @@ export const getStudentByIdRepository = async (studentId: number) => {
                     university: true,
                 }
             },
+
             semesters: {
                 select: {
                     id: true,
                     semester: true,
+                    sgpa: true,
+                },
+                orderBy: {
+                    semester: "asc"
                 }
             },
+
             documents: {
                 select: {
                     id: true,
                     semester: true,
                     publicId: true,
                     url: true,
+                },
+
+                orderBy: {
+                    semester: "asc"
                 }
             },
+
             applications: {
-                include: {
+                select: {
+                    id: true,
+                    userId: true,
+                    jobId: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    deletedAt: true,
+
                     job: {
                         select: {
                             id: true,
@@ -102,6 +126,10 @@ export const getStudentByIdRepository = async (studentId: number) => {
                             company: true,
                         }
                     }
+                },
+
+                orderBy: {
+                    createdAt: "desc"
                 }
             }
         }

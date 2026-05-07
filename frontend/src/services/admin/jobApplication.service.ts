@@ -23,13 +23,4 @@ export const adminJobApplicationService = {
     const response = await api.post("/admin-apps/status", data);
     return response.data;
   },
-
-  getAllApplications: async (
-    filters: ApplicantFilters = {}
-  ): Promise<ApplicantsResponse> => {
-    const response = await api.get("/admin-apps/list", {
-      params: filters,
-    });
-    return response.data;
-  },
 };

@@ -73,11 +73,7 @@ const data: { navMain: NavGroup[] } = {
             },
           ],
         },
-        {
-          title: "Applications",
-          url: "/admin/applications",
-          icon: FileText,
-        },
+
       ],
     },
     {

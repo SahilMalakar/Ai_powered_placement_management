@@ -21,19 +21,59 @@ export const getAllStudentsQuerySchema = z.object({
 export type GetAllStudentsQueryInput = z.infer<typeof getAllStudentsQuerySchema>;
 
 export interface StudentProfile {
+  id: number;
   fullName: string;
   branch: (typeof BranchEnum)[number];
-  cgpa: number;
-  backlog: boolean;
+  cgpa: number | null;
+  backlog: boolean | null;
+  backlogSubjects: string[];
   verificationStatus: (typeof VerificationStatusEnum)[number];
-  rollNo?: string;
+  rollNo: string;
+  degree: string | null;
+  dob: string;
+  phoneNumber: string | null;
+  graduationYear: number | null;
+  university: string | null;
+}
+
+export interface StudentSemester {
+  id: number;
+  semester: number;
+  sgpa: number;
+}
+
+export interface StudentDocument {
+  id: number;
+  semester: number | null;
+  url: string;
+  publicId: string | null;
+}
+
+export interface StudentApplication {
+  id: number;
+  userId: number;
+  jobId: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  job: {
+    id: number;
+    title: string;
+    company: string;
+  };
 }
 
 export interface Student {
   id: number;
   email: string;
+  createdAt: string;
+  updatedAt: string;
   deletedAt: string | null;
   profile: StudentProfile;
+  semesters: StudentSemester[];
+  documents: StudentDocument[];
+  applications: StudentApplication[];
 }
 
 export interface StudentPagination {
