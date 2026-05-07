@@ -20,7 +20,16 @@ export const adminJobApplicationService = {
   updateApplicationStatus: async (
     data: UpdateApplicationStatusInput
   ): Promise<BatchUpdateResponse> => {
-    const response = await api.post("/admin/job/application/status", data);
+    const response = await api.post("/admin-apps/status", data);
+    return response.data;
+  },
+
+  getAllApplications: async (
+    filters: ApplicantFilters = {}
+  ): Promise<ApplicantsResponse> => {
+    const response = await api.get("/admin-apps/list", {
+      params: filters,
+    });
     return response.data;
   },
 };

@@ -7,6 +7,11 @@ import { swaggerSpec } from './configs/swagger.js';
 
 const app: Express = express();
 
+app.use((req, res, next) => {
+    console.log(`[REQUEST] ${req.method} ${req.url}`);
+    next();
+});
+
 // cors setup to pass specific endpoints only
 app.use(
     cors({

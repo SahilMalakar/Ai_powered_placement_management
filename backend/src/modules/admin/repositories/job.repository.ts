@@ -64,6 +64,11 @@ export const getAllJobs = async (filters: {
             },
             skip: Number(skip),
             take: Number(limit),
+            include: {
+                _count: {
+                    select: { applications: true }
+                }
+            }
         }),
         prisma.job.count({ where }),
     ]);
@@ -78,6 +83,45 @@ export const getAllJobs = async (filters: {
         },
     };
 };
+
+/**
+ * Fetch all jobs with per-status application counts for the dashboard.
+ * Returns each job with a statusCounts object: { APPLIED, SHORTLISTED, SELECTED, REJECTED }
+ */
+export const getJobsWithApplicationStats = async () => {
+    const jobs = await prisma.job.findMany({
+        where: { deletedAt: null },
+        orderBy: { createdAt: 'desc' },
+        include: {
+            _count: {
+                select: { applications: true }
+            },
+            applications: {
+                where: { deletedAt: null },
+                select: { status: true }
+            }
+        }
+    });
+
+    return jobs.map(job => {
+        const statusCounts = {
+            APPLIED: 0,
+            SHORTLISTED: 0,
+            SELECTED: 0,
+            REJECTED: 0,
+        };
+        job.applications.forEach(app => {
+            if (app.status in statusCounts) {
+                statusCounts[app.status as keyof typeof statusCounts]++;
+            }
+        });
+
+        // Strip the raw applications array — only return aggregated counts
+        const { applications, ...jobWithoutApps } = job;
+        return { ...jobWithoutApps, statusCounts };
+    });
+};
+
 
 export const getJobById = async (jobId: number) => {
     return await prisma.job.findFirst({

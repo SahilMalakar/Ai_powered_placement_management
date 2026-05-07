@@ -145,3 +145,96 @@ export const bulkUpdateApplicationStatusRepository = async (
         isolationLevel: "Serializable",
     });
 };
+
+/**
+ * Fetch all applications across all jobs with pagination and filters.
+ */
+export const getAllApplicationsRepository = async (query: any) => {
+    const { search, status, branch, verificationStatus, page, limit, jobId } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+        deletedAt: null,
+        user: { deletedAt: null },
+        job: { deletedAt: null }
+    };
+
+    if (jobId) {
+        where.jobId = Number(jobId);
+    }
+
+    if (status && status !== 'all') {
+        where.status = status;
+    }
+
+    if ((branch && branch !== 'all') || search || (verificationStatus && verificationStatus !== "all")) {
+        where.user = {
+            ...(where.user || {}),
+            profile: {
+                ...(where.user?.profile || {}),
+            }
+        };
+
+        if (branch && branch !== 'all') {
+            where.user.profile.branch = branch;
+        }
+
+        if (verificationStatus && verificationStatus !== "all") {
+            where.user.profile.verificationStatus = verificationStatus;
+        }
+
+        if (search) {
+            where.OR = [
+                { user: { email: { contains: search, mode: 'insensitive' } } },
+                { user: { profile: { fullName: { contains: search, mode: 'insensitive' } } } },
+                { user: { profile: { rollNo: { contains: search, mode: 'insensitive' } } } }
+            ];
+        }
+    }
+
+    const [applicants, total] = await Promise.all([
+        prisma.application.findMany({
+            where,
+            include: {
+                job: {
+                    select: {
+                        id: true,
+                        title: true,
+                        company: true
+                    }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        profile: {
+                            select: {
+                                fullName: true,
+                                rollNo: true,
+                                cgpa: true,
+                                branch: true,
+                                verificationStatus: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            skip,
+            take: limit
+        }),
+        prisma.application.count({ where })
+    ]);
+
+    return {
+        applicants,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
+};

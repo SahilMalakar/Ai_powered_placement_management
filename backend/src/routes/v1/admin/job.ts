@@ -14,7 +14,9 @@ import {
     getAllJobsController,
     getJobByIdController,
     deleteJobByIdController,
+    getApplicationDashboardController,
 } from '../../../modules/admin/controllers/job.controller.js';
+import { getJobApplicantsController } from '../../../modules/admin/controllers/jobApplication.controller.js';
 import { idSchema } from '../../../types/auth.js';
 
 /**
@@ -54,7 +56,56 @@ const jobRouter: Router = Router();
  *                 ]
  *               }
  */
-jobRouter.get('/', authMiddleware, getAllJobsController);
+jobRouter.get('/',
+    authMiddleware,
+    getAllJobsController
+);
+
+/**
+ * @swagger
+ * /api/v1/admin/job/dashboard:
+ *   get:
+ *     summary: Get all jobs with per-status application counts for the admin dashboard
+ *     tags: [Admin Jobs]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard data fetched successfully
+ */
+jobRouter.get('/dashboard',
+    authMiddleware,
+    requireAdmin,
+    getApplicationDashboardController
+);
+
+/**
+ * @swagger
+ * /api/v1/admin/job/{id}/applicants:
+ *   get:
+ *     summary: Get all applicants for a specific job (Admin Only)
+ *     tags: [Admin - Job Management]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Job ID
+ *     responses:
+ *       200:
+ *         description: List of applicants with profile data
+ *       404:
+ *         description: Job not found
+ */
+jobRouter.get("/:id/applicants",
+    validateParams(idSchema),
+    authMiddleware,
+    requireAdmin,
+    getJobApplicantsController
+);
 
 /**
  * @swagger
@@ -91,7 +142,11 @@ jobRouter.get('/', authMiddleware, getAllJobsController);
  *       404:
  *         description: Job not found
  */
-jobRouter.get('/:id', authMiddleware, validateParams(idSchema), getJobByIdController);
+jobRouter.get('/:id',
+    authMiddleware,
+    validateParams(idSchema),
+    getJobByIdController
+);
 
 /**
  * @swagger

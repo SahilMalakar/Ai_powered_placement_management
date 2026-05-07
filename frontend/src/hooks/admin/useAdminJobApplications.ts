@@ -12,6 +12,17 @@ export const APPLICANT_KEYS = {
   all: (jobId: string) => [QUERY_KEYS.ADMIN_JOB_APPLICANTS, jobId] as const,
   list: (jobId: string, filters: ApplicantFilters) =>
     [QUERY_KEYS.ADMIN_JOB_APPLICANTS, jobId, "list", filters] as const,
+  global: (filters: ApplicantFilters) =>
+    [QUERY_KEYS.ADMIN_JOB_APPLICANTS, "global", "list", filters] as const,
+};
+
+// ─── Fetch all applications across all jobs ────────────────────────
+export const useAllApplicants = (filters: ApplicantFilters = {}) => {
+  return useQuery({
+    queryKey: APPLICANT_KEYS.global(filters),
+    queryFn: () => adminJobApplicationService.getAllApplications(filters),
+    staleTime: 1000 * 60 * 2,
+  });
 };
 
 // ─── Fetch applicants for a job ────────────────────────────────────

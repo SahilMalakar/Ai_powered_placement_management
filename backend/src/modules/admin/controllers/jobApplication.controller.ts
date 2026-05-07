@@ -2,8 +2,29 @@ import { sendSuccess } from "../../../utils/ApiResonse.js";
 import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { BadRequestError, UnauthorizedError } from "../../../utils/errors/httpErrors.js";
 import { HTTP_STATUS } from "../../../utils/httpStatus.js";
-import { getJobApplicantsService, updateApplicationStatusService } from "../services/jobApplication.service.js";
+import { getJobApplicantsService, updateApplicationStatusService, getAllApplicationsService } from "../services/jobApplication.service.js";
 import { getJobApplicantsQuerySchema, updateApplicationStatusSchema } from "../../../types/admin/jobApplication.js";
+
+/**
+ * Controller to fetch all applications across all jobs with pagination and filters.
+ */
+export const getAllApplicationsController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    // Reuse the same query schema as job-specific applicants
+    const query = getJobApplicantsQuerySchema.parse(req.query);
+
+    const result = await getAllApplicationsService(query);
+
+    return sendSuccess(
+        res,
+        result,
+        "Applications fetched successfully",
+        HTTP_STATUS.OK
+    );
+});
 
 /**
  * Controller to fetch all applicants for a specific job with pagination and filters.

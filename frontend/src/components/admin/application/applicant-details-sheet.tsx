@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -71,124 +71,129 @@ const VERIFICATION_CONFIG: Record<string, { label: string; className: string }> 
 
 interface ApplicantDetailsSheetProps {
   applicant: Applicant | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ApplicantDetailsSheet({ applicant }: ApplicantDetailsSheetProps) {
-  if (!applicant) return null;
-
-  const profile = applicant.user.profile;
-  const statusConfig = STATUS_CONFIG[applicant.status];
-  const verificationConfig = VERIFICATION_CONFIG[profile?.verificationStatus || "NOT_VERIFIED"];
+export function ApplicantDetailsSheet({ applicant, open, onOpenChange }: ApplicantDetailsSheetProps) {
+  const profile = applicant?.user?.profile;
+  const statusConfig = applicant ? STATUS_CONFIG[applicant.status] : null;
+  const verificationConfig = applicant ? VERIFICATION_CONFIG[profile?.verificationStatus || "NOT_VERIFIED"] : null;
 
   return (
-    <SheetContent className="sm:max-w-md border-l border-border bg-card p-0 shadow-modal">
-      <ScrollArea className="h-full">
-        <div className="p-6 space-y-8">
-          {/* Header Identity */}
-          <SheetHeader className="p-0 space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-pale font-heading text-2xl font-bold text-deep-blue dark:bg-muted dark:text-foreground shadow-sm">
-                {(profile?.fullName || "?").charAt(0).toUpperCase()}
-              </div>
-              <div className="space-y-1">
-                <SheetTitle className="text-xl font-bold tracking-tight">
-                  {profile?.fullName || "Student Name"}
-                </SheetTitle>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={cn("text-[10px] uppercase tracking-wider font-bold h-5 px-1.5", verificationConfig.className)}
-                  >
-                    {verificationConfig.label}
-                  </Badge>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="sm:max-w-md border-l border-border bg-card p-0 shadow-modal">
+        {applicant && statusConfig && verificationConfig && (
+          <ScrollArea className="h-full">
+            <div className="p-6 space-y-8">
+              {/* Header Identity */}
+              <SheetHeader className="p-0 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-pale font-heading text-2xl font-bold text-deep-blue dark:bg-muted dark:text-foreground shadow-sm">
+                    {(profile?.fullName || "?").charAt(0).toUpperCase()}
+                  </div>
+                  <div className="space-y-1">
+                    <SheetTitle className="text-xl font-bold tracking-tight">
+                      {profile?.fullName || "Student Name"}
+                    </SheetTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={cn("text-[10px] uppercase tracking-wider font-bold h-5 px-1.5", verificationConfig.className)}
+                      >
+                        {verificationConfig.label}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              <Separator className="bg-border/50" />
+
+              {/* Core Info Grid */}
+              <div className="grid grid-cols-2 gap-y-6">
+                <InfoItem label="Roll Number" value={profile?.rollNo || "—"} icon={User} />
+                <InfoItem label="Branch" value={profile?.branch || "—"} icon={GitBranch} />
+                <InfoItem label="CGPA" value={profile?.cgpa?.toFixed(2) || "—"} icon={GraduationCap} mono />
+                <InfoItem label="Applied On" value={format(new Date(applicant.createdAt), "dd MMM yyyy")} icon={Clock} />
+                <div className="col-span-2">
+                  <InfoItem label="Email Address" value={applicant.user.email} icon={Mail} />
                 </div>
               </div>
-            </div>
-          </SheetHeader>
 
-          <Separator className="bg-border/50" />
+              <Separator className="bg-border/50" />
 
-          {/* Core Info Grid */}
-          <div className="grid grid-cols-2 gap-y-6">
-            <InfoItem label="Roll Number" value={profile?.rollNo || "—"} icon={User} />
-            <InfoItem label="Branch" value={profile?.branch || "—"} icon={GitBranch} />
-            <InfoItem label="CGPA" value={profile?.cgpa?.toFixed(2) || "—"} icon={GraduationCap} mono />
-            <InfoItem label="Applied On" value={format(new Date(applicant.createdAt), "dd MMM yyyy")} icon={Clock} />
-            <div className="col-span-2">
-              <InfoItem label="Email Address" value={applicant.user.email} icon={Mail} />
-            </div>
-          </div>
+              {/* Application Status & Timeline */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-heading font-semibold text-foreground/80 flex items-center gap-2">
+                  <History className="size-4" />
+                  Application Status
+                </h3>
 
-          <Separator className="bg-border/50" />
+                <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground font-medium">Current Status</span>
+                    <Badge className={cn("font-semibold", statusConfig.className)} variant="outline">
+                      {statusConfig.label}
+                    </Badge>
+                  </div>
 
-          {/* Application Status & Timeline */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-heading font-semibold text-foreground/80 flex items-center gap-2">
-              <History className="size-4" />
-              Application Status
-            </h3>
-            
-            <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground font-medium">Current Status</span>
-                <Badge className={cn("font-semibold", statusConfig.className)} variant="outline">
-                  {statusConfig.label}
-                </Badge>
+                  <div className="space-y-3">
+                    <TimelineItem
+                      status="Applied"
+                      date={format(new Date(applicant.createdAt), "dd MMM yyyy, hh:mm a")}
+                      isCompleted
+                      isFirst
+                    />
+                    <TimelineItem
+                      status="Shortlisted"
+                      date={applicant.status === "SHORTLISTED" || applicant.status === "SELECTED" ? format(new Date(applicant.updatedAt), "dd MMM yyyy, hh:mm a") : "Pending"}
+                      isCompleted={applicant.status === "SHORTLISTED" || applicant.status === "SELECTED"}
+                    />
+                    <TimelineItem
+                      status="Selected"
+                      date={applicant.status === "SELECTED" ? format(new Date(applicant.updatedAt), "dd MMM yyyy, hh:mm a") : "Pending"}
+                      isCompleted={applicant.status === "SELECTED"}
+                      isLast
+                    />
+                  </div>
+                </div>
               </div>
-              
-              <div className="space-y-3">
-                <TimelineItem 
-                  status="Applied" 
-                  date={format(new Date(applicant.createdAt), "dd MMM yyyy, hh:mm a")} 
-                  isCompleted 
-                  isFirst
-                />
-                <TimelineItem 
-                  status="Shortlisted" 
-                  date={applicant.status === "SHORTLISTED" || applicant.status === "SELECTED" ? format(new Date(applicant.updatedAt), "dd MMM yyyy, hh:mm a") : "Pending"} 
-                  isCompleted={applicant.status === "SHORTLISTED" || applicant.status === "SELECTED"} 
-                />
-                <TimelineItem 
-                  status="Selected" 
-                  date={applicant.status === "SELECTED" ? format(new Date(applicant.updatedAt), "dd MMM yyyy, hh:mm a") : "Pending"} 
-                  isCompleted={applicant.status === "SELECTED"} 
-                  isLast
-                />
+
+              <Separator className="bg-border/50" />
+
+              {/* Admin Notes Section */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-heading font-semibold text-foreground/80 flex items-center gap-2">
+                  <FileText className="size-4" />
+                  Admin Notes
+                </h3>
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="Add internal notes about this applicant..."
+                    className="min-h-[100px] bg-muted/30 border-border resize-none focus-visible:ring-primary"
+                  />
+                  <Button size="sm" className="w-full shadow-button btn-primary">
+                    Save Notes
+                  </Button>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-4">
+                <Button variant="outline" className="w-full gap-2 border-border hover:bg-accent">
+                  <ExternalLink className="size-4" />
+                  View Full Profile
+                </Button>
               </div>
             </div>
-          </div>
-
-          <Separator className="bg-border/50" />
-
-          {/* Admin Notes Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-heading font-semibold text-foreground/80 flex items-center gap-2">
-              <FileText className="size-4" />
-              Admin Notes
-            </h3>
-            <div className="space-y-3">
-              <Textarea 
-                placeholder="Add internal notes about this applicant..." 
-                className="min-h-[100px] bg-muted/30 border-border resize-none focus-visible:ring-primary"
-              />
-              <Button size="sm" className="w-full shadow-button btn-primary">
-                Save Notes
-              </Button>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="pt-4">
-            <Button variant="outline" className="w-full gap-2 border-border hover:bg-accent">
-              <ExternalLink className="size-4" />
-              View Full Profile
-            </Button>
-          </div>
-        </div>
-      </ScrollArea>
-    </SheetContent>
+          </ScrollArea>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
+
 
 function InfoItem({ label, value, icon: Icon, mono = false }: { label: string; value: string; icon: any; mono?: boolean }) {
   return (

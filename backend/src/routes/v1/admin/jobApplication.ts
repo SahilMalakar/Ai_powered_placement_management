@@ -1,43 +1,31 @@
 import { Router } from 'express';
-import { validateParams } from '../../../middlewares/validate.middlware.js';
-import { idSchema } from '../../../types/auth.js';
 import { authMiddleware } from '../../../middlewares/auth.middleware.js';
 import { requireAdmin } from '../../../middlewares/rbac.middleware.js';
-import { getJobApplicantsController, updateApplicationStatusController } from '../../../modules/admin/controllers/jobApplication.controller.js';
+import { updateApplicationStatusController, getAllApplicationsController } from '../../../modules/admin/controllers/jobApplication.controller.js';
 
 const jobApplicationRouter: Router = Router();
 
 /**
  * @swagger
- * /v1/admin/job/{id}/applicants:
+ * /api/v1/admin/job/application/list:
  *   get:
- *     summary: Get all applicants for a specific job (Admin Only)
+ *     summary: Get all applications across all jobs (Admin Only)
  *     tags: [Admin - Job Management]
  *     security:
  *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Job ID
  *     responses:
  *       200:
- *         description: List of applicants with profile data
- *       404:
- *         description: Job not found
+ *         description: List of all applications
  */
-jobApplicationRouter.get("/:id/applicants",
-    validateParams(idSchema),
+jobApplicationRouter.get("/list",
     authMiddleware,
     requireAdmin,
-    getJobApplicantsController
+    getAllApplicationsController
 );
 
 /**
  * @swagger
- * /v1/admin/job/application/status:
+ * /api/v1/admin/job/application/status:
  *   post:
  *     summary: Batch update application statuses (Admin Only)
  *     description: >

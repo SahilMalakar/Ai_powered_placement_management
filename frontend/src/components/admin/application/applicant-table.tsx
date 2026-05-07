@@ -8,7 +8,10 @@ import {
   MoreVertical,
   Eye,
   UserCheck,
-  UserX
+  UserX,
+  ChevronLeft,
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import type { Applicant, ApplicationStatus } from "@/types/admin/jobApplication";
+import type { Applicant, ApplicationStatus, PaginationData } from "@/types/admin/jobApplication";
 
 // ─── Status badge config (design system) ──────────────────────────
 const APP_STATUS_STYLES: Record<
@@ -53,18 +56,24 @@ const VERIFICATION_STYLES: Record<string, string> = {
 
 interface ApplicantTableProps {
   applicants: Applicant[];
+  pagination?: PaginationData;
+  isLoading?: boolean;
   selectedIds: Set<number>;
   onToggleSelect: (id: number) => void;
   onToggleAll: () => void;
   onViewDetails: (applicant: Applicant) => void;
+  onPageChange?: (page: number) => void;
 }
 
 export function ApplicantTable({
   applicants,
+  pagination,
+  isLoading,
   selectedIds,
   onToggleSelect,
   onToggleAll,
   onViewDetails,
+  onPageChange,
 }: ApplicantTableProps) {
   const allSelected =
     applicants.length > 0 && applicants.every((a) => selectedIds.has(a.id));
@@ -216,9 +225,58 @@ export function ApplicantTable({
                 </tr>
               );
             })}
+            
+            {!isLoading && applicants.length === 0 && (
+              <tr>
+                <td colSpan={8} className="px-4 py-20 text-center text-mist">
+                  No applicants found matching the filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Footer */}
+      {pagination && onPageChange && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-card/50">
+          <div className="text-xs text-mist font-medium">
+            Showing <span className="text-foreground">{(pagination.page - 1) * pagination.limit + 1}</span> to{" "}
+            <span className="text-foreground">
+              {Math.min(pagination.page * pagination.limit, pagination.total)}
+            </span>{" "}
+            of <span className="text-foreground">{pagination.total}</span> results
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              onClick={() => onPageChange(pagination.page - 1)}
+              disabled={pagination.page <= 1 || isLoading}
+            >
+              <ChevronLeft className="size-4" />
+            </Button>
+            <div className="text-xs font-bold text-foreground min-w-16 text-center">
+              Page {pagination.page} of {pagination.totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              onClick={() => onPageChange(pagination.page + 1)}
+              disabled={pagination.page >= pagination.totalPages || isLoading}
+            >
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] flex items-center justify-center z-10">
+          <Loader2 className="size-8 text-primary animate-spin" />
+        </div>
+      )}
     </div>
   );
 }

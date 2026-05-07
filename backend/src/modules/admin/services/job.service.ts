@@ -6,6 +6,7 @@ import {
     getStudentsForJobNotification,
     getAllJobs,
     deleteJob,
+    getJobsWithApplicationStats,
 } from '../repositories/job.repository.js';
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import type {
@@ -272,4 +273,11 @@ export const deleteJobService = async (jobId: number) => {
     }
 
     return deletedJob;
+};
+
+/**
+ * Get all jobs with per-status application counts for the applications dashboard.
+ */
+export const getApplicationDashboardService = async () => {
+    return await getJobsWithApplicationStats();
 };

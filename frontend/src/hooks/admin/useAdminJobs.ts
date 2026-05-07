@@ -96,3 +96,12 @@ export const useDeleteJob = () => {
     },
   });
 };
+
+// ─── Applications Dashboard ───────────────────────────────────────
+export const useApplicationDashboard = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.ADMIN_JOBS, "dashboard"] as const,
+    queryFn: () => adminJobService.getApplicationDashboard(),
+    staleTime: 1000 * 60 * 3, // 3 minutes
+  });
+};

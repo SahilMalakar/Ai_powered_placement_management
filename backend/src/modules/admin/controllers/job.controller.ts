@@ -10,6 +10,7 @@ import {
     getAllJobsService,
     getJobByIdService,
     deleteJobService,
+    getApplicationDashboardService,
 } from '../services/job.service.js';
 import { getAllJobsQuerySchema } from '../../../types/admin/job.js';
 
@@ -96,7 +97,7 @@ export const getAllJobsController = asyncHandler(async (req, res) => {
 
     // Use safeParse to handle validation errors gracefully
     const result = getAllJobsQuerySchema.safeParse(req.query);
-    
+
     if (!result.success) {
         const message = result.error.issues.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
         throw new BadRequestError(`Invalid query parameters: ${message}`);
@@ -135,3 +136,10 @@ export const deleteJobByIdController = asyncHandler(async (req, res) => {
     return sendSuccess(res, null, 'Job deleted successfully', HTTP_STATUS.OK);
 });
 
+export const getApplicationDashboardController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+    const data = await getApplicationDashboardService();
+    return sendSuccess(res, data, 'Application dashboard fetched successfully', HTTP_STATUS.OK);
+});

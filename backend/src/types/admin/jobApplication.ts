@@ -13,8 +13,8 @@ export type UpdateApplicationStatusInput = z.infer<typeof updateApplicationStatu
 
 export const getJobApplicantsQuerySchema = z.object({
     search: z.string().optional(),
-    status: z.enum(ApplicationStatus).optional(),
-    branch: z.string().optional(), // Could be enum but string is safer if not strictly defined for students
+    status: z.union([z.enum(ApplicationStatus), z.literal("all")]).optional(),
+    branch: z.string().optional(),
     verificationStatus: z.string().optional(),
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(10),
