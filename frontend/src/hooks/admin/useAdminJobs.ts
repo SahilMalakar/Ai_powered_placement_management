@@ -2,12 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminJobService } from "@/services/admin/job.service";
 import { toast } from "sonner";
 import { CreateJobInput, UpdateJobInput } from "@/types/admin/job";
+import { QUERY_KEYS } from "@/constants/query-keys";
 
 // Centralized Query Keys
 export const ADMIN_JOB_KEYS = {
-  all: ["admin-jobs"] as const,
-  list: (filters: any) => ["admin-jobs", "list", filters] as const,
-  detail: (id: string) => ["admin-jobs", "detail", id] as const,
+  all: [QUERY_KEYS.ADMIN_JOBS] as const,
+  list: (filters: any) => [QUERY_KEYS.ADMIN_JOBS, "list", filters] as const,
+  detail: (id: string) => [QUERY_KEYS.ADMIN_JOB_DETAIL, id] as const,
 };
 
 export const useAdminJobs = (filters: any = {}) => {

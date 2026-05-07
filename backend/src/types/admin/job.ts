@@ -40,7 +40,15 @@ export type UpdateJobInput = z.infer<typeof updateJobSchema>;
 export const getAllJobsQuerySchema = z.object({
     search: z.string().optional(),
     branch: z.enum(Branch).optional(),
+    branches: z.preprocess(
+        (val) => (typeof val === 'string' ? [val] : val),
+        z.array(z.enum(Branch))
+    ).optional(),
     cgpa: z.string().optional(),
+    backlogAllowed: z.preprocess(
+        (val) => (val === 'true' || val === true),
+        z.boolean()
+    ).optional(),
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(10),
     status: z.enum(JobStatus).optional(),

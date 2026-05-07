@@ -42,15 +42,13 @@ export const getAllJobs = async (filters: {
         ];
     }
 
-    if (branch) {
-        where.allowedBranches = {
-            has: branch,
-        };
-    }
-
     if (filters.branches && filters.branches.length > 0) {
         where.allowedBranches = {
             hasSome: filters.branches,
+        };
+    } else if (branch) {
+        where.allowedBranches = {
+            has: branch,
         };
     }
 

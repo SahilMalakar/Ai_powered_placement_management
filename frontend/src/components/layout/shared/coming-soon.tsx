@@ -14,7 +14,7 @@ export default function ComingSoon({ title }: { title: string }) {
           We're currently building this feature to give you the best experience possible. Stay tuned!
         </p>
       </div>
-      <Button render={<Link href="/admin/dashboard" />} variant="outline" className="gap-2">
+      <Button render={<Link href="/admin/dashboard" />} nativeButton={false} variant="outline" className="gap-2">
         <ArrowLeft className="size-4" /> Back to Dashboard
       </Button>
     </div>
