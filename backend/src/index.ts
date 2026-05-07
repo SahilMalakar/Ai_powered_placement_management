@@ -7,9 +7,12 @@ import { initializeAtsWorker } from './workers/ats.worker.js';
 import { initializeResumeWorker } from './workers/resume.worker.js';
 import { initializeDocumentWorker } from './workers/document.worker.js';
 import { initializeVerificationWorker } from './workers/verification.worker.js';
+import { clearUploadsDirectory } from './utils/fileHandler/cleanup.js';
 
-// Start the background notification worker
+// Cleanup and Worker initialization
 try {
+    // Clear temp files from previous sessions
+    clearUploadsDirectory();
     sendEmailFromQueueViaWorker();
     initializeAtsWorker();
     initializeResumeWorker();

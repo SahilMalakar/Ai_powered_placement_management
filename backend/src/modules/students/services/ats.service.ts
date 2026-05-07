@@ -75,19 +75,45 @@ export const requestAtsAnalysisService = async (
     };
 };
 
-// Service to fetch the status and basic info of a specific analysis.
+// Service to fetch the status and full info of a specific analysis.
 export const getAtsStatusService = async (id: number, userId: number) => {
     const result = await findAtsResultById(id, userId);
     if (!result) {
         throw new NotFoundError('ATS analysis report not found.');
     }
+
+    // Basic response for pending/failed jobs
+    if (result.status !== 'COMPLETED') {
+        return {
+            id: result.id,
+            status: result.status,
+            analysisMode: result.analysisMode,
+            createdAt: result.createdAt,
+        };
+    }
+
+    // Full response for completed jobs
     return {
         id: result.id,
         status: result.status,
-        score: result.score,
         analysisMode: result.analysisMode,
+        detectedRole: result.detectedRole,
+        score: result.score,
+        keywordScore: result.keywordScore,
+        formatScore: result.formatScore,
+        experienceScore: result.experienceScore,
+        projectScore: result.projectScore,
+        skillsScore: result.skillsScore,
+        additionalDetailsScore: result.additionalDetailsScore,
+        matchedKeywords: result.matchedKeywords,
+        missingKeywords: result.missingKeywords,
+        strengths: result.strengths,
+        weaknesses: result.weaknesses,
+        suggestions: result.suggestions,
+        createdAt: result.createdAt,
     };
 };
+
 
 // Service to fetch paginated analysis results for a student.
 export const getAtsResultsService = async (

@@ -24,7 +24,7 @@ export default function StudentLayout({
           {/* ── Sidebar ── */}
           <StudentSidebar />
 
-          <SidebarInset className="bg-background">
+          <SidebarInset className="bg-transparent">
             {/* ── Navbar ── */}
             <Navbar />
 

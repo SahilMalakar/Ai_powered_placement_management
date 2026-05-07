@@ -23,20 +23,17 @@ export const requestAtsAnalysisController = asyncHandler(
             );
         }
 
-        // Job Description is now optional (triggers GENERIC mode if missing)
         const { jobDescription } = req.body;
+        const filePath = req.file.path;
 
         try {
             const userId = req.user.userId;
-            const filePath = req.file.path;
 
             const { atsResultId, message } = await requestAtsAnalysisService(
                 userId,
                 filePath,
                 jobDescription || null
             );
-
-            await fs.unlink(filePath);
 
             return sendSuccess(
                 res,
@@ -45,13 +42,14 @@ export const requestAtsAnalysisController = asyncHandler(
                 HTTP_STATUS.ACCEPTED
             );
         } catch (error: unknown) {
-            if (req.file) {
-                await fs.unlink(req.file.path).catch(() => {});
-            }
             throw error;
+        } finally {
+            // Always attempt to cleanup the local file
+            await fs.unlink(filePath).catch(() => {});
         }
     }
 );
+
 
 // Controller to fetch status of a specific ATS analysis.
 export const getAtsStatusController = asyncHandler(
