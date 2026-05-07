@@ -3,11 +3,17 @@ import type {
   ApplicantsResponse,
   BatchUpdateResponse,
   UpdateApplicationStatusInput,
+  ApplicantFilters,
 } from "@/types/admin/jobApplication";
 
 export const adminJobApplicationService = {
-  getJobApplicants: async (jobId: string): Promise<ApplicantsResponse> => {
-    const response = await api.get(`/admin/job/${jobId}/applicants`);
+  getJobApplicants: async (
+    jobId: string,
+    filters: ApplicantFilters = {}
+  ): Promise<ApplicantsResponse> => {
+    const response = await api.get(`/admin/job/${jobId}/applicants`, {
+      params: filters,
+    });
     return response.data;
   },
 

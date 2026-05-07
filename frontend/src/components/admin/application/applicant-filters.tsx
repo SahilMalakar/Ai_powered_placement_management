@@ -35,7 +35,9 @@ export interface ApplicantFilters {
   search: string;
   status: string;
   branch: string;
-  verification: string;
+  verificationStatus: string;
+  page?: number;
+  limit?: number;
 }
 
 interface ApplicantFiltersProps {
@@ -51,7 +53,7 @@ export function ApplicantFiltersBar({
     !!filters.search ||
     (filters.status !== "all" && !!filters.status) ||
     (filters.branch !== "all" && !!filters.branch) ||
-    (filters.verification !== "all" && !!filters.verification);
+    (filters.verificationStatus !== "all" && !!filters.verificationStatus);
 
   return (
     <div className="space-y-3">
@@ -125,14 +127,14 @@ export function ApplicantFiltersBar({
 
           {/* Verification */}
           <Select
-            value={filters.verification || "all"}
-            onValueChange={(val) => onFilterChange({ verification: val ?? undefined })}
+            value={filters.verificationStatus || "all"}
+            onValueChange={(val) => onFilterChange({ verificationStatus: val ?? undefined })}
           >
             <SelectTrigger
               className={cn(
                 "w-[155px] h-10 bg-card border-border shadow-sm",
-                filters.verification !== "all" &&
-                  filters.verification &&
+                filters.verificationStatus !== "all" &&
+                  filters.verificationStatus &&
                   "border-primary/40 bg-primary/5"
               )}
             >
@@ -146,6 +148,7 @@ export function ApplicantFiltersBar({
               ))}
             </SelectContent>
           </Select>
+
         </div>
       </div>
 
@@ -183,15 +186,15 @@ export function ApplicantFiltersBar({
             </Badge>
           )}
 
-          {filters.verification !== "all" && filters.verification && (
+          {filters.verificationStatus !== "all" && filters.verificationStatus && (
             <Badge
               variant="outline"
               className="gap-1 px-2.5 h-7 rounded-md bg-primary/5 border-primary/20 text-primary font-medium"
             >
-              {filters.verification}
+              {filters.verificationStatus}
               <X
                 className="size-3 cursor-pointer hover:text-error transition-colors"
-                onClick={() => onFilterChange({ verification: "all" })}
+                onClick={() => onFilterChange({ verificationStatus: "all" })}
               />
             </Badge>
           )}
@@ -202,7 +205,7 @@ export function ApplicantFiltersBar({
                 search: "",
                 status: "all",
                 branch: "all",
-                verification: "all",
+                verificationStatus: "all",
               })
             }
             className="text-xs text-muted-foreground hover:text-error font-medium ml-1 transition-colors"

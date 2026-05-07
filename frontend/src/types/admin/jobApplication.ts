@@ -67,10 +67,20 @@ export type UpdateApplicationStatusInput = z.infer<
 >;
 
 // ─── Response types ────────────────────────────────────────────────
+export interface PaginationData {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface ApplicantsResponse {
   success: boolean;
   message: string;
-  data: Applicant[];
+  data: {
+    applicants: Applicant[];
+    pagination: PaginationData;
+  };
 }
 
 export interface BatchUpdateResponse {
@@ -81,4 +91,13 @@ export interface BatchUpdateResponse {
     total: number;
     skipped: number;
   };
+}
+
+export interface ApplicantFilters {
+  search?: string;
+  status?: string;
+  branch?: string;
+  verificationStatus?: string;
+  page?: number;
+  limit?: number;
 }

@@ -16,15 +16,16 @@ const VALID_TRANSITIONS: Record<string, ApplicationStatus[]> = {
 };
 
 /**
- * Fetch all applicants for a specific job.
+ * Fetch all applicants for a specific job with pagination and filters.
  */
-export const getJobApplicantsService = async (jobId: number) => {
+export const getJobApplicantsService = async (jobId: number, query: any) => {
     const job = await getJobById(jobId);
     if (!job) {
         throw new NotFoundError("Job Not Found");
     }
-    return await getApplicantByJobIdRepository(jobId);
+    return await getApplicantByJobIdRepository(jobId, query);
 };
+
 
 /**
  * Batch update application statuses with race-condition safety.

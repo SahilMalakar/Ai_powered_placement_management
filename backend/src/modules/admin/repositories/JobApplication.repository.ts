@@ -2,37 +2,85 @@ import type { ApplicationStatus } from "../../../prisma/generated/prisma/enums.j
 import { prisma } from "../../../prisma/prisma.js";
 
 /**
- * Fetch all applicants for a specific job.
+ * Fetch all applicants for a specific job with pagination and filters.
  * Excludes soft-deleted applications.
  */
-export const getApplicantByJobIdRepository = async (jobId: number) => {
-    return await prisma.application.findMany({
-        where: {
-            jobId: jobId,
-            deletedAt: null
-        },
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    email: true,
-                    profile: {
-                        select: {
-                            fullName: true,
-                            rollNo: true,
-                            cgpa: true,
-                            branch: true,
-                            verificationStatus: true
+export const getApplicantByJobIdRepository = async (jobId: number, query: any) => {
+    const { search, status, branch, verificationStatus, page, limit } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+        jobId: jobId,
+        deletedAt: null,
+        user: { deletedAt: null }
+    };
+
+    if (status) {
+        where.status = status;
+    }
+
+    if (branch || search || verificationStatus) {
+        where.user.profile = {
+            ...(where.user.profile || {}),
+        };
+
+        if (branch) {
+            where.user.profile.branch = branch;
+        }
+
+        if (verificationStatus) {
+            where.user.profile.verificationStatus = verificationStatus;
+        }
+
+        if (search) {
+            where.OR = [
+                { user: { email: { contains: search, mode: 'insensitive' } } },
+                { user: { profile: { fullName: { contains: search, mode: 'insensitive' } } } },
+                { user: { profile: { rollNo: { contains: search, mode: 'insensitive' } } } }
+            ];
+        }
+    }
+
+    const [applicants, total] = await Promise.all([
+        prisma.application.findMany({
+            where,
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        profile: {
+                            select: {
+                                fullName: true,
+                                rollNo: true,
+                                cgpa: true,
+                                branch: true,
+                                verificationStatus: true
+                            }
                         }
                     }
                 }
-            }
-        },
-        orderBy: {
-            createdAt: "desc"
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            skip,
+            take: limit
+        }),
+        prisma.application.count({ where })
+    ]);
+
+    return {
+        applicants,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
         }
-    });
+    };
 };
+
 
 /**
  * Atomically fetch eligible applications and update their status.

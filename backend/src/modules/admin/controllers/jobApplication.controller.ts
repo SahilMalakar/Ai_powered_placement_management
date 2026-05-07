@@ -3,10 +3,10 @@ import { asyncHandler } from "../../../utils/asyncHandler.js";
 import { BadRequestError, UnauthorizedError } from "../../../utils/errors/httpErrors.js";
 import { HTTP_STATUS } from "../../../utils/httpStatus.js";
 import { getJobApplicantsService, updateApplicationStatusService } from "../services/jobApplication.service.js";
-import { updateApplicationStatusSchema } from "../../../types/admin/jobApplication.js";
+import { getJobApplicantsQuerySchema, updateApplicationStatusSchema } from "../../../types/admin/jobApplication.js";
 
 /**
- * Controller to fetch all applicants for a specific job.
+ * Controller to fetch all applicants for a specific job with pagination and filters.
  */
 export const getJobApplicantsController = asyncHandler(async (req, res) => {
     if (!req.user) {
@@ -14,16 +14,20 @@ export const getJobApplicantsController = asyncHandler(async (req, res) => {
     }
 
     const jobId = Number(req.params.id);
+    
+    // 1. Validate query parameters
+    const query = getJobApplicantsQuerySchema.parse(req.query);
 
-    const applicants = await getJobApplicantsService(jobId);
+    const result = await getJobApplicantsService(jobId, query);
 
     return sendSuccess(
         res,
-        applicants,
+        result,
         "Job Applicants fetched successfully",
         HTTP_STATUS.OK
     );
 });
+
 
 /**
  * Controller to batch update application statuses.

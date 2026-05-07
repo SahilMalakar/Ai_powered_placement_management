@@ -1,20 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminJobApplicationService } from "@/services/admin/jobApplication.service";
 import { toast } from "sonner";
-import type { UpdateApplicationStatusInput } from "@/types/admin/jobApplication";
+import type { 
+  UpdateApplicationStatusInput, 
+  ApplicantFilters 
+} from "@/types/admin/jobApplication";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
 // ─── Query key helpers ─────────────────────────────────────────────
 export const APPLICANT_KEYS = {
-  list: (jobId: string) =>
-    [QUERY_KEYS.ADMIN_JOB_APPLICANTS, jobId] as const,
+  all: (jobId: string) => [QUERY_KEYS.ADMIN_JOB_APPLICANTS, jobId] as const,
+  list: (jobId: string, filters: ApplicantFilters) =>
+    [QUERY_KEYS.ADMIN_JOB_APPLICANTS, jobId, "list", filters] as const,
 };
 
 // ─── Fetch applicants for a job ────────────────────────────────────
-export const useJobApplicants = (jobId: string) => {
+export const useJobApplicants = (jobId: string, filters: ApplicantFilters = {}) => {
   return useQuery({
-    queryKey: APPLICANT_KEYS.list(jobId),
-    queryFn: () => adminJobApplicationService.getJobApplicants(jobId),
+    queryKey: APPLICANT_KEYS.list(jobId, filters),
+    queryFn: () => adminJobApplicationService.getJobApplicants(jobId, filters),
     enabled: !!jobId,
     staleTime: 1000 * 60 * 2, // 2 minutes — applications change frequently
   });
@@ -29,7 +33,7 @@ export const useUpdateApplicationStatus = (jobId: string) => {
       adminJobApplicationService.updateApplicationStatus(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({
-        queryKey: APPLICANT_KEYS.list(jobId),
+        queryKey: APPLICANT_KEYS.all(jobId),
       });
       toast.success(
         response.message ||

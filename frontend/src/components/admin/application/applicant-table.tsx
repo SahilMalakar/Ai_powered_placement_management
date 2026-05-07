@@ -4,6 +4,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import {
+  MoreVertical,
+  Eye,
+  UserCheck,
+  UserX
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import type { Applicant, ApplicationStatus } from "@/types/admin/jobApplication";
 
 // ─── Status badge config (design system) ──────────────────────────
@@ -41,6 +56,7 @@ interface ApplicantTableProps {
   selectedIds: Set<number>;
   onToggleSelect: (id: number) => void;
   onToggleAll: () => void;
+  onViewDetails: (applicant: Applicant) => void;
 }
 
 export function ApplicantTable({
@@ -48,6 +64,7 @@ export function ApplicantTable({
   selectedIds,
   onToggleSelect,
   onToggleAll,
+  onViewDetails,
 }: ApplicantTableProps) {
   const allSelected =
     applicants.length > 0 && applicants.every((a) => selectedIds.has(a.id));
@@ -84,6 +101,7 @@ export function ApplicantTable({
               <th className="px-4 py-3 text-left font-heading font-semibold text-foreground/80 text-xs uppercase tracking-wider">
                 Applied On
               </th>
+              <th className="w-12 px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -95,23 +113,22 @@ export function ApplicantTable({
                 APP_STATUS_STYLES.APPLIED;
               const verificationStyle =
                 VERIFICATION_STYLES[
-                  profile?.verificationStatus || "NOT_VERIFIED"
+                profile?.verificationStatus || "NOT_VERIFIED"
                 ] || VERIFICATION_STYLES.NOT_VERIFIED;
 
               return (
                 <tr
                   key={applicant.id}
                   className={cn(
-                    "border-b border-border/50 transition-colors hover:bg-accent/50 cursor-pointer",
+                    "border-b border-border/50 transition-colors hover:bg-accent/50 cursor-pointer group/row",
                     isSelected && "bg-primary/5 hover:bg-primary/8"
                   )}
-                  onClick={() => onToggleSelect(applicant.id)}
+                  onClick={() => onViewDetails(applicant)}
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => onToggleSelect(applicant.id)}
-                      onClick={(e) => e.stopPropagation()}
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -120,7 +137,7 @@ export function ApplicantTable({
                         {(profile?.fullName || "?").charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-foreground truncate">
+                        <p className="font-medium text-foreground truncate group-hover/row:text-primary transition-colors">
                           {profile?.fullName || "Unknown"}
                         </p>
                         <p className="text-xs text-mist dark:text-muted-foreground/60 truncate font-mono">
@@ -143,7 +160,7 @@ export function ApplicantTable({
                     <Badge
                       variant="outline"
                       className={cn(
-                        "text-xs font-medium",
+                        "text-[10px] font-bold uppercase tracking-wider h-5",
                         verificationStyle
                       )}
                     >
@@ -157,15 +174,44 @@ export function ApplicantTable({
                     <Badge
                       variant="outline"
                       className={cn(
-                        "text-xs font-medium",
+                        "text-xs font-semibold",
                         statusStyle.className
                       )}
                     >
                       {statusStyle.label}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-mist dark:text-muted-foreground/60 text-xs">
+                  <td className="px-4 py-3 text-mist dark:text-muted-foreground/60 text-xs font-medium">
                     {format(new Date(applicant.createdAt), "d MMM yyyy")}
+                  </td>
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="h-8 w-8 text-muted-foreground"
+                          >
+                            <MoreVertical className="size-4" />
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="end" className="w-48 shadow-modal">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onViewDetails(applicant)} className="gap-2 cursor-pointer">
+                          <Eye className="size-4" /> View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 cursor-pointer">
+                          <UserCheck className="size-4" /> Verify Student
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="gap-2 cursor-pointer text-error focus:text-error focus:bg-error/10">
+                          <UserX className="size-4" /> Reject Profile
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               );

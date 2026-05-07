@@ -10,3 +10,14 @@ export const updateApplicationStatusSchema = z.object({
 });
 
 export type UpdateApplicationStatusInput = z.infer<typeof updateApplicationStatusSchema>;
+
+export const getJobApplicantsQuerySchema = z.object({
+    search: z.string().optional(),
+    status: z.enum(ApplicationStatus).optional(),
+    branch: z.string().optional(), // Could be enum but string is safer if not strictly defined for students
+    verificationStatus: z.string().optional(),
+    page: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().positive().max(100).default(10),
+});
+
+export type GetJobApplicantsQueryInput = z.infer<typeof getJobApplicantsQuerySchema>;
