@@ -10,6 +10,12 @@ interface AppState {
   setAuthenticated: (isAuthenticated: boolean) => void;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
+  /**
+   * Atomic action to update multiple authentication states at once.
+   * Prevents race conditions during hydration where isLoading is false 
+   * but isAuthenticated is still false for one render frame.
+   */
+  setAuth: (user: User | null, isLoading: boolean) => void;
 }
 
 /**
@@ -23,11 +29,17 @@ export const useAppStore = create<AppState>()(
     user: null,
     isAuthenticated: false,
     setUser: (user) => {
-      console.log('[Zustand] setUser action called with:', user);
       set({ user, isAuthenticated: !!user });
     },
     setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
     isLoading: true,
     setIsLoading: (isLoading) => set({ isLoading }),
+    setAuth: (user, isLoading) => {
+      set({ 
+        user, 
+        isAuthenticated: !!user, 
+        isLoading 
+      });
+    },
   }))
 );

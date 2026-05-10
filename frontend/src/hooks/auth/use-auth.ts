@@ -24,7 +24,9 @@ export function useAuth() {
       setUser(data.user)
       setAuthenticated(true)
       toast.success("Login successful!")
-      router.replace("/dashboard")
+      
+      const isAdmin = data.user.role === "ADMIN" || data.user.role === "SUPER_ADMIN";
+      router.replace(isAdmin ? "/admin/dashboard" : "/dashboard");
     },
     onError: (error) => {
       let errorMessage = "Something went wrong"
@@ -45,7 +47,9 @@ export function useAuth() {
       setUser(data.user)
       setAuthenticated(true)
       toast.success("Signup successful!")
-      router.replace("/dashboard")
+      
+      const isAdmin = data.user.role === "ADMIN" || data.user.role === "SUPER_ADMIN";
+      router.replace(isAdmin ? "/admin/dashboard" : "/dashboard");
     },
     onError: (error) => {
       let errorMessage = "Something went wrong"

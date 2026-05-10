@@ -28,13 +28,13 @@ export function RoleGuard({
     if (!isLoading) {
       if (!isAuthenticated) {
         console.log("[RoleGuard] Not authenticated, redirecting to:", redirectTo);
-        router.push(redirectTo);
+        router.replace(redirectTo);
       } else if (user && !allowedRoles.includes(user.role)) {
         console.log(`[RoleGuard] Role ${user.role} not authorized for this area. Allowed:`, allowedRoles);
         
         // If an admin tries to access student routes, or vice-versa
         const fallback = user.role === "STUDENT" ? "/dashboard" : "/admin/dashboard";
-        router.push(fallback);
+        router.replace(fallback);
       } else {
         setIsAuthorized(true);
       }

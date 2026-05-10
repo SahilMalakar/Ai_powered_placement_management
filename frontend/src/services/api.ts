@@ -42,28 +42,18 @@ const processQueue = (error: any, token: string | null = null) => {
 
 // Request interceptor for logging
 api.interceptors.request.use((config) => {
-  const method = config.method?.toUpperCase();
-  const url = config.url;
-  console.log(`%c🚀 API [REQUEST]: ${method} ${url}`, "color: #818cf8; font-weight: bold;");
   return config;
 });
 
 // Response interceptor to handle global errors and logging
 api.interceptors.response.use(
   (response) => {
-    const { method, url } = response.config;
-    const status = response.status;
-    console.log(`%c✅ API [SUCCESS]: ${method?.toUpperCase()} ${url} (${status})`, "color: #1D9E75; font-weight: bold;");
     return response;
   },
   async (error: AxiosError<any>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-    const { method, url } = originalRequest || {};
+    const { url } = originalRequest || {};
     const status = error.response?.status;
-    const errorCode = error.response?.data?.errorCode;
-    const message = error.response?.data?.message || error.message;
-
-    console.log(`%c❌ API [ERROR]: ${method?.toUpperCase()} ${url} (${status}) - ${message}`, "color: #E24B4A; font-weight: bold;");
 
     // Handle 401 Unauthorized / Token Expired
     if (status === 401 && !originalRequest._retry) {
@@ -91,25 +81,38 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          console.log('%c🔄 API [REFRESH]: Attempting to refresh tokens...', "color: #EF9F27; font-weight: bold;");
           await api.post('/auth/refresh-token');
           processQueue(null);
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          console.log('%c🚫 API [REFRESH_FAILED]: Redirecting to login', "color: #E24B4A; font-weight: bold;");
-          if (typeof window !== 'undefined') {
+          
+        // CRITICAL: Do not redirect to /login if the original request was the auth check or refresh token
+        // This prevents infinite reload loops and allows unauthenticated users to stay on public pages.
+        const isExcluded = requestUrl.includes('/auth/me') || requestUrl.includes('/auth/refresh-token');
+        
+        if (!isExcluded && typeof window !== 'undefined') {
+          if (!window.location.pathname.startsWith('/login')) {
             window.location.href = '/login';
           }
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
         }
+        
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
+      }
+    }
 
-      // If it's an auth route or refresh failed, redirect if it's not the /auth/me check
-      if (!requestUrl.includes('/auth/me') && typeof window !== 'undefined') {
-        window.location.href = '/login';
+    // If it's not a 401 or refresh was already tried, handle it here
+    if (status === 401) {
+      const requestUrl = url || '';
+      const isExcluded = requestUrl.includes('/auth/me') || requestUrl.includes('/auth/refresh-token');
+
+      if (!isExcluded && typeof window !== 'undefined') {
+        if (!window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
       }
     }
 

@@ -11,11 +11,9 @@ import { useEffect } from "react"
  * If the cookie is missing or expired, the store stays unauthenticated.
  */
 export function useAuthCheck() {
-  const setUser = useAppStore((state) => state.setUser)
-  const setAuthenticated = useAppStore((state) => state.setAuthenticated)
-  const setIsLoading = useAppStore((state) => state.setIsLoading)
+  const setAuth = useAppStore((state) => state.setAuth)
 
-  const { data, isSuccess, isError, isLoading } = useQuery({
+  const { data, isSuccess, isLoading } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: async () => {
       const response = await api.get("/auth/me")
@@ -26,25 +24,16 @@ export function useAuthCheck() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // Keep Zustand's isLoading in sync with the auth query's loading state.
-  // This prevents RoleGuard from redirecting before the auth check completes.
+  // Update Zustand store based on query state.
   useEffect(() => {
-    setIsLoading(isLoading)
-  }, [isLoading, setIsLoading])
-
-  useEffect(() => {
-    if (isSuccess && data?.data) {
-      setUser(data.data)
-      setAuthenticated(true)
+    // Only update the store when the query is no longer loading.
+    // The store's isLoading defaults to true, so we only need to 
+    // transition to false once the auth check (success or failure) completes.
+    if (!isLoading) {
+      const user = isSuccess && data?.data ? data.data : null;
+      setAuth(user, false);
     }
-  }, [isSuccess, data, setUser, setAuthenticated])
+  }, [isLoading, isSuccess, data, setAuth]);
 
-  useEffect(() => {
-    if (isError) {
-      setUser(null)
-      setAuthenticated(false)
-    }
-  }, [isError, setUser, setAuthenticated])
-
-  return { isLoading }
+  return { isLoading };
 }

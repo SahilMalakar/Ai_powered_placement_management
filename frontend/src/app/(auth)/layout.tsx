@@ -10,16 +10,19 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const { isAuthenticated, user, isLoading } = useAppStore();
 
   React.useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/dashboard");
+    // Only redirect if auth check is complete and we are authenticated
+    if (!isLoading && isAuthenticated && user) {
+      const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+      const destination = isAdmin ? "/admin/dashboard" : "/dashboard";
+      router.replace(destination);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, isLoading, router]);
 
-  // While authenticated, render nothing to prevent flash of login UI
-  if (isAuthenticated) {
+  // While loading or authenticated, render nothing to prevent flash of login UI
+  if (isLoading || isAuthenticated) {
     return null;
   }
 
