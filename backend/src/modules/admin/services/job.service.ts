@@ -8,6 +8,7 @@ import {
     deleteJob,
     getJobsWithApplicationStats,
 } from '../repositories/job.repository.js';
+import { findApplicationByUserIdAndJobId } from '../../students/repositories/application.repository.js';
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import type {
     CreateJobInput,
@@ -203,8 +204,10 @@ export const getAllJobsService = async (
     }
 };
 
-export const getJobByIdService = async (jobId: number, userRole?: string) => {
+export const getJobByIdService = async (jobId: number, userRole?: string, userId?: number) => {
     const cacheKey = CACHE_KEYS.JOB_DETAILS(jobId);
+
+    let jobData: any;
 
     try {
         const cacheClient = getRedisConnectionForCaching();
@@ -212,32 +215,30 @@ export const getJobByIdService = async (jobId: number, userRole?: string) => {
         // Try Cache Hit
         const cachedJob = await cacheClient.get(cacheKey);
         if (cachedJob) {
-            const job = JSON.parse(cachedJob);
+            jobData = JSON.parse(cachedJob);
             // Security Check for cached data
-            if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
+            if (userRole === 'STUDENT' && jobData.status !== 'ACTIVE') {
                 throw new BadRequestError('Job is not available');
             }
             console.log('🚀 Cache Hit (Details): ', cacheKey);
-            return job;
+        } else {
+            // Cache Miss
+            console.log('⚡ Cache Miss (Details): ', cacheKey);
+            const job = await getJobById(jobId);
+
+            if (!job) {
+                throw new BadRequestError('Job not found');
+            }
+
+            // Security: Students should only see ACTIVE jobs
+            if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
+                throw new BadRequestError('Job is not available');
+            }
+
+            // Set Cache with 5-minute TTL
+            await cacheClient.set(cacheKey, JSON.stringify(job), 'EX', 300);
+            jobData = job;
         }
-
-        // Cache Miss
-        console.log('⚡ Cache Miss (Details): ', cacheKey);
-        const job = await getJobById(jobId);
-
-        if (!job) {
-            throw new BadRequestError('Job not found');
-        }
-
-        // Security: Students should only see ACTIVE jobs
-        if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
-            throw new BadRequestError('Job is not available');
-        }
-
-        // Set Cache with 5-minute TTL
-        await cacheClient.set(cacheKey, JSON.stringify(job), 'EX', 300);
-
-        return job;
     } catch (error) {
         if (error instanceof BadRequestError) throw error;
 
@@ -248,8 +249,19 @@ export const getJobByIdService = async (jobId: number, userRole?: string) => {
         if (userRole === 'STUDENT' && job.status !== 'ACTIVE') {
             throw new BadRequestError('Job is not available');
         }
-        return job;
+        jobData = job;
     }
+
+    // Enrich with student's application status (per-request, not cached)
+    if (userRole === 'STUDENT' && userId) {
+        const application = await findApplicationByUserIdAndJobId(userId, jobId);
+        return {
+            ...JSON.parse(JSON.stringify(jobData)),
+            applicationStatus: application?.status ?? null,
+        };
+    }
+
+    return jobData;
 };
 
 export const deleteJobService = async (jobId: number) => {

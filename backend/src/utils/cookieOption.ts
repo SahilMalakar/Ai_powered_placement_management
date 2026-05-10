@@ -6,7 +6,7 @@ export const cookieOption = {
 
 export const accessTokenCookieOptions = {
     ...cookieOption,
-    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days (matches refresh token)
 } as const;
 
 export const refreshTokenCookieOptions = {

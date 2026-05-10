@@ -120,7 +120,7 @@ export const getJobByIdController = asyncHandler(async (req, res) => {
     }
 
     const jobId = Number(req.params.id);
-    const job = await getJobByIdService(jobId, req.user.role);
+    const job = await getJobByIdService(jobId, req.user.role, req.user.userId);
 
     return sendSuccess(res, job, 'Job fetched successfully', HTTP_STATUS.OK);
 });

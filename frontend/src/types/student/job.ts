@@ -12,6 +12,7 @@ export interface Job {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  applicationStatus?: 'APPLIED' | 'SHORTLISTED' | 'SELECTED' | 'REJECTED' | null;
 }
 
 export interface JobPagination {

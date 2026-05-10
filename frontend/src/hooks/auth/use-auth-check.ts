@@ -13,6 +13,7 @@ import { useEffect } from "react"
 export function useAuthCheck() {
   const setUser = useAppStore((state) => state.setUser)
   const setAuthenticated = useAppStore((state) => state.setAuthenticated)
+  const setIsLoading = useAppStore((state) => state.setIsLoading)
 
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["auth", "me"],
@@ -24,6 +25,12 @@ export function useAuthCheck() {
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
+
+  // Keep Zustand's isLoading in sync with the auth query's loading state.
+  // This prevents RoleGuard from redirecting before the auth check completes.
+  useEffect(() => {
+    setIsLoading(isLoading)
+  }, [isLoading, setIsLoading])
 
   useEffect(() => {
     if (isSuccess && data?.data) {

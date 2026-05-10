@@ -67,8 +67,14 @@ api.interceptors.response.use(
 
     // Handle 401 Unauthorized / Token Expired
     if (status === 401 && !originalRequest._retry) {
-      // If the error is specifically about an expired token
-      if (errorCode === 'TOKEN_EXPIRED') {
+      const requestUrl = url || '';
+      
+      // Don't attempt refresh for login, signup, or the refresh-token endpoint itself
+      const isAuthRoute = requestUrl.includes('/auth/login') || 
+                         requestUrl.includes('/auth/signup') || 
+                         requestUrl.includes('/auth/refresh-token');
+
+      if (!isAuthRoute) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
@@ -91,6 +97,7 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
+          console.log('%c🚫 API [REFRESH_FAILED]: Redirecting to login', "color: #E24B4A; font-weight: bold;");
           if (typeof window !== 'undefined') {
             window.location.href = '/login';
           }
@@ -100,8 +107,7 @@ api.interceptors.response.use(
         }
       }
 
-      // For other 401 errors (e.g., unauthorized access on non-expired routes)
-      const requestUrl = url || '';
+      // If it's an auth route or refresh failed, redirect if it's not the /auth/me check
       if (!requestUrl.includes('/auth/me') && typeof window !== 'undefined') {
         window.location.href = '/login';
       }

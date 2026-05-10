@@ -133,53 +133,76 @@ export default function JobDetailsPage() {
           </div>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger
-            render={
-              <Button
-                size="lg"
-                disabled={isExpired || status !== "ACTIVE" || isPending}
-                className={cn(
-                  "w-full md:w-auto min-w-[140px] text-lg py-6",
-                  (isExpired || status !== "ACTIVE") &&
-                    "bg-muted text-muted-foreground border-none shadow-none"
-                )}
-              />
-            }
-          >
-            {isPending ? (
-              <Loader2 className="size-5 animate-spin" />
-            ) : isExpired ? (
-              "Expired"
-            ) : status !== "ACTIVE" ? (
-              "Unavailable"
-            ) : (
-              "Apply Now"
-            )}
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Confirm Application</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to apply for <strong>{title}</strong> at{" "}
-                <strong>{company}</strong>? A snapshot of your current profile
-                will be shared with the company.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleApply} disabled={isPending}>
-                {isPending ? "Applying..." : "Confirm & Apply"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {/* Application Status or Apply Button */}
+        {job.applicationStatus ? (
+          <div className="w-full md:w-auto flex flex-col items-center gap-2">
+            <Badge
+              className={cn(
+                "px-5 py-2.5 text-base font-semibold rounded-lg border shadow-sm",
+                job.applicationStatus === 'APPLIED' && "bg-primary/10 text-primary border-primary/20",
+                job.applicationStatus === 'SHORTLISTED' && "bg-warning/10 text-warning border-warning/20",
+                job.applicationStatus === 'SELECTED' && "bg-success/10 text-success border-success/20",
+                job.applicationStatus === 'REJECTED' && "bg-error/10 text-error border-error/20"
+              )}
+            >
+              {job.applicationStatus === 'APPLIED' && "✓ Applied"}
+              {job.applicationStatus === 'SHORTLISTED' && "⏳ Shortlisted"}
+              {job.applicationStatus === 'SELECTED' && "🎉 Selected"}
+              {job.applicationStatus === 'REJECTED' && "✗ Not Selected"}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              You have already applied
+            </span>
+          </div>
+        ) : (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger
+              render={
+                <Button
+                  size="lg"
+                  disabled={isExpired || status !== "ACTIVE" || isPending}
+                  className={cn(
+                    "w-full md:w-auto min-w-[140px] text-lg py-6",
+                    (isExpired || status !== "ACTIVE") &&
+                      "bg-muted text-muted-foreground border-none shadow-none"
+                  )}
+                />
+              }
+            >
+              {isPending ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : isExpired ? (
+                "Expired"
+              ) : status !== "ACTIVE" ? (
+                "Unavailable"
+              ) : (
+                "Apply Now"
+              )}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirm Application</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to apply for <strong>{title}</strong> at{" "}
+                  <strong>{company}</strong>? A snapshot of your current profile
+                  will be shared with the company.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  disabled={isPending}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleApply} disabled={isPending}>
+                  {isPending ? "Applying..." : "Confirm & Apply"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* Quick Stats / Criteria */}
