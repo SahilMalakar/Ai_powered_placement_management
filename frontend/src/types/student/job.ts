@@ -29,7 +29,7 @@ export interface JobsResponse {
 export interface JobFilters {
   search?: string;
   branches?: string[];
-  backlog?: 'all' | 'yes' | 'no';
+  backlogAllowed?: boolean;
   page?: number;
   limit?: number;
 }

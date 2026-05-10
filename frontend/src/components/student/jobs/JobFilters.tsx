@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, X, ChevronDown, GitBranch, ShieldCheck, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 import { JobFilters as IJobFilters } from "@/types/student/job";
 
@@ -31,7 +32,24 @@ interface JobFiltersProps {
 }
 
 export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
+  const [localSearch, setLocalSearch] = useState(filters.search || "");
   const selectedBranches = filters.branches || [];
+
+  // Sync local search with external filter changes (e.g. "Clear All")
+  useEffect(() => {
+    setLocalSearch(filters.search || "");
+  }, [filters.search]);
+
+  // Debounce effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== (filters.search || "")) {
+        onFilterChange({ search: localSearch || undefined, page: 1 });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [localSearch, onFilterChange, filters.search]);
 
   const toggleBranch = (branch: string) => {
     const updated = selectedBranches.includes(branch)
@@ -44,7 +62,7 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
     onFilterChange({ branches: undefined, page: 1 });
   };
 
-  const hasActiveFilters = selectedBranches.length > 0 || (filters.backlog && filters.backlog !== 'all');
+  const hasActiveFilters = selectedBranches.length > 0 || filters.backlogAllowed !== undefined;
 
   return (
     <div className="space-y-4">
@@ -56,12 +74,12 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           <Input
             placeholder="Search by role or company..."
             className="pl-10 h-10 bg-card border-border shadow-sm focus-visible:ring-primary"
-            value={filters.search || ""}
-            onChange={(e) => onFilterChange({ search: e.target.value, page: 1 })}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           {/* Multi-select Branch Popover */}
           <Popover>
             <PopoverTrigger
@@ -69,23 +87,23 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
                 <Button
                   variant="outline"
                   className={cn(
-                    "h-10 min-w-[160px] justify-between gap-2 bg-card border-border shadow-sm font-normal text-sm",
-                    selectedBranches.length > 0 && "border-primary/40 bg-primary/5"
+                    "h-10 w-full sm:w-48 shrink-0 justify-between gap-2 bg-card border-border shadow-sm font-normal text-sm transition-all hover:bg-accent/50",
+                    selectedBranches.length > 0 && "border-primary/40 bg-primary/5 ring-1 ring-primary/10"
                   )}
                 />
               }
             >
-              <div className="flex items-center gap-2">
-                <GitBranch className="size-4 text-mist" />
+              <div className="flex items-center gap-2 truncate">
+                <GitBranch className="size-4 text-mist shrink-0" />
                 {selectedBranches.length === 0 ? (
-                  <span className="text-muted-foreground">Branches</span>
+                  <span className="text-muted-foreground truncate">Branches</span>
                 ) : (
-                  <span className="text-foreground">
+                  <span className="text-foreground truncate">
                     {selectedBranches.length} selected
                   </span>
                 )}
               </div>
-              <ChevronDown className="size-3.5 text-muted-foreground" />
+              <ChevronDown className="size-3.5 text-muted-foreground shrink-0" />
             </PopoverTrigger>
             <PopoverContent align="start" sideOffset={6} className="w-56 p-0">
               {/* Header */}
@@ -138,22 +156,22 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
 
           {/* Backlog Filter */}
           <Select
-            value={filters.backlog || "all"}
+            value={filters.backlogAllowed === undefined ? "all" : filters.backlogAllowed ? "yes" : "no"}
             onValueChange={(val) =>
               onFilterChange({
-                backlog: val === "all" ? undefined : (val as 'yes' | 'no'),
+                backlogAllowed: val === "all" ? undefined : val === "yes",
                 page: 1,
               })
             }
           >
             <SelectTrigger
               className={cn(
-                "w-[160px] h-10 bg-card border-border shadow-sm",
-                filters.backlog && filters.backlog !== 'all' && "border-primary/40 bg-primary/5"
+                "w-full sm:w-48 shrink-0 h-10 bg-card border-border shadow-sm font-normal text-sm transition-all hover:bg-accent/50 justify-between",
+                filters.backlogAllowed !== undefined && "border-primary/40 bg-primary/5 ring-1 ring-primary/10"
               )}
             >
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="size-4 text-mist" />
+              <div className="flex items-center gap-2 truncate">
+                <ShieldCheck className="size-4 text-mist shrink-0" />
                 <SelectValue placeholder="Backlog" />
               </div>
             </SelectTrigger>
@@ -188,26 +206,26 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
             </Badge>
           ))}
 
-          {filters.backlog && filters.backlog !== 'all' && (
+          {filters.backlogAllowed !== undefined && (
             <Badge
               variant="outline"
               className={cn(
                 "gap-1 px-2.5 h-7 rounded-md font-medium",
-                filters.backlog === 'yes'
+                filters.backlogAllowed
                   ? "bg-success/10 border-success/20 text-success"
                   : "bg-warning/10 border-warning/20 text-warning"
               )}
             >
-              {filters.backlog === 'yes' ? 'Backlog OK' : 'No Backlog'}
+              {filters.backlogAllowed ? 'Backlog OK' : 'No Backlog'}
               <X
                 className="size-3 cursor-pointer hover:text-error transition-colors"
-                onClick={() => onFilterChange({ backlog: undefined, page: 1 })}
+                onClick={() => onFilterChange({ backlogAllowed: undefined, page: 1 })}
               />
             </Badge>
           )}
 
           <button
-            onClick={() => onFilterChange({ branches: undefined, backlog: undefined, page: 1 })}
+            onClick={() => onFilterChange({ branches: undefined, backlogAllowed: undefined, page: 1 })}
             className="text-xs text-muted-foreground hover:text-error font-medium ml-1 transition-colors"
           >
             Clear all
