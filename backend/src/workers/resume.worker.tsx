@@ -36,12 +36,12 @@ const resumeGenerationChain = RunnableSequence.from([
             const chain = AUDIT_PROMPT.pipe(llm);
             console.log('--- [AI Resume Generation] Stage 1: Fact Audit Input ---');
             console.dir({ profileData: input.profileData }, { depth: null });
-            
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const res = await (chain as any).invoke({
                 profileData: JSON.stringify(input.profileData),
             });
-            
+
             console.log('--- [AI Resume Generation] Stage 1: Fact Audit Output ---');
             console.log(res.content);
             return res.content;
@@ -182,7 +182,7 @@ export const initializeResumeWorker = async () => {
                     );
                     if (type === 'GENERATE_RESUME' && resumeId) {
                         await updateResumeStatus(resumeId, 'FAILED').catch(
-                            () => {}
+                            () => { }
                         );
                     }
                     throw new UnrecoverableError(
@@ -192,7 +192,7 @@ export const initializeResumeWorker = async () => {
 
                 // Mark the resume as failed if it exists and this is a generation job
                 if (type === 'GENERATE_RESUME' && resumeId) {
-                    await updateResumeStatus(resumeId, 'FAILED').catch(() => {});
+                    await updateResumeStatus(resumeId, 'FAILED').catch(() => { });
                 }
 
                 throw new InternalServerError(`${type} failed: ${message}`);

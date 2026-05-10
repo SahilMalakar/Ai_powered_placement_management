@@ -9,10 +9,10 @@ export const resumeQueue = new Queue(RESUME_QUEUE_NAME, {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connection: getRedisConnection() as any,
     defaultJobOptions: {
-        attempts: 3,
+        attempts: 5,
         backoff: {
             type: 'exponential',
-            delay: 5000,
+            delay: 10000,
         },
         removeOnComplete: true,
     },

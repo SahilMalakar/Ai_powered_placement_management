@@ -12,12 +12,11 @@ if (!serverConfig.GEMINI_API_KEY) {
 }
 
 // Model names to try in order (Primary -> Fallbacks)
-// We use 2.0 Flash as primary for its speed and 1.5 Flash/Pro as fallbacks.
+// gemini-2.5-flash has the best free tier quota; 2.0-flash and 2.0-flash-lite as fallbacks.
 const MODEL_NAMES = [
+    'gemini-2.5-flash',
     'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-8b',
-    'gemini-1.5-pro',
+    'gemini-2.0-flash-lite',
 ];
 
 const createModel = (modelName: string) => {
@@ -25,7 +24,6 @@ const createModel = (modelName: string) => {
         model: modelName,
         temperature: 0.1,
         apiKey: serverConfig.GEMINI_API_KEY,
-        maxOutputTokens: 5000,
     });
 };
 

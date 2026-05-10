@@ -52,7 +52,7 @@ export const initializeAtsWorker = async () => {
 
                 // Mark as FAILED in database
                 await updateAtsResult(atsResultId, { status: 'FAILED' }).catch(
-                    () => {}
+                    () => { }
                 );
 
                 if (isRateLimit) {
