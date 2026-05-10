@@ -80,13 +80,13 @@ export function ExperienceTab({ onNext, onPrev }: ExperienceTabProps) {
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           {experiences.map((exp) => (
             <Card key={exp.id} className={cn("bg-card shadow-card border-border overflow-hidden", isPending && "opacity-50")}>
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-bold text-foreground font-heading">{exp.role} — {exp.company}</h4>
+                    <h4 className="font-bold text-foreground font-heading ">{exp.role} — {exp.company}</h4>
                     <p className="text-sm text-muted-foreground mt-1 font-body">
                       {new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} – 
                       {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : "Present"} 

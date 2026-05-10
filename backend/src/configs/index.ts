@@ -5,7 +5,7 @@ type ServerConfig = {
     DATABASE_URL: string;
     JWT_SECRET: string;
     REFRESH_TOKEN_SECRET: string;
-    GOOGLE_API_KEY: string;
+    GEMINI_API_KEY: string;
     REDIS_URL: string;
     MAIL_PASS: string;
     MAIL_USER: string;
@@ -29,7 +29,7 @@ export const serverConfig: ServerConfig = {
         'postgresql://postgres:sweety@12345@localhost:5432/placement_db',
     JWT_SECRET: process.env.JWT_SECRET!,
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
-    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
     REDIS_URL: process.env.REDIS_URL!,
     MAIL_PASS: process.env.MAIL_PASS!,
     MAIL_USER: process.env.MAIL_USER!,

@@ -19,7 +19,6 @@ import type { NotificationTypes } from '../../../types/admin/notification.js';
 import { addBulkEmailsToQueue } from '../../../queues/notification.queue.js';
 import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
 import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
-import { JobStatus, Branch } from '../../../prisma/generated/prisma/enums.js';
 
 export const createJobService = async (jobData: CreateJobInput) => {
     const job = await createJob(jobData as JobCreateInput);
