@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                color: #001D39;
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+                background-color: #f8fafc;
+            }
+            .wrapper {
+                width: 100%;
+                background-color: #f8fafc;
+                padding: 40px 20px;
+                box-sizing: border-box;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background: #ffffff;
+                border: 1px solid rgba(0, 0, 0, 0.07);
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            }
+            .header {
+                background: linear-gradient(135deg, #818cf8, #c084fc);
+                color: #ffffff;
+                padding: 30px 40px;
+                text-align: center;
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+            .content {
+                padding: 40px;
+            }
+            .salutation {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 20px;
+                color: #001D39;
+            }
+            .message-body {
+                font-size: 15px;
+                color: #49769F;
+                white-space: pre-line;
+                margin-bottom: 30px;
+            }
+            .btn-container {
+                text-align: center;
+                margin: 35px 0 15px 0;
+            }
+            .btn {
+                display: inline-block;
+                background: linear-gradient(135deg, #818cf8, #c084fc);
+                color: #ffffff !important;
+                text-decoration: none;
+                padding: 12px 30px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 15px;
+                box-shadow: 0 4px 12px rgba(129, 140, 248, 0.25);
+                transition: transform 0.2s ease;
+            }
+            .divider {
+                border: 0;
+                border-top: 1px solid rgba(0, 0, 0, 0.07);
+                margin: 30px 0;
+            }
+            .footer {
+                font-size: 13px;
+                color: #7BBDE8;
+                text-align: center;
+            }
+            .footer p {
+                margin: 5px 0;
+            }
+            .signature {
+                font-size: 14px;
+                font-weight: 500;
+                color: #001D39;
+                margin-top: 25px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="container">
+                <div class="header">
+                    <h2>Placement Cell Announcement</h2>
+                </div>
+                <div class="content">
+                    <p class="salutation">Dear {{studentName}},</p>
+                    
+                    <div class="message-body">
+                        {{message}}
+                    </div>
+
+                    {{#if hasLink}}
+                    <div class="btn-container">
+                        <a href="{{link}}" target="_blank" class="btn">{{linkLabel}}</a>
+                    </div>
+                    {{/if}}
+
+                    <div class="signature">
+                        Best regards,<br>
+                        <strong>{{senderName}}</strong><br>
+                        <span style="color: #7BBDE8; font-size: 12px;">Training & Placement Officer</span>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="footer">
+                        <p>This is an official communication from the Training & Placement Cell.</p>
+                        <p>Please do not reply directly to this email.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
