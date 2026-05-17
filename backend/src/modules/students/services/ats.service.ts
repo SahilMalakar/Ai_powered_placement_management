@@ -121,7 +121,30 @@ export const getAtsResultsService = async (
     page: number = 1,
     limit: number = 10
 ) => {
-    return await findAtsResultsByUserId(userId, page, limit);
+    const history = await findAtsResultsByUserId(userId, page, limit);
+    const todayCount = await countAtsAnalysesToday(userId);
+    return {
+        ...history,
+        todayCount,
+    };
+};
+
+// Service to hard-delete a specific ATS report.
+export const deleteAtsResultService = async (id: number, userId: number) => {
+    const result = await findAtsResultById(id, userId);
+    if (!result) {
+        throw new NotFoundError('ATS analysis report not found.');
+    }
+
+    // Edge Case Guard: Prevent deletion of actively running analyses (PENDING/PROCESSING)
+    // to avoid background worker failure logs or inconsistent data states.
+    if (result.status === 'PENDING' || result.status === 'PROCESSING') {
+        throw new BadRequestError(
+            'Cannot delete an ATS analysis report while it is still processing.'
+        );
+    }
+
+    return await deleteAtsResult(id);
 };
 
 

@@ -6,6 +6,7 @@ import {
     requestAtsAnalysisService,
     getAtsResultsService,
     getAtsStatusService,
+    deleteAtsResultService,
 } from '../services/ats.service.js';
 import { BadRequestError } from '../../../utils/errors/httpErrors.js';
 import fs from 'fs/promises';
@@ -84,6 +85,26 @@ export const getAtsResultsController = asyncHandler(
         const results = await getAtsResultsService(req.user.userId, page, limit);
 
         return sendSuccess(res, results, 'ATS reports fetched successfully.');
+    }
+);
+
+// Controller to handle DELETE /students/ats/:id
+export const deleteAtsResultController = asyncHandler(
+    async (req: Request, res: Response) => {
+        if (!req.user) {
+            throw new BadRequestError('Unauthorized user session.');
+        }
+
+        const { id } = req.params;
+        const numericId = Number(id);
+
+        if (isNaN(numericId)) {
+            throw new BadRequestError('Invalid report ID provided.');
+        }
+
+        await deleteAtsResultService(numericId, req.user.userId);
+
+        return sendSuccess(res, null, 'ATS report deleted successfully.', HTTP_STATUS.OK);
     }
 );
 

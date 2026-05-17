@@ -3,9 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useAtsAnalyze } from '@/hooks/student/useAtsAnalyze';
 import { useAtsHistory } from '@/hooks/student/useAtsHistory';
+import { useDeleteAts } from '@/hooks/student/useDeleteAts';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, ChevronRight, History } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileText, Calendar, ChevronRight, History, Trash2, Loader2 } from 'lucide-react';
 import { AtsUploadSection } from '@/components/student/ats/AtsUploadSection';
 
 export default function ATSAnalyzerPage() {
@@ -18,6 +20,7 @@ export default function ATSAnalyzerPage() {
   });
 
   const { data: historyData } = useAtsHistory(1, 10);
+  const { mutate: deleteAts, isPending: isDeleting, variables: deletingId } = useDeleteAts();
 
   const handleAnalyze = (file: File, jd: string) => {
     const formData = new FormData();
@@ -28,6 +31,11 @@ export default function ATSAnalyzerPage() {
 
   const handleViewHistoryItem = (id: number) => {
     router.push(`/ats/${id}`);
+  };
+
+  const handleDelete = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    deleteAts(id);
   };
 
   return (
@@ -80,7 +88,20 @@ export default function ATSAnalyzerPage() {
                     </div>
                   </div>
 
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 z-10"
+                    disabled={isDeleting && deletingId === item.id}
+                    onClick={(e) => handleDelete(e, item.id)}
+                  >
+                    {isDeleting && deletingId === item.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
                 </Card>
               ))}
             </div>

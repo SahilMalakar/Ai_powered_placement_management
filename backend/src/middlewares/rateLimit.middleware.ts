@@ -48,3 +48,30 @@ export const applicationRateLimiter = rateLimit({
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
+
+// Custom rate limiter for ATS creation.
+// Limit: 5 ATS analyses per 24 hours.
+// Partitioned by User ID for precision.
+export const atsRateLimiter = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    max: 5, // Limit each student to 5 ATS reports per day
+    keyGenerator: (req) => {
+        return (
+            (
+                req as unknown as { user?: { userId?: number } }
+            ).user?.userId?.toString() ||
+            req.ip ||
+            'unknown-ip'
+        );
+    },
+    validate: { default: false },
+    handler: (req, res, next) => {
+        next(
+            new ForbiddenError(
+                'Daily ATS analysis limit (5/day) reached. Try again tomorrow.'
+            )
+        );
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});

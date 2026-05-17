@@ -27,6 +27,7 @@ export interface AtsStatusResponse {
 export interface AtsHistoryResponse {
   results: AtsStatusResponse[];
   total: number;
+  todayCount?: number;
 }
 
 export const atsService = {
@@ -44,5 +45,9 @@ export const atsService = {
 
   getHistory: async (page: number = 1, limit: number = 10): Promise<AtsHistoryResponse> => {
     return api.get(`/students/ats?page=${page}&limit=${limit}`).then(r => r.data.data);
+  },
+
+  deleteAts: async (id: number): Promise<void> => {
+    return api.delete(`/students/ats/${id}`).then(r => r.data.data);
   }
 };

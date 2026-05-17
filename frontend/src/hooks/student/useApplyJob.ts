@@ -10,6 +10,7 @@ export const useApplyJob = () => {
     mutationFn: (jobId: number) => applyToJob(jobId),
     onSuccess: (data, jobId) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.JOBS] });
+      queryClient.invalidateQueries({ queryKey: ["applications", "my"] });
       toast.success(data.message || "Applied successfully.");
     },
     onError: (error: any) => {

@@ -2,10 +2,12 @@ import { Router } from 'express';
 import { authMiddleware } from '../../../middlewares/auth.middleware.js';
 import { requireStudent } from '../../../middlewares/rbac.middleware.js';
 import { atsUpload } from '../../../utils/fileHandler/multer.js';
+import { atsRateLimiter } from '../../../middlewares/rateLimit.middleware.js';
 import {
     requestAtsAnalysisController,
     getAtsResultsController,
     getAtsStatusController,
+    deleteAtsResultController,
 } from '../../../modules/students/controllers/ats.controller.js';
 
 /**
@@ -69,6 +71,7 @@ atsRouter.post(
     '/analyze',
     authMiddleware,
     requireStudent,
+    atsRateLimiter,
     atsUpload.single('resume'),
     requestAtsAnalysisController
 );
@@ -165,6 +168,46 @@ atsRouter.get(
  *                       type: integer
  */
 atsRouter.get('/', authMiddleware, requireStudent, getAtsResultsController);
+
+/**
+ * @swagger
+ * /api/v1/students/ats/{id}:
+ *   delete:
+ *     summary: Hard delete an ATS report
+ *     description: Permanently deletes a specific COMPLETED or FAILED ATS analysis report.
+ *     tags: [ATS]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the ATSResult record.
+ *     responses:
+ *       200:
+ *         description: ATS report deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "ATS report deleted successfully."
+ *                 data:
+ *                   type: null
+ *       400:
+ *         description: Invalid report ID provided.
+ *       404:
+ *         description: ATS analysis report not found.
+ */
+atsRouter.delete('/:id', authMiddleware, requireStudent, deleteAtsResultController);
 
 export { atsRouter };
 
