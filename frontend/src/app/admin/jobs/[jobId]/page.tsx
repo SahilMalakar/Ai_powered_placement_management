@@ -431,9 +431,11 @@ export default function AdminJobDetailPage() {
       </Tabs>
 
       {/* Applicant Details Side Panel */}
-      <Sheet open={!!activeApplicant} onOpenChange={(open) => !open && setActiveApplicant(null)}>
-        <ApplicantDetailsSheet applicant={activeApplicant} />
-      </Sheet>
+      <ApplicantDetailsSheet
+        applicant={activeApplicant}
+        open={!!activeApplicant}
+        onOpenChange={(open) => !open && setActiveApplicant(null)}
+      />
     </div>
   );
 }

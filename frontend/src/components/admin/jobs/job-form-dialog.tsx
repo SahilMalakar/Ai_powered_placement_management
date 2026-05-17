@@ -60,7 +60,7 @@ export function JobFormDialog({ job, trigger, open: externalOpen, onOpenChange: 
       requiredCgpa: 0,
       allowedBranches: [],
       backlogAllowed: false,
-      status: "ACTIVE",
+      status: "DRAFT",
       deadline: "",
     },
   });
@@ -75,7 +75,7 @@ export function JobFormDialog({ job, trigger, open: externalOpen, onOpenChange: 
         requiredCgpa: job.requiredCgpa || 0,
         allowedBranches: job.allowedBranches || [],
         backlogAllowed: job.backlogAllowed || false,
-        status: job.status || "ACTIVE",
+        status: job.status || "DRAFT",
         deadline: job.deadline ? new Date(job.deadline).toISOString() : "",
       });
     } else {
@@ -86,7 +86,7 @@ export function JobFormDialog({ job, trigger, open: externalOpen, onOpenChange: 
         requiredCgpa: 0,
         allowedBranches: [],
         backlogAllowed: false,
-        status: "ACTIVE",
+        status: "DRAFT",
         deadline: "",
       });
     }

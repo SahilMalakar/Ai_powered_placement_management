@@ -21,7 +21,7 @@ export const createJobSchema = z.object({
   requiredCgpa: z.number().min(0).max(10),
   allowedBranches: z.array(z.enum(BranchEnum)).min(1, "Select at least one branch"),
   backlogAllowed: z.boolean(),
-  status: z.enum(JobStatusEnum),
+  status: z.enum(JobStatusEnum).optional(),
   deadline: z.string().min(1, "Deadline is required"),
 });
 

@@ -84,22 +84,11 @@ const data: { navMain: NavGroup[] } = {
           url: "/admin/students",
           icon: Users,
         },
-        {
-          title: "Verifications",
-          url: "/admin/verification",
-          icon: ShieldCheck,
-          badge: "12", // Placeholder for actual count
-        },
       ],
     },
     {
       title: "Intelligence",
       items: [
-        {
-          title: "ATS Analytics",
-          url: "/admin/analytics",
-          icon: BarChart3,
-        },
         {
           title: "Export Center",
           url: "/admin/export",
