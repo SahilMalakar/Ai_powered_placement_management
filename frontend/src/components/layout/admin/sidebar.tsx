@@ -23,9 +23,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useAppStore } from "@/store/useAppStore"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface NavItem {
   title: string
@@ -121,7 +122,17 @@ const data: { navMain: NavGroup[] } = {
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppStore((state) => state.user)
+  const { setUser, setAuthenticated } = useAppStore()
   const pathname = usePathname()
+  const router = useRouter()
+  const queryClient = useQueryClient()
+
+  const handleLogout = () => {
+    setUser(null)
+    setAuthenticated(false)
+    queryClient.clear()
+    router.push("/login")
+  }
 
   // Flatten the navigation items for a single-level experience
   const allItems: NavItem[] = data.navMain.flatMap(group => group.items)
@@ -202,17 +213,34 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-0 border-t border-sidebar-border">
+        {/* User info */}
+        <div className="px-5 py-3 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center flex items-center gap-3">
+          <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-data-[collapsible=icon]:mx-auto">
+            <span className="text-xs font-bold text-primary">
+              {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "A"}
+            </span>
+          </div>
+          <div className="flex flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
+            <span className="text-sm font-medium text-sidebar-foreground truncate">
+              {user?.name || "Admin"}
+            </span>
+            <span className="text-[11px] text-sidebar-foreground/50 truncate">
+              {user?.email || "admin@placementcube.com"}
+            </span>
+          </div>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
-              className="w-full h-12 px-5 text-error hover:bg-error/5 hover:text-error transition-colors rounded-none"
+              className="w-full h-11 px-5 text-error hover:bg-error/5 hover:text-error transition-colors rounded-none border-t border-sidebar-border"
+              onClick={handleLogout}
             >
               <LogOut className="size-4 mr-3" />
               <span className="font-medium">Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="px-5 py-3 border-t border-sidebar-border bg-sidebar/30">
+        <div className="px-5 py-2.5 border-t border-sidebar-border bg-sidebar/30 group-data-[collapsible=icon]:hidden">
           <p className="text-[10px] text-sidebar-foreground/40 font-medium">
             © 2026 PlacementCube · Admin v1.0
           </p>

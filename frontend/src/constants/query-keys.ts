@@ -18,6 +18,7 @@ export const QUERY_KEYS = {
   STUDENT_ATS_HISTORY: "student-ats-history",
   ADMIN_TEAM: "admin-team",
   ADMIN_MESSAGES: "admin-messages",
+  ADMIN_DASHBOARD_STATS: "admin-dashboard-stats",
   STUDENT_ANNOUNCEMENTS: "student-announcements",
 } as const;
 

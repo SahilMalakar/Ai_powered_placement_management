@@ -17,6 +17,7 @@ import studentRouter from './admin/students.js';
 import jobApplicationRouter from './admin/jobApplication.js';
 import teamRouter from './admin/team.js';
 import { messageRouter } from './admin/message.js';
+import { dashboardRouter } from './admin/dashboard.js';
 
 const router: Router = Router();
 
@@ -40,5 +41,6 @@ router.use('/v1/admin/job', jobRouter);
 router.use("/v1/admin/students", studentRouter);
 router.use("/v1/admin/team", teamRouter);
 router.use("/v1/admin/messages", messageRouter);
+router.use("/v1/admin/dashboard", dashboardRouter);
 
 export { router };
