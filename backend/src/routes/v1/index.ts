@@ -12,6 +12,7 @@ import { atsRouter } from './students/ats.js';
 import { documentRouter } from './students/document.js';
 import { verificationRouter } from './students/verification.js';
 import { applicationRouter } from './students/application.js';
+import { announcementsRouter } from './students/announcements.js';
 import studentRouter from './admin/students.js';
 import jobApplicationRouter from './admin/jobApplication.js';
 import teamRouter from './admin/team.js';
@@ -31,6 +32,7 @@ router.use('/v1/students/ats', atsRouter);
 router.use('/v1/students/document', documentRouter);
 router.use('/v1/students/verification', verificationRouter);
 router.use('/v1/students/application', applicationRouter);
+router.use('/v1/students/announcements', announcementsRouter);
 
 
 router.use("/v1/admin-apps", jobApplicationRouter);

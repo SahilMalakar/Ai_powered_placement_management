@@ -251,6 +251,20 @@ model ATSResult {
   @@index([userId])
 }
 
+model NotificationMessage {
+  id          Int                @id @default(autoincrement())
+  message     String
+  link        String?
+  branches    Branch[]
+  status      NotificationStatus @default(QUEUED)
+  createdById Int
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  // Relations
+  createdBy   User     @relation(fields: [createdById], references: [id])
+}
+
 enum ATSAnalysisType {
   GENERIC // analyzed against general backend/role template
   JD_MATCHED // analyzed against a specific job description
@@ -313,22 +327,9 @@ enum ResumeStatus {
   FAILED
 }
 
-model NotificationMessage {
-  id          Int                @id @default(autoincrement())
-  message     String
-  link        String?
-  branches    Branch[]
-  status      NotificationStatus @default(QUEUED)
-  createdById Int
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-
-  // Relations
-  createdBy   User     @relation(fields: [createdById], references: [id])
-}
 
 enum NotificationStatus {
   QUEUED
-  PROCESSING
+  COMPLETED
   FAILED
 }

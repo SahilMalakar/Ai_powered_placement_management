@@ -121,12 +121,19 @@ export const sendAdminMessageService = async (params: {
                 const chunk = emailJobs.slice(i, i + CHUNK_SIZE);
                 await addBulkEmailsToQueue(chunk);
             }
+            await updateMessageStatusRepository(savedMessage.id, 'COMPLETED');
+            savedMessage.status = 'COMPLETED';
         } catch (error) {
             console.error(`❌ Redis Queue Insertion Failed for announcement ID ${savedMessage.id}:`, error);
             // Robust rollback/failover status flag
             await updateMessageStatusRepository(savedMessage.id, 'FAILED');
+            savedMessage.status = 'FAILED';
             throw error; // Re-throw to express error handler
         }
+    } else {
+        // If there are no target students, mark as COMPLETED immediately
+        await updateMessageStatusRepository(savedMessage.id, 'COMPLETED');
+        savedMessage.status = 'COMPLETED';
     }
 
     return {

@@ -5,6 +5,7 @@ import {
   FileScan,
   User,
   ClipboardList,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,6 +20,11 @@ export const studentNavItems: NavItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Announcements",
+    href: "/announcements",
+    icon: Bell,
   },
   {
     label: "Job Board",

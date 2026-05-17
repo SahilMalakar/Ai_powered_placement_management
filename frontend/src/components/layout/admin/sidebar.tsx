@@ -9,6 +9,7 @@ import {
   UserPlus,
   Settings,
   LogOut,
+  MessageSquare,
 } from "lucide-react"
 
 import {
@@ -49,6 +50,11 @@ const data: { navMain: NavGroup[] } = {
           title: "Dashboard",
           url: "/admin/dashboard",
           icon: LayoutDashboard,
+        },
+        {
+          title: "Announcements",
+          url: "/admin/messages",
+          icon: MessageSquare,
         },
       ],
     },
