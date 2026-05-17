@@ -1,6 +1,5 @@
 import { Worker, Job, UnrecoverableError } from 'bullmq';
 import type { NotificationTypes } from '../types/admin/notification.js';
-import { BadRequestError } from '../utils/errors/httpErrors.js';
 import { getRedisConnection } from '../configs/redis.config.js';
 import { readMailTemplate } from '../utils/templates/mail.templet.handler.js';
 import {

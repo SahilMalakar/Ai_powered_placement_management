@@ -26,6 +26,7 @@ model User {
   atsResults   ATSResult[]
   semesters    SemesterResult[]
   jobsCreated  Job[]
+  notificationsCreated NotificationMessage[]
 
   @@index([role])
 }
@@ -310,4 +311,17 @@ enum ResumeStatus {
   GENERATING
   COMPLETED
   FAILED
+}
+
+model NotificationMessage {
+  id          Int      @id @default(autoincrement())
+  message     String
+  link        String?
+  branches    Branch[]
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdBy   User     @relation(fields: [createdById], references: [id])
 }
