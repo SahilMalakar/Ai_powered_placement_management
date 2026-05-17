@@ -1,14 +1,12 @@
 "use client";
 
 import {
-  MoreVertical,
   Calendar,
   Briefcase,
   Users,
   Power,
   PowerOff,
   Edit3,
-  Trash2,
   Loader2,
   GraduationCap,
   GitBranch,
@@ -17,14 +15,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { format, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -55,7 +45,6 @@ const STATUS_STYLES: Record<
 interface AdminJobCardProps {
   job: Job;
   onEdit: (job: Job) => void;
-  onDelete: (job: Job) => void;
   onToggleStatus: (params: { id: string; currentStatus: string }) => void;
   isToggling: boolean;
 }
@@ -63,7 +52,6 @@ interface AdminJobCardProps {
 export function AdminJobCard({
   job,
   onEdit,
-  onDelete,
   onToggleStatus,
   isToggling,
 }: AdminJobCardProps) {
@@ -226,27 +214,6 @@ export function AdminJobCard({
                 </>
               )}
             </Button>
-
-            {/* More actions dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                    <MoreVertical className="size-4" />
-                  </button>
-                }
-              />
-              <DropdownMenuContent align="end" className="w-48 shadow-modal">
-                <DropdownMenuLabel>More Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="gap-2 cursor-pointer text-error focus:text-error focus:bg-error/10"
-                  onClick={() => onDelete(job)}
-                >
-                  <Trash2 className="size-4" /> Delete Posting
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </CardContent>

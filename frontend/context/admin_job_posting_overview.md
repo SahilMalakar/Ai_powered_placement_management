@@ -37,11 +37,10 @@ Here are the central files that power the admin jobs listing, details, and creat
 
 | UI / Component Layer | File Path (Click to view) | Role |
 | :--- | :--- | :--- |
-| **Main Jobs Page** | [page.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/app/admin/jobs/page.tsx) | Handles lists, skeletons, status toggles, pagination, and anchors creation/edition/deletion dialog states. |
+| **Main Jobs Page** | [page.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/app/admin/jobs/page.tsx) | Handles lists, skeletons, status toggles, pagination, and anchors creation/edition dialog states. |
 | **Job Details & Applicants** | [page.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/app/admin/jobs/%5BjobId%5D/page.tsx) | Displays job specifications, applicant data grids with multi-select, and triggers application status updates (e.g. `SHORTLISTED`, `SELECTED`). |
 | **Job Form Dialog** | [job-form-dialog.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/components/admin/jobs/job-form-dialog.tsx) | A multi-mode `Dialog` (`DialogContent`) which handles both **Create** and **Update** modes using `react-hook-form` and `@hookform/resolvers/zod`. |
 | **Job Filters** | [job-filters.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/components/admin/jobs/job-filters.tsx) | Renders input boxes, state pickers, and branch checkboxes, debouncing search parameters to prevent excessive API hits. |
-| **Job Delete Dialog** | [delete-job-dialog.tsx](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/components/admin/jobs/delete-job-dialog.tsx) | Handles confirmation flow and calls `useDeleteJob` mutation. |
 
 ---
 
@@ -64,7 +63,6 @@ Located at [job.service.ts](file:///e:/Devlopment%20101/Tnp-placement-final-year
 - `updateJob(id, data)`: `PATCH /admin/job/${id}`
 - `activateJob(id)`: `POST /admin/job/${id}/activate`
 - `deactivateJob(id)`: `POST /admin/job/${id}/deactivate`
-- `deleteJob(id)`: `DELETE /admin/job/${id}`
 
 ### C. TanStack Query Hooks
 Located at [useAdminJobs.ts](file:///e:/Devlopment%20101/Tnp-placement-final-year/frontend/src/hooks/admin/useAdminJobs.ts).
@@ -73,7 +71,6 @@ Located at [useAdminJobs.ts](file:///e:/Devlopment%20101/Tnp-placement-final-yea
 - `useCreateJob()`: Performs post-request and invalidates `ADMIN_JOBS` queries on success, showing custom Sonner toasts.
 - `useUpdateJob(id)`: Performs patch update and invalidates specific list/detail cache keys.
 - `useToggleJobStatus()`: Resolves current status and executes either `activateJob` or `deactivateJob`.
-- `useDeleteJob()`: Performs deletion request and invalidates list keys.
 
 ---
 

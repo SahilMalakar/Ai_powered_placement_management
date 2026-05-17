@@ -4,10 +4,7 @@ import * as React from "react"
 import {
   LayoutDashboard,
   Briefcase,
-  FileText,
   Users,
-  ShieldCheck,
-  BarChart3,
   Download,
   UserPlus,
   Settings,

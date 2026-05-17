@@ -1,12 +1,11 @@
 "use client";
 
-import { Building2, Loader2, Plus } from "lucide-react";
+import { Building2, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminJobs, useToggleJobStatus } from "@/hooks/admin/useAdminJobs";
 import { JobFormDialog } from "@/components/admin/jobs/job-form-dialog";
-import { DeleteJobDialog } from "@/components/admin/jobs/delete-job-dialog";
 import { AdminJobCard } from "@/components/admin/jobs/job-card";
 import {
   AdminJobFiltersBar,
@@ -90,7 +89,6 @@ export default function AdminJobsPage() {
   const pagination = response?.data?.pagination;
 
   const [editingJob, setEditingJob] = useState<Job | null>(null);
-  const [deletingJob, setDeletingJob] = useState<Job | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleFilterChange = (newFilters: Partial<AdminJobFilters>) => {
@@ -170,7 +168,6 @@ export default function AdminJobsPage() {
                 key={job.id}
                 job={job}
                 onEdit={setEditingJob}
-                onDelete={setDeletingJob}
                 onToggleStatus={toggleStatus}
                 isToggling={isToggling}
               />
@@ -201,16 +198,6 @@ export default function AdminJobsPage() {
         onOpenChange={(open) => !open && setEditingJob(null)}
       />
 
-      {/* Delete Confirmation */}
-      {deletingJob && (
-        <DeleteJobDialog
-          jobId={String(deletingJob.id)}
-          jobTitle={deletingJob.title}
-          companyName={deletingJob.company}
-          open={!!deletingJob}
-          onOpenChange={(open) => !open && setDeletingJob(null)}
-        />
-      )}
     </div>
   );
 }
