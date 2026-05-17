@@ -7,13 +7,13 @@ export const findAllAdmins = async () => {
             role: {
                 in: ['ADMIN', 'SUPER_ADMIN'],
             },
-            deletedAt: null,
         },
         select: {
             id: true,
             email: true,
             role: true,
             createdAt: true,
+            deletedAt: true,
         },
         orderBy: {
             createdAt: 'desc',
