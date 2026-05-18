@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { adminStudentService } from "@/services/admin/student.service";
 import { toast } from "sonner";
 import { QUERY_KEYS } from "@/constants/query-keys";
@@ -15,6 +15,7 @@ export const useAdminStudents = (filters: GetAllStudentsQueryInput) => {
     queryKey: ADMIN_STUDENT_KEYS.list(filters),
     queryFn: () => adminStudentService.getAllStudents(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    placeholderData: keepPreviousData, // Keep old data visible during refetch
   });
 };
 

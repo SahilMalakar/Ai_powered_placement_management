@@ -7,6 +7,7 @@ import { initializeAtsWorker } from './workers/ats.worker.js';
 import { initializeResumeWorker } from './workers/resume.worker.js';
 import { initializeDocumentWorker } from './workers/document.worker.js';
 import { initializeVerificationWorker } from './workers/verification.worker.js';
+import { initializeExportWorker } from './workers/export.worker.js';
 import { clearUploadsDirectory } from './utils/fileHandler/cleanup.js';
 
 // Cleanup and Worker initialization
@@ -18,6 +19,7 @@ try {
     initializeResumeWorker();
     initializeDocumentWorker();
     initializeVerificationWorker();
+    initializeExportWorker();
     console.log(`Successfully initialized background workers`);
 } catch (error) {
     console.log(error);

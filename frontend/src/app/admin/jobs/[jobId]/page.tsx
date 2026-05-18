@@ -29,6 +29,7 @@ import {
   useJobApplicants,
   useUpdateApplicationStatus,
 } from "@/hooks/admin/useAdminJobApplications";
+import { useAdminExport } from "@/hooks/admin/useExport";
 import { ApplicantTable } from "@/components/admin/application/applicant-table";
 import {
   ApplicantFiltersBar,
@@ -88,6 +89,7 @@ export default function AdminJobDetailPage() {
     useJobApplicants(jobId, apiParams);
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateApplicationStatus(jobId);
+  const { exportData, isExporting } = useAdminExport();
 
   const job = jobResponse?.data;
   const applicants = applicantsResponse?.data?.applicants || [];
@@ -96,6 +98,17 @@ export default function AdminJobDetailPage() {
   // ─── Handlers ──────────────────────────────────────────────────
   const handleFilterChange = (newFilters: Partial<ApplicantFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters, page: newFilters.page || 1 }));
+  };
+
+  const handleExport = () => {
+    exportData({
+      type: "applications",
+      jobId: Number(jobId),
+      search: filters.search,
+      status: filters.status,
+      branch: filters.branch,
+      verificationStatus: filters.verificationStatus,
+    });
   };
 
   const toggleSelect = (id: number) => {
@@ -192,8 +205,13 @@ export default function AdminJobDetailPage() {
           <Button variant="outline" size="sm" className="shadow-button">
             Edit Job
           </Button>
-          <Button size="sm" className="shadow-button btn-primary">
-            Export List
+          <Button 
+            size="sm" 
+            className="shadow-button btn-primary"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? "Exporting..." : "Export List"}
           </Button>
         </div>
       </div>
