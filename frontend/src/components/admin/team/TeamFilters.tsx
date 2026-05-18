@@ -28,18 +28,18 @@ export function TeamFilters({
           placeholder="Search by email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-transparent pl-9 pr-4 py-2 border border-input rounded-md text-sm outline-hidden focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-[#141414]"
+          className="w-full bg-transparent pl-9 pr-4 py-2 border border-input rounded-md text-sm outline-hidden focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-card"
         />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Status Segmented Control */}
-        <div className="flex bg-muted/30 dark:bg-[#141414] border border-border rounded-lg p-0.5 self-start">
+        <div className="flex bg-muted/30 dark:bg-card border border-border rounded-lg p-0.5 self-start">
           <button
             onClick={() => setStatusFilter("ACTIVE")}
             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer border-none ${
               statusFilter === "ACTIVE"
-                ? "bg-card text-foreground shadow-subtle font-sans"
+                ? "bg-card text-foreground shadow-card font-sans"
                 : "text-muted-foreground hover:text-foreground font-sans"
             }`}
           >
@@ -49,7 +49,7 @@ export function TeamFilters({
             onClick={() => setStatusFilter("DEACTIVATED")}
             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer border-none ${
               statusFilter === "DEACTIVATED"
-                ? "bg-card text-foreground shadow-subtle font-sans"
+                ? "bg-card text-foreground shadow-card font-sans"
                 : "text-muted-foreground hover:text-foreground font-sans"
             }`}
           >
@@ -59,7 +59,7 @@ export function TeamFilters({
             onClick={() => setStatusFilter("ALL")}
             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer border-none ${
               statusFilter === "ALL"
-                ? "bg-card text-foreground shadow-subtle font-sans"
+                ? "bg-card text-foreground shadow-card font-sans"
                 : "text-muted-foreground hover:text-foreground font-sans"
             }`}
           >
@@ -71,7 +71,7 @@ export function TeamFilters({
         <select
           value={roleFilter}
           onChange={(e: any) => setRoleFilter(e.target.value)}
-          className="bg-transparent border border-input rounded-md px-3 py-2 text-xs font-bold outline-hidden focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-[#141414] font-sans"
+          className="bg-transparent border border-input rounded-md px-3 py-2 text-xs font-bold outline-hidden focus:border-ring focus:ring-2 focus:ring-ring/20 dark:bg-card font-sans"
         >
           <option value="ALL">All Roles</option>
           <option value="SUPER_ADMIN">Super Admin Only</option>

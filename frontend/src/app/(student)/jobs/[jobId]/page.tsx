@@ -104,7 +104,7 @@ export default function JobDetailsPage() {
         <div className="space-y-4 flex-1">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl md:text-4xl font-heading font-bold text-navy dark:text-foreground leading-tight">
+              <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground leading-tight">
                 {title}
               </h1>
               {status === 'ACTIVE' && !isExpired && (
@@ -113,13 +113,13 @@ export default function JobDetailsPage() {
                 </Badge>
               )}
             </div>
-            <div className="flex items-center text-xl text-steel dark:text-muted-foreground font-medium gap-2">
-              <Building2 className="size-5 text-mist" />
+            <div className="flex items-center text-xl text-muted-foreground font-medium gap-2">
+              <Building2 className="size-5 text-muted-foreground" />
               {company}
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm text-mist dark:text-muted-foreground/70">
+          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground dark:text-muted-foreground/70">
             <div className="flex items-center gap-1.5">
               <Calendar className="size-4" />
               <span>Posted on {format(new Date(job.createdAt), "d MMM yyyy")}</span>
@@ -208,13 +208,13 @@ export default function JobDetailsPage() {
       {/* Quick Stats / Criteria */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-card p-6 rounded-xl border border-border/50 shadow-sm space-y-2">
-          <div className="flex items-center gap-2 text-mist dark:text-muted-foreground/60 text-sm font-medium">
+          <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground/60 text-sm font-medium">
             <GitBranch className="size-4" />
             Allowed Branches
           </div>
           <div className="flex flex-wrap gap-1.5">
             {allowedBranches.map((branch: string) => (
-              <Badge key={branch} variant="outline" className="bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+              <Badge key={branch} variant="outline" className="bg-secondary border-border text-foreground">
                 {branch}
               </Badge>
             ))}
@@ -222,23 +222,23 @@ export default function JobDetailsPage() {
         </div>
 
         <div className="bg-card p-6 rounded-xl border border-border/50 shadow-sm space-y-2">
-          <div className="flex items-center gap-2 text-mist dark:text-muted-foreground/60 text-sm font-medium">
+          <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground/60 text-sm font-medium">
             <GraduationCap className="size-4" />
             Min. CGPA Requirement
           </div>
-          <div className="text-2xl font-bold text-navy dark:text-foreground">
-            {requiredCgpa} <span className="text-sm font-normal text-mist">/ 10</span>
+          <div className="text-2xl font-bold text-foreground">
+            {requiredCgpa} <span className="text-sm font-normal text-muted-foreground">/ 10</span>
           </div>
         </div>
 
         <div className="bg-card p-6 rounded-xl border border-border/50 shadow-sm space-y-2">
-          <div className="flex items-center gap-2 text-mist dark:text-muted-foreground/60 text-sm font-medium">
+          <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground/60 text-sm font-medium">
             <AlertTriangle className="size-4" />
             Backlog Policy
           </div>
           <div className={cn(
             "text-lg font-semibold",
-            backlogAllowed ? "text-success" : "text-steel"
+            backlogAllowed ? "text-success" : "text-muted-foreground"
           )}>
             {backlogAllowed ? "Allowed" : "No Backlogs Allowed"}
           </div>
@@ -248,11 +248,11 @@ export default function JobDetailsPage() {
       {/* Main Content Sections */}
       <div className="space-y-8">
         <div className="bg-card p-8 rounded-2xl border border-border/50 shadow-sm space-y-6">
-          <h2 className="text-2xl font-heading font-bold text-navy dark:text-foreground border-b pb-4 border-border/50">
+          <h2 className="text-2xl font-heading font-bold text-foreground border-b pb-4 border-border/50">
             Job Description
           </h2>
           <div 
-            className="prose prose-slate dark:prose-invert max-w-none text-steel dark:text-muted-foreground leading-relaxed text-lg"
+            className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground leading-relaxed text-lg"
             dangerouslySetInnerHTML={{ __html: description }}
           />
         </div>

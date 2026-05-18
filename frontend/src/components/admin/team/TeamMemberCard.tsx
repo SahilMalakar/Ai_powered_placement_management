@@ -46,8 +46,8 @@ export function TeamMemberCard({
                 isDeleted
                   ? "bg-muted/80 text-muted-foreground"
                   : member.role === "SUPER_ADMIN"
-                  ? "bg-gradient-to-br from-[#818cf8] to-[#c084fc] text-white"
-                  : "bg-teal-blue/10 text-teal-blue border border-teal-blue/20"
+                  ? "bg-gradient-to-br from-brand-blue to-brand-indigo text-white"
+                  : "bg-brand-blue/10 text-brand-blue border border-brand-blue/20"
               }`}
             >
               {initialLetter}
@@ -110,7 +110,7 @@ export function TeamMemberCard({
             <Button
               variant="outline"
               onClick={() => onOpenReactivate(member.id, member.email, member.role)}
-              className="w-full h-9 text-xs font-bold rounded-md bg-[#1D9E75]/10 text-[#1D9E75] border border-[#1D9E75]/20 hover:bg-[#1D9E75] hover:text-white cursor-pointer"
+              className="w-full h-9 text-xs font-bold rounded-md bg-success/10 text-success border border-success/20 hover:bg-success hover:text-white cursor-pointer"
             >
               <RefreshCw className="size-3.5 mr-1.5 animate-spin-hover" /> Reactivate
             </Button>

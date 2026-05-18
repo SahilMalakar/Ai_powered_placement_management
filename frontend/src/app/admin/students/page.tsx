@@ -102,7 +102,7 @@ export default function AdminStudentsPage() {
           </p>
         </div>
         <Button 
-          className="h-10 px-5 bg-gradient-to-r from-[#818cf8] to-[#c084fc] hover:opacity-95 transition-all text-white font-bold text-xs gap-2 rounded-xl shadow-button border-none shrink-0 group"
+          className="h-10 px-5 bg-gradient-to-r from-brand-blue to-brand-indigo hover:opacity-90 transition-all text-white font-semibold text-xs gap-2 rounded-md shadow-button border-none shrink-0 group"
           onClick={handleExport}
           disabled={isExporting}
         >

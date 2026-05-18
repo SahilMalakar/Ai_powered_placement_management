@@ -64,8 +64,8 @@ export function ReactivateMemberDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md bg-card border border-border/80 shadow-heavy rounded-2xl p-6 dark:shadow-[0_24px_64px_rgba(0,0,0,0.80)]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-heading font-bold text-[#1D9E75] flex items-center gap-2">
-            <RefreshCw className="size-5 text-[#1D9E75]" /> Reactivate Member
+          <DialogTitle className="text-xl font-heading font-bold text-success flex items-center gap-2">
+            <RefreshCw className="size-5 text-success" /> Reactivate Member
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-1">
             Restoring account access for: <span className="font-mono text-foreground font-semibold break-all">{memberEmail}</span>
@@ -124,7 +124,7 @@ export function ReactivateMemberDialog({
             </Button>
             <Button
               type="submit"
-              className="bg-[#1D9E75] hover:bg-[#1D9E75]/95 text-white shadow-subtle font-bold text-xs rounded-md border-none cursor-pointer"
+              className="bg-success hover:bg-success/90 text-white shadow-button font-bold text-xs rounded-md border-none cursor-pointer"
               disabled={isPending}
             >
               {isPending ? "Restoring..." : "Restore Account"}

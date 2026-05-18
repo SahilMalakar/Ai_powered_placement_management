@@ -24,7 +24,7 @@ export function RecentApplications({ applications }: RecentApplicationsProps) {
         </h2>
         <Link 
           href="/applications" 
-          className="text-xs text-indigo-400 hover:text-[#c084fc] transition-colors"
+          className="text-xs text-brand-blue hover:text-brand-indigo transition-colors"
         >
           View history
         </Link>

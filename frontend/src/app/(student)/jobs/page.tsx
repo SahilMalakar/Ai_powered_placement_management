@@ -50,10 +50,10 @@ export default function JobsPage() {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-2">
-        <h1 className="font-heading text-3xl font-bold tracking-tight text-navy dark:text-foreground">
+        <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground">
           Job Board
         </h1>
-        <p className="text-steel dark:text-muted-foreground max-w-2xl">
+        <p className="text-muted-foreground max-w-2xl">
           Explore and apply for the latest placement opportunities. Stay updated with deadlines and eligibility criteria.
         </p>
       </div>
@@ -73,8 +73,8 @@ export default function JobsPage() {
         </div>
       ) : data?.jobs.length === 0 ? (
         <div className="py-12 text-center space-y-4 bg-card rounded-xl border border-dashed border-border/60">
-          <p className="text-steel dark:text-muted-foreground font-medium text-lg">No jobs found matching your filters.</p>
-          <p className="text-sm text-mist">Try adjusting your search or filters.</p>
+          <p className="text-muted-foreground font-medium text-lg">No jobs found matching your filters.</p>
+          <p className="text-sm text-muted-foreground">Try adjusting your search or filters.</p>
         </div>
       ) : (
         <>

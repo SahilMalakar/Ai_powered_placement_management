@@ -151,7 +151,7 @@ export default function AdminTeamPage() {
         {isSuperAdmin && (
           <Button 
             onClick={() => setIsAddOpen(true)}
-            className="h-10 bg-gradient-to-r from-[#818cf8] to-[#c084fc] text-white shadow-subtle hover:opacity-90 font-bold text-xs gap-2 rounded-md transition-all border-none cursor-pointer font-sans"
+            className="h-10 bg-gradient-to-r from-brand-blue to-brand-indigo text-white shadow-button hover:opacity-90 font-semibold text-xs gap-2 rounded-md transition-all border-none cursor-pointer"
           >
             <UserPlus className="size-4" /> Add Team Member
           </Button>

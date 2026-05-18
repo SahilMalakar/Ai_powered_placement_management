@@ -24,7 +24,7 @@ export function AtsProcessingState() {
       </div>
 
       <div className="w-full max-w-md h-1.5 bg-muted rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-[#818cf8] to-[#c084fc] animate-shimmer" style={{ width: '60%', backgroundSize: '200% 100%' }} />
+        <div className="h-full bg-gradient-to-r from-brand-blue to-brand-indigo animate-shimmer" style={{ width: '60%', backgroundSize: '200% 100%' }} />
       </div>
 
       <p className="text-[10px] uppercase font-bold text-muted-foreground/50 tracking-[0.2em]">

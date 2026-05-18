@@ -53,13 +53,13 @@ export function ResumeList() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-navy dark:text-foreground">Your Resumes</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-foreground font-heading">Your Resumes</h2>
           <p className="text-muted-foreground">Manage your AI-generated resumes and exports.</p>
         </div>
         <Button 
           onClick={() => generateResume()} 
           disabled={isGenerating || resumes?.some(r => r.status === 'GENERATING')}
-          className="bg-gradient-to-r from-[#818cf8] to-[#c084fc] hover:opacity-90 text-white shadow-button"
+          className="bg-gradient-to-r from-brand-blue to-brand-indigo hover:opacity-90 text-white shadow-button rounded-md"
         >
           {isGenerating ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -78,8 +78,8 @@ export function ResumeList() {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center p-16 text-center bg-white dark:bg-card rounded-xl border border-dashed shadow-sm">
-          <div className="h-16 w-16 bg-pale dark:bg-muted rounded-full flex items-center justify-center mb-4">
-            <FileText className="h-8 w-8 text-steel" />
+          <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <FileText className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-semibold mb-2">No resumes yet</h3>
           <p className="text-muted-foreground max-w-sm mb-6">
@@ -113,7 +113,7 @@ function ResumeCard({ resume }: { resume: Resume }) {
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="text-lg font-bold text-navy dark:text-foreground">
+            <CardTitle className="text-lg font-bold text-foreground font-heading">
               {resume.jsonData?.targetRole || `Resume v${resume.version}`}
             </CardTitle>
             <CardDescription className="text-xs">

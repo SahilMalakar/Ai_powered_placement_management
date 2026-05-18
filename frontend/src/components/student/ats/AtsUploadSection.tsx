@@ -131,7 +131,7 @@ export function AtsUploadSection({ onAnalyze, isPending }: AtsUploadSectionProps
         <Button
           onClick={handleAnalyze}
           disabled={!file || isPending}
-          className="gap-2 px-8 h-11 bg-gradient-to-br from-[#818cf8] to-[#c084fc] text-white shadow-subtle hover:opacity-90 transition-opacity"
+          className="gap-2 px-8 h-11 bg-gradient-to-br from-brand-blue to-brand-indigo text-white shadow-button hover:opacity-90 transition-all rounded-md"
         >
           <BarChart2 className="w-4 h-4" />
           {isPending ? "Analyzing..." : "Analyze resume"}

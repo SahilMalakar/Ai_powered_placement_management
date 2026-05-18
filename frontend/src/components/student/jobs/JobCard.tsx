@@ -70,14 +70,14 @@ export function JobCard({ job }: JobCardProps) {
       <CardContent className="pt-6">
         {/* Header: Icon + Title + Company */}
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-pale font-heading text-xl font-bold text-deep-blue dark:bg-muted dark:text-foreground">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted font-heading text-xl font-bold text-foreground">
             {initials}
           </div>
           <div className="flex-1 min-w-0 space-y-1">
             <h3 className="font-heading text-lg font-semibold leading-tight tracking-tight text-foreground">
               {title}
             </h3>
-            <div className="flex items-center gap-1.5 text-sm text-steel dark:text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Briefcase className="size-3.5 shrink-0" />
               <span className="font-medium">{company}</span>
             </div>
@@ -86,18 +86,18 @@ export function JobCard({ job }: JobCardProps) {
 
         {/* Badges: Branches, CGPA, Backlog, Deadline */}
         <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="outline" className="gap-1 bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+          <Badge variant="outline" className="gap-1 bg-secondary border-border text-foreground">
             <GitBranch className="size-3" />
             {allowedBranches.join(", ")}
           </Badge>
-          <Badge variant="outline" className="gap-1 bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground">
+          <Badge variant="outline" className="gap-1 bg-secondary border-border text-foreground">
             <GraduationCap className="size-3" />
             CGPA ≥ {requiredCgpa}
           </Badge>
           <Badge
             variant="outline"
             className={cn(
-              "bg-pale/30 border-pale text-deep-blue dark:bg-muted/50 dark:border-border dark:text-foreground",
+              "bg-secondary border-border text-foreground",
               backlogAllowed
                 ? "bg-success/10 border-success/20 text-success dark:bg-success/10 dark:border-success/20 dark:text-success"
                 : ""
@@ -109,7 +109,7 @@ export function JobCard({ job }: JobCardProps) {
 
         {/* Footer: Deadline + Apply */}
         <div className="mt-6 flex items-center justify-between border-t pt-4 border-border/50">
-          <div className="flex items-center gap-1.5 text-xs text-mist dark:text-muted-foreground/60">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             {isExpired ? (
               <>
                 <AlertTriangle className="size-3.5 text-error" />

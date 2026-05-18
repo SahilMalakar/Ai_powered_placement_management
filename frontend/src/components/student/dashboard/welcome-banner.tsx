@@ -19,7 +19,7 @@ export function WelcomeBanner({
     <Card className="relative overflow-hidden rounded-xl border border-border bg-card p-6 md:p-8 shadow-card flex flex-col md:flex-row justify-between items-start md:items-center gap-6 dark:bg-[#141414] dark:border-[#202020]">
       
       {/* Subtle Decorative Background Light Spot */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#818cf8]/10 to-[#c084fc]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-brand-blue/10 to-brand-indigo/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
 
       <div className="space-y-3 relative z-10">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground font-heading">

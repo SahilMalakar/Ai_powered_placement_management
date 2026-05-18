@@ -93,12 +93,12 @@ export function AnnouncementsList({ messages }: AnnouncementsListProps) {
     return (
       <div className="flex flex-col items-center justify-center p-16 text-center bg-white dark:bg-[#141414] border border-border/80 dark:border-[#202020] rounded-2xl shadow-card">
         <div className="h-16 w-16 bg-slate-50 dark:bg-[#1a1a1a] rounded-full flex items-center justify-center mb-4 border border-border/40">
-          <BellOff className="h-8 w-8 text-steel dark:text-muted-foreground" />
+          <BellOff className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="text-xl font-bold text-navy dark:text-foreground font-heading">
+        <h3 className="text-xl font-bold text-foreground font-heading">
           All quiet here
         </h3>
-        <p className="text-sm text-steel dark:text-muted-foreground mt-2 max-w-sm">
+        <p className="text-sm text-muted-foreground mt-2 max-w-sm">
           No active placement announcements or broadcasts have been registered for your branch yet. Keep checking!
         </p>
       </div>
@@ -126,12 +126,12 @@ export function AnnouncementsList({ messages }: AnnouncementsListProps) {
                   <div className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                     <UserCheck className="h-3.5 w-3.5" />
                   </div>
-                  <span className="text-xs font-semibold text-navy dark:text-foreground font-sans">
+                  <span className="text-xs font-semibold text-foreground font-sans">
                     {announcement.createdBy.profile?.fullName || "Placement Cell Officer"}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-steel dark:text-muted-foreground">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Calendar className="h-3.5 w-3.5" />
                   <span className="font-mono">
                     {formatDistanceToNow(new Date(announcement.createdAt), { addSuffix: true })}
@@ -140,14 +140,14 @@ export function AnnouncementsList({ messages }: AnnouncementsListProps) {
               </div>
 
               {/* ── BROADCAST CONTENT ── */}
-              <div className="text-sm font-body text-navy/90 dark:text-foreground/90 leading-relaxed whitespace-pre-line bg-slate-50/50 dark:bg-[#1a1a1a]/20 p-4 rounded-xl border border-border/40 dark:border-[#252525]/40">
+              <div className="text-sm font-body text-foreground/90 leading-relaxed whitespace-pre-line bg-slate-50/50 dark:bg-[#1a1a1a]/20 p-4 rounded-xl border border-border/40 dark:border-[#252525]/40">
                 {announcement.message}
               </div>
 
               {/* ── COHORTS TARGET & CTA LINK ── */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] uppercase font-bold text-steel dark:text-muted-foreground tracking-wider">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                     Targeted Branch:
                   </span>
                   {announcement.branches.map((b: string) => (

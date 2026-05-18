@@ -38,18 +38,16 @@ export function AnnouncementsDashboard() {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto px-4 md:px-0">
       {/* ── 1. HEADER SECTION ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#141414] border border-border/80 dark:border-[#202020] rounded-2xl p-6 shadow-card relative overflow-hidden">
-        {/* Decorative Light Mode Sky Blue Wash Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#66a6ff]/5 to-[#89f7fe]/5 pointer-events-none dark:hidden" />
         
         <div className="flex items-center gap-4 relative z-10">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-[#818cf8] to-[#c084fc] flex items-center justify-center text-white shadow-button">
+          <div className="h-12 w-12 rounded-md bg-gradient-to-tr from-brand-blue to-brand-indigo flex items-center justify-center text-white shadow-button">
             <Bell className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-navy dark:text-foreground font-heading">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground font-heading">
               Announcements
             </h1>
-            <p className="text-sm text-steel dark:text-muted-foreground mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               Targeted broadcasts, placement alerts, and guidelines for your branch
             </p>
           </div>
@@ -80,10 +78,10 @@ export function AnnouncementsDashboard() {
           <div className="h-12 w-12 bg-error/10 text-error rounded-full flex items-center justify-center mb-4">
             <Bell className="h-6 w-6" />
           </div>
-          <h3 className="text-lg font-bold text-navy dark:text-foreground font-heading">
+          <h3 className="text-lg font-bold text-foreground font-heading">
             Failed to sync announcements
           </h3>
-          <p className="text-sm text-steel dark:text-muted-foreground mt-1 max-w-sm mb-6">
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm mb-6">
             Make sure your basic profile details are complete or check your internet connection.
           </p>
           <Button onClick={() => refetch()} className="btn-primary">
@@ -121,12 +119,12 @@ export function AnnouncementsDashboard() {
 
               <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs text-steel dark:text-muted-foreground">
-                    Showing <span className="font-semibold text-navy dark:text-foreground">{(page - 1) * limit + 1}</span> to{" "}
-                    <span className="font-semibold text-navy dark:text-foreground">
+                  <p className="text-xs text-muted-foreground">
+                    Showing <span className="font-semibold text-foreground">{(page - 1) * limit + 1}</span> to{" "}
+                    <span className="font-semibold text-foreground">
                       {Math.min(page * limit, pagination.totalCount)}
                     </span>{" "}
-                    of <span className="font-semibold text-navy dark:text-foreground">{pagination.totalCount}</span> announcements
+                    of <span className="font-semibold text-foreground">{pagination.totalCount}</span> announcements
                   </p>
                 </div>
                 <div>
@@ -142,7 +140,7 @@ export function AnnouncementsDashboard() {
                     </Button>
 
                     <div className="flex items-center justify-center px-3 h-8 bg-muted dark:bg-[#1a1a1a] border border-border/80 dark:border-[#202020] rounded-md">
-                      <span className="text-xs font-mono font-bold text-navy dark:text-foreground">
+                      <span className="text-xs font-mono font-bold text-foreground">
                         {page} / {pagination.totalPages}
                       </span>
                     </div>

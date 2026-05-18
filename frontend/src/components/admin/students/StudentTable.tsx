@@ -51,9 +51,9 @@ const VERIFICATION_STYLES: Record<string, { bg: string; text: string; dot: strin
     dot: "bg-warning animate-pulse" 
   },
   NOT_VERIFIED: { 
-    bg: "bg-pale/40 border-pale/60 dark:bg-muted/30 dark:border-border", 
-    text: "text-steel dark:text-muted-foreground", 
-    dot: "bg-steel dark:bg-muted-foreground" 
+    bg: "bg-muted/40 border-border dark:bg-muted/30 dark:border-border", 
+    text: "text-muted-foreground dark:text-muted-foreground", 
+    dot: "bg-muted-foreground dark:bg-muted-foreground" 
   },
   FAILED: { 
     bg: "bg-error/10 border-error/20", 
@@ -64,12 +64,12 @@ const VERIFICATION_STYLES: Record<string, { bg: string; text: string; dot: strin
 
 // ─── Avatar Color Generator ─────────────────────────────────────────
 const AVATAR_COLORS = [
-  "from-[#818cf8] to-[#c084fc]",    // lavender → violet
-  "from-[#4E8EA2] to-[#7BBDE8]",    // teal → sky
-  "from-[#1D9E75] to-[#4E8EA2]",    // success → teal
-  "from-[#EF9F27] to-[#E24B4A]",    // warning → error (warm)
-  "from-[#0A4174] to-[#49769F]",    // deep blue → steel
-  "from-[#c084fc] to-[#818cf8]",    // violet → lavender
+  "from-brand-blue to-brand-indigo",
+  "from-brand-mid to-brand-indigo",
+  "from-brand-blue to-brand-mid",
+  "from-brand-indigo to-brand-blue",
+  "from-brand-mid to-brand-blue",
+  "from-brand-indigo to-brand-mid",
 ];
 
 function getAvatarColor(name: string): string {

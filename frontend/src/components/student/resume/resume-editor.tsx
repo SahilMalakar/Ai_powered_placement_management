@@ -65,7 +65,7 @@ export function ResumeEditor({ resume }: ResumeEditorProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-navy dark:text-foreground">Resume Editor</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground font-heading">Resume Editor</h1>
           <p className="text-muted-foreground">Customize your AI-generated resume content.</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
@@ -81,7 +81,7 @@ export function ResumeEditor({ resume }: ResumeEditorProps) {
           <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving}
-            className="flex-1 sm:flex-none bg-gradient-to-r from-[#818cf8] to-[#c084fc] hover:opacity-90 text-white shadow-button"
+            className="flex-1 sm:flex-none bg-gradient-to-r from-brand-blue to-brand-indigo hover:opacity-90 text-white shadow-button rounded-md"
           >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Changes

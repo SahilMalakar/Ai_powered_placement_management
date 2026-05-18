@@ -113,7 +113,7 @@ export default function AdminStudentDetailPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <Button className="flex-1 md:flex-none h-12 px-8 bg-gradient-to-r from-[#818cf8] to-[#c084fc] text-white font-bold rounded-xl shadow-button hover:opacity-90 transition-all gap-2">
+            <Button className="flex-1 md:flex-none h-12 px-8 bg-gradient-to-r from-brand-blue to-brand-indigo text-white font-semibold rounded-md shadow-button hover:opacity-90 transition-all gap-2">
               <UserCheck className="size-5" /> Verify Profile
             </Button>
             <Button variant="outline" size="icon" className="size-12 rounded-xl border-border/60 text-error hover:bg-error/10 hover:border-error/20 shadow-card transition-all">
@@ -290,7 +290,7 @@ export default function AdminStudentDetailPage() {
                             variant="outline"
                             className={cn(
                               "text-[10px] font-bold uppercase border-transparent shadow-card",
-                              app.status === "APPLIED" && "bg-pale text-steel",
+                              app.status === "APPLIED" && "bg-muted text-muted-foreground",
                               app.status === "SHORTLISTED" && "bg-warning/10 text-warning",
                               app.status === "SELECTED" && "bg-success/10 text-success",
                               app.status === "REJECTED" && "bg-error/10 text-error",

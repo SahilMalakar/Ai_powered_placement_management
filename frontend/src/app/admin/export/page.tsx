@@ -341,7 +341,7 @@ export default function AdminExportPage() {
 
           <div className="pt-4 border-t border-border/50 flex justify-end">
             <Button
-              className="px-6 py-5 bg-gradient-to-r from-[#818cf8] to-[#c084fc] hover:opacity-95 transition-all text-white font-bold rounded-xl shadow-button border-none flex items-center gap-2 group cursor-pointer disabled:opacity-50"
+              className="px-6 py-5 bg-gradient-to-r from-brand-blue to-brand-indigo hover:opacity-90 transition-all text-white font-semibold rounded-md shadow-button border-none flex items-center gap-2 group cursor-pointer disabled:opacity-50"
               onClick={handleExport}
               disabled={isExporting}
             >

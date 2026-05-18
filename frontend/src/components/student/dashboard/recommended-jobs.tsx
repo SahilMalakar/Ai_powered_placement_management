@@ -33,7 +33,7 @@ export function RecommendedJobs({
         </h2>
         <Link 
           href="/jobs" 
-          className="text-xs text-indigo-400 hover:text-[#c084fc] transition-colors"
+          className="text-xs text-brand-blue hover:text-brand-indigo transition-colors"
         >
           See all
         </Link>
@@ -47,7 +47,7 @@ export function RecommendedJobs({
           >
             <div>
               <div className="flex items-start justify-between gap-4">
-                <Badge variant="applied" className="bg-[#818cf8]/10 text-[#818cf8] border border-[#818cf8]/20 text-[9px] uppercase font-bold tracking-wider rounded-full px-2 py-0.5 shrink-0">
+                <Badge variant="success" className="bg-success/10 text-success border border-success/20 text-[9px] uppercase font-bold tracking-wider rounded-full px-2 py-0.5 shrink-0">
                   Eligible
                 </Badge>
                 <span className="text-[10px] text-muted-foreground font-mono">
@@ -74,7 +74,7 @@ export function RecommendedJobs({
                   disabled={applyingJobId === job.id}
                   className={cn(
                     buttonVariants({ variant: "default", size: "default" }),
-                    "h-8 gap-1.5 px-3.5 text-xs font-semibold text-white rounded bg-gradient-to-r from-[#818cf8] to-[#c084fc] shadow-button hover:opacity-90 active:translate-y-px transition-all border-none cursor-pointer flex items-center justify-center disabled:opacity-50"
+                    "h-8 gap-1.5 px-3.5 text-xs font-semibold text-white rounded-md bg-gradient-to-r from-brand-blue to-brand-indigo shadow-button hover:opacity-90 active:translate-y-px transition-all border-none cursor-pointer flex items-center justify-center disabled:opacity-50"
                   )}
                 >
                   {applyingJobId === job.id ? (
@@ -91,7 +91,7 @@ export function RecommendedJobs({
                   href="/jobs"
                   className={cn(
                     buttonVariants({ variant: "default", size: "default" }),
-                    "h-8 gap-1.5 px-3.5 text-xs font-semibold text-white rounded bg-gradient-to-r from-[#818cf8] to-[#c084fc] shadow-button hover:opacity-90 active:translate-y-px transition-all border-none cursor-pointer"
+                    "h-8 gap-1.5 px-3.5 text-xs font-semibold text-white rounded-md bg-gradient-to-r from-brand-blue to-brand-indigo shadow-button hover:opacity-90 active:translate-y-px transition-all border-none cursor-pointer"
                   )}
                 >
                   Apply Now

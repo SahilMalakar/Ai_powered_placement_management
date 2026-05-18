@@ -49,7 +49,7 @@ export function AddMemberDialog({ isOpen, onOpenChange, onSubmit, isPending }: A
       <DialogContent className="max-w-md bg-card border border-border/80 shadow-heavy rounded-2xl p-6 dark:shadow-[0_24px_64px_rgba(0,0,0,0.80)]">
         <DialogHeader>
           <DialogTitle className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
-            <UserPlus className="size-5 text-[#818cf8]" /> Add Team Member
+            <UserPlus className="size-5 text-primary" /> Add Team Member
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground mt-1">
             Create and register a new administrative account.
@@ -122,7 +122,7 @@ export function AddMemberDialog({ isOpen, onOpenChange, onSubmit, isPending }: A
             </Button>
             <Button
               type="submit"
-              className="bg-gradient-to-r from-[#818cf8] to-[#c084fc] text-white shadow-subtle hover:opacity-90 font-bold text-xs rounded-md border-none cursor-pointer"
+              className="bg-gradient-to-r from-brand-blue to-brand-indigo text-white shadow-button hover:opacity-90 font-semibold text-xs rounded-md border-none cursor-pointer"
               disabled={isPending}
             >
               {isPending ? "Creating..." : "Create Account"}
