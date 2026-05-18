@@ -13,21 +13,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-const resetPasswordSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
+import { useAuth } from "@/hooks/auth/use-auth"
+
+import { emailSchema, passwordSchema } from "@/types/auth"
+
+const resetPasswordFormSchema = z.object({
+  email: emailSchema,
   otp: z.string().length(6, "OTP must be exactly 6 digits"),
-  newPassword: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters"),
+  newPassword: passwordSchema,
   confirmPassword: z.string().min(1, "Confirm password is required"),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 })
 
-type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
+type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>
 
 export function ResetPasswordForm() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const { resetPassword, isResetPasswordPending } = useAuth()
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
 
   const searchParams = useSearchParams()
@@ -37,8 +41,8 @@ export function ResetPasswordForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetPasswordValues>({
-    resolver: zodResolver(resetPasswordSchema),
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordFormSchema),
     defaultValues: {
       email: emailParam,
       otp: "",
@@ -47,18 +51,12 @@ export function ResetPasswordForm() {
     },
   })
 
-  async function onSubmit(data: ResetPasswordValues) {
-    setIsLoading(true)
-    
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    setIsLoading(false)
-    toast.success("Password reset successful!", {
-      description: "You can now log in with your new password.",
+  async function onSubmit(data: ResetPasswordFormValues) {
+    resetPassword({
+      email: data.email,
+      otp: data.otp,
+      newPassword: data.newPassword,
     })
-    
-    router.push("/login")
   }
 
   return (
@@ -70,7 +68,7 @@ export function ResetPasswordForm() {
             <Input
               id="email"
               type="email"
-              disabled={isLoading || !!emailParam}
+              disabled={isResetPasswordPending || !!emailParam}
               className={cn(errors.email && "border-error focus-visible:ring-error")}
               {...register("email")}
             />
@@ -86,7 +84,7 @@ export function ResetPasswordForm() {
               placeholder="123456"
               type="text"
               maxLength={6}
-              disabled={isLoading}
+              disabled={isResetPasswordPending}
               className={cn(
                 "font-mono tracking-widest text-center text-lg",
                 errors.otp && "border-error focus-visible:ring-error"
@@ -108,7 +106,7 @@ export function ResetPasswordForm() {
                 id="newPassword"
                 placeholder="••••••••"
                 type={showPassword ? "text" : "password"}
-                disabled={isLoading}
+                disabled={isResetPasswordPending}
                 className={cn(
                   "pr-10",
                   errors.newPassword && "border-error focus-visible:ring-error"
@@ -121,7 +119,7 @@ export function ResetPasswordForm() {
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
+                disabled={isResetPasswordPending}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +139,7 @@ export function ResetPasswordForm() {
               id="confirmPassword"
               placeholder="••••••••"
               type="password"
-              disabled={isLoading}
+              disabled={isResetPasswordPending}
               className={cn(errors.confirmPassword && "border-error focus-visible:ring-error")}
               {...register("confirmPassword")}
             />
@@ -153,9 +151,9 @@ export function ResetPasswordForm() {
           <Button 
             type="submit" 
             className="w-full bg-deep-blue hover:bg-deep-blue/90 text-white dark:bg-sky dark:hover:bg-sky/90 dark:text-navy"
-            disabled={isLoading}
+            disabled={isResetPasswordPending}
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isResetPasswordPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Reset Password
           </Button>
         </div>

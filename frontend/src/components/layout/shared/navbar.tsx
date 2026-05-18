@@ -17,12 +17,15 @@ import { LogOut, User, Settings } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { useAppStore } from "@/store/useAppStore";
 
+import { useAuth } from "@/hooks/auth/use-auth";
+
 /**
  * Shared top navbar for both Admin and Student portals.
  * Sticky at top, flex layout within SidebarInset.
  */
 export function Navbar() {
-  const { user, setAuthenticated, setUser } = useAppStore();
+  const { user } = useAppStore();
+  const { logout } = useAuth();
   const router = useRouter();
 
   // Extract initials from user name or email
@@ -43,9 +46,7 @@ export function Navbar() {
   };
 
   const handleLogout = () => {
-    setAuthenticated(false);
-    setUser(null);
-    router.push("/login");
+    logout();
   };
 
   const isAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";

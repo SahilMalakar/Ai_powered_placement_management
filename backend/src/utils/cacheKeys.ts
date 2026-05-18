@@ -18,4 +18,5 @@ export const CACHE_KEYS = {
     ADMIN_STUDENTS_LIST: 'admin:students:list',
     ADMIN_STUDENT_DETAILS: (studentId: number | string) => `admin:student:details:${studentId}`,
     ADMIN_DASHBOARD_STATS: 'admin:dashboard:stats',
+    PASSWORD_RESET_OTP: (email: string) => `otp:reset:${email}`,
 };

@@ -24,3 +24,16 @@ export interface User {
   role: 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN';
   isProfileCompleted?: boolean;
 }
+
+export const forgetPasswordSchema = z.object({
+  email: emailSchema,
+});
+export type ForgetPasswordValues = z.infer<typeof forgetPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  email: emailSchema,
+  otp: z.string().length(6, "OTP must be exactly 6 digits"),
+  newPassword: passwordSchema,
+});
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
+

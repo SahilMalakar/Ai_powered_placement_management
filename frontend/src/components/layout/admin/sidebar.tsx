@@ -120,18 +120,15 @@ const data: { navMain: NavGroup[] } = {
   ],
 }
 
+import { useAuth } from "@/hooks/auth/use-auth"
+
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppStore((state) => state.user)
-  const { setUser, setAuthenticated } = useAppStore()
   const pathname = usePathname()
-  const router = useRouter()
-  const queryClient = useQueryClient()
+  const { logout } = useAuth()
 
   const handleLogout = () => {
-    setUser(null)
-    setAuthenticated(false)
-    queryClient.clear()
-    router.push("/login")
+    logout()
   }
 
   // Flatten the navigation items for a single-level experience

@@ -79,7 +79,7 @@ export const meController = asyncHandler(async (req, res) => {
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
-    await logoutService();
+    await logoutService(req.user?.userId);
 
     res.clearCookie('token', cookieOption);
     res.clearCookie('refreshToken', cookieOption);

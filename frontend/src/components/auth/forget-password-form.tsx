@@ -14,15 +14,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-const forgetPasswordSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-})
-
-type ForgetPasswordValues = z.infer<typeof forgetPasswordSchema>
+import { useAuth } from "@/hooks/auth/use-auth"
+import { forgetPasswordSchema, ForgetPasswordValues } from "@/types/auth"
 
 export function ForgetPasswordForm() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const { forgetPassword, isForgetPasswordPending } = useAuth()
 
   const {
     register,
@@ -36,18 +33,11 @@ export function ForgetPasswordForm() {
   })
 
   async function onSubmit(data: ForgetPasswordValues) {
-    setIsLoading(true)
-    
-    // Mock API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    setIsLoading(false)
-    toast.success("OTP sent!", {
-      description: `If an account exists for ${data.email}, you will receive a 6-digit code.`,
+    forgetPassword(data, {
+      onSuccess: () => {
+        router.push(`/reset-password?email=${encodeURIComponent(data.email)}`)
+      }
     })
-    
-    // Redirect to reset password with email pre-filled
-    router.push(`/reset-password?email=${encodeURIComponent(data.email)}`)
   }
 
   return (
@@ -63,7 +53,7 @@ export function ForgetPasswordForm() {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading}
+              disabled={isForgetPasswordPending}
               className={cn(errors.email && "border-error focus-visible:ring-error")}
               {...register("email")}
             />
@@ -74,9 +64,9 @@ export function ForgetPasswordForm() {
           <Button 
             type="submit" 
             className="w-full bg-deep-blue hover:bg-deep-blue/90 text-white dark:bg-sky dark:hover:bg-sky/90 dark:text-navy"
-            disabled={isLoading}
+            disabled={isForgetPasswordPending}
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isForgetPasswordPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send Reset Link
           </Button>
         </div>

@@ -29,6 +29,10 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
 import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import {
+    notificationQueue,
+    notifcationQueue,
+} from '../../../queues/notification.queue.js';
 
 export const signupService = async (signupData: SignupInput) => {
     const isUserExist = await findUserByEmail(signupData.email);
@@ -124,8 +128,14 @@ export const meService = async (userId: number) => {
     return user;
 };
 
-export const logoutService = async () => {
+export const logoutService = async (userId?: number) => {
     // Future: invalidate refresh token / blacklist token
+    if (userId) {
+        const cacheClient = getRedisConnectionForCaching();
+        const cacheKey = CACHE_KEYS.USER_SESSION(userId);
+        await cacheClient.del(cacheKey);
+        console.log('🧹 Cache Invalidated on Logout: ', cacheKey);
+    }
 
     return true;
 };
@@ -162,25 +172,54 @@ export const changePasswordService = async (
 };
 
 export const forgetPasswordService = async (data: ForgetPasswordInput) => {
+    console.log(`🔍 [ForgetPassword] Request received for email: "${data.email}"`);
     const user = await findUserByEmail(data.email);
 
-    // Do not reveal if email exists or not
-    if (!user || user.deletedAt) {
+    if (!user) {
+        console.log(`⚠️ [ForgetPassword] User with email "${data.email}" does not exist in the database!`);
         return true;
     }
+
+    if (user.deletedAt) {
+        console.log(`⚠️ [ForgetPassword] User with email "${data.email}" exists but has been deleted (deletedAt is set)!`);
+        return true;
+    }
+
+    console.log(`👤 [ForgetPassword] User found: ID ${user.id}, Role ${user.role}`);
 
     // generate 6-digit otp
     const _otp = crypto.randomInt(100000, 999999).toString();
 
-    // TODO: Handle token storage using Redis (otp:reset:{email} -> otp) with 10m TTL
+    // Store OTP in Redis with 10m TTL
+    const cacheClient = getRedisConnectionForCaching();
+    const cacheKey = CACHE_KEYS.PASSWORD_RESET_OTP(data.email);
+    await cacheClient.set(cacheKey, _otp, 'EX', 600);
+    console.log(`🔑 OTP generated and cached for ${data.email}: ${_otp}`);
 
-    // TODO: Use BullMQ email.queue to push sending job with OTP
+    // Use BullMQ email.queue to push sending job with OTP
+    await notificationQueue.add(notifcationQueue, {
+        to: data.email,
+        subject: 'Password Reset OTP',
+        templateId: 'otp',
+        params: {
+            otp: _otp
+        }
+    });
+    console.log(`✉️ Email job queued for sending OTP to ${data.email}`);
 
     return true;
 };
 
 export const resetPasswordService = async (data: ResetPasswordInput) => {
-    //  Fetch OTP from Redis and verify
+    const cacheClient = getRedisConnectionForCaching();
+    const cacheKey = CACHE_KEYS.PASSWORD_RESET_OTP(data.email);
+
+    // Fetch OTP from Redis and verify
+    const cachedOtp = await cacheClient.get(cacheKey);
+    if (!cachedOtp || cachedOtp !== data.otp) {
+        throw new InvalidCredentialsError('Invalid or expired OTP');
+    }
+
     const user = await findUserByEmail(data.email);
     if (!user || user.deletedAt) {
         throw new NotFoundError('User not found');
@@ -191,12 +230,13 @@ export const resetPasswordService = async (data: ResetPasswordInput) => {
     await updateUserPassword(user.id, hashedPassword);
 
     // Cache Invalidation
-    const cacheClient = getRedisConnectionForCaching();
-    const cacheKey = CACHE_KEYS.USER_SESSION(user.id);
-    await cacheClient.del(cacheKey);
-    console.log('🧹 Cache Invalidated: ', cacheKey);
+    const sessionCacheKey = CACHE_KEYS.USER_SESSION(user.id);
+    await cacheClient.del(sessionCacheKey);
+    console.log('🧹 Cache Invalidated: ', sessionCacheKey);
 
     // delete otp from redis
+    await cacheClient.del(cacheKey);
+    console.log('🧹 OTP Cache Invalidated: ', cacheKey);
 
     return true;
 };
