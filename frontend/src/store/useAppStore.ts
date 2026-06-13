@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 import { User } from '@/types/auth';
+import { ExportJobStatus } from '@/types/admin/export';
 
 interface AppState {
   user: User | null;
@@ -16,6 +17,17 @@ interface AppState {
    * but isAuthenticated is still false for one render frame.
    */
   setAuth: (user: User | null, isLoading: boolean) => void;
+
+  // Export State
+  exportJobId: string | null;
+  exportStatus: ExportJobStatus;
+  exportDownloadUrl: string | null;
+  exportError: string | null;
+  setExportJobId: (jobId: string | null) => void;
+  setExportStatus: (status: ExportJobStatus) => void;
+  setExportDownloadUrl: (url: string | null) => void;
+  setExportError: (error: string | null) => void;
+  resetExportState: () => void;
 }
 
 /**
@@ -41,5 +53,22 @@ export const useAppStore = create<AppState>()(
         isLoading 
       });
     },
+
+    // Export State Implementation
+    exportJobId: null,
+    exportStatus: 'idle',
+    exportDownloadUrl: null,
+    exportError: null,
+    setExportJobId: (exportJobId) => set({ exportJobId }),
+    setExportStatus: (exportStatus) => set({ exportStatus }),
+    setExportDownloadUrl: (exportDownloadUrl) => set({ exportDownloadUrl }),
+    setExportError: (exportError) => set({ exportError }),
+    resetExportState: () => set({ 
+      exportJobId: null, 
+      exportStatus: 'idle', 
+      exportDownloadUrl: null, 
+      exportError: null 
+    }),
   }))
 );
+

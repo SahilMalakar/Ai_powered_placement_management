@@ -26,7 +26,7 @@ export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) || 4001,
     DATABASE_URL:
         process.env.DATABASE_URL ||
-        'postgresql://postgres:sweety@12345@localhost:5432/placement_db',
+        'postgresql://postgres:strongpassword@localhost:5432/placement_db?schema=public',
     JWT_SECRET: process.env.JWT_SECRET!,
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY!,

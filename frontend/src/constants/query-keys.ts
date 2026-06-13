@@ -20,5 +20,8 @@ export const QUERY_KEYS = {
   ADMIN_MESSAGES: "admin-messages",
   ADMIN_DASHBOARD_STATS: "admin-dashboard-stats",
   STUDENT_ANNOUNCEMENTS: "student-announcements",
+  ADMIN_EXPORT_PREVIEW: "admin-export-preview",
+  ADMIN_EXPORT_STATUS: "admin-export-status",
+  ADMIN_ALL_APPLICATIONS: "admin-all-applications",
 } as const;
 

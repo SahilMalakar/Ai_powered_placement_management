@@ -49,3 +49,12 @@ export const useUpdateApplicationStatus = (jobId: string) => {
     },
   });
 };
+
+export const useAllJobApplications = (filters: ApplicantFilters = {}) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.ADMIN_ALL_APPLICATIONS, filters],
+    queryFn: () => adminJobApplicationService.getAllApplications(filters),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+};
+

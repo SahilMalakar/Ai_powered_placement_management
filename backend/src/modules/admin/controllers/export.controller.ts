@@ -6,7 +6,11 @@ import { exportRequestSchema } from '../../../shared/types/admin/export.js';
 import { requestExportService, getExportStatusService } from '../services/export.service.js';
 
 export const requestExportController = asyncHandler(async (req, res) => {
+    console.log("=== requestExportController HIT ===");
+    console.log("req.body:", req.body);
+    
     if (!req.user) {
+        console.log("requestExportController: Unauthorized (no req.user)");
         throw new UnauthorizedError('Unauthorized');
     }
 
@@ -16,11 +20,14 @@ export const requestExportController = asyncHandler(async (req, res) => {
         const message = result.error.issues
             .map((err) => `${err.path.join('.')}: ${err.message}`)
             .join(', ');
+        console.log("requestExportController: Validation failed", message);
         throw new BadRequestError(`Invalid export request: ${message}`);
     }
 
     // 2. Trigger the service logic
+    console.log("requestExportController: Validation success, triggering service", result.data);
     const data = await requestExportService(result.data, req.user.userId);
+    console.log("requestExportController: Service finished successfully. Job info:", data);
 
     return sendSuccess(
         res,

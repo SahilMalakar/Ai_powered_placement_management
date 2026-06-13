@@ -1,0 +1,30 @@
+export const STUDENT_EXPORT_FIELDS = [
+  { key: 'id', label: 'ID' },
+  { key: 'email', label: 'Email' },
+  { key: 'fullName', label: 'Full Name' },
+  { key: 'rollNo', label: 'Roll Number' },
+  { key: 'branch', label: 'Branch' },
+  { key: 'degree', label: 'Degree' },
+  { key: 'cgpa', label: 'CGPA' },
+  { key: 'dob', label: 'Date of Birth' },
+  { key: 'backlog', label: 'Has Backlog' },
+  { key: 'backlogSubjects', label: 'Backlog Subjects' },
+  { key: 'verificationStatus', label: 'Verification Status' },
+  { key: 'phoneNumber', label: 'Phone Number' },
+  { key: 'graduationYear', label: 'Graduation Year' },
+  { key: 'university', label: 'University' },
+  { key: 'sgpa', label: 'SGPA (Sem 1–8)' },
+  { key: 'documents', label: 'Marksheets (Sem 1–8)' },
+] as const;
+
+export const APPLICATION_EXPORT_FIELDS = [
+  { key: 'jobTitle', label: 'Job Title' },
+  { key: 'company', label: 'Company' },
+  { key: 'studentName', label: 'Student Name' },
+  { key: 'rollNo', label: 'Roll Number' },
+  { key: 'studentEmail', label: 'Student Email' },
+  { key: 'branch', label: 'Branch' },
+  { key: 'cgpa', label: 'CGPA' },
+  { key: 'applicationStatus', label: 'Application Status' },
+  { key: 'appliedDate', label: 'Applied Date' },
+] as const;

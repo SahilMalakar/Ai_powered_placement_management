@@ -3,7 +3,24 @@ import { prisma } from "../../../prisma/prisma.js";
 import type { ExportRequestInput } from "../../../shared/types/admin/export.js";
 
 export const getStudentsForExportRepository = async (params: Omit<ExportRequestInput, 'type'>) => {
-    const { search, branch, cgpa, backlogAllowed, verificationStatus } = params;
+    const { search, branch, cgpa, backlogAllowed, verificationStatus, selectedIds } = params;
+
+    if (selectedIds && selectedIds.length > 0) {
+        return await prisma.user.findMany({
+            where: {
+                id: { in: selectedIds },
+                role: "STUDENT"
+            },
+            include: {
+                profile: true,
+                semesters: true,
+                documents: true
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+    }
 
     const where: Prisma.UserWhereInput = {
         role: "STUDENT",
@@ -25,19 +42,10 @@ export const getStudentsForExportRepository = async (params: Omit<ExportRequestI
 
     return await prisma.user.findMany({
         where,
-        select: {
-            id: true,
-            email: true,
-            profile: {
-                select: {
-                    fullName: true,
-                    rollNo: true,
-                    branch: true,
-                    cgpa: true,
-                    backlog: true,
-                    verificationStatus: true,
-                }
-            }
+        include: {
+            profile: true,
+            semesters: true,
+            documents: true
         },
         orderBy: {
             createdAt: "desc"
@@ -46,7 +54,42 @@ export const getStudentsForExportRepository = async (params: Omit<ExportRequestI
 };
 
 export const getApplicationsForExportRepository = async (params: Omit<ExportRequestInput, 'type'>) => {
-    const { search, status, branch, verificationStatus, jobId } = params;
+    const { search, status, branch, verificationStatus, jobId, selectedIds } = params;
+
+    const include = {
+        job: {
+            select: {
+                title: true,
+                company: true
+            }
+        },
+        user: {
+            select: {
+                email: true,
+                profile: {
+                    select: {
+                        fullName: true,
+                        rollNo: true,
+                        cgpa: true,
+                        branch: true
+                    }
+                }
+            }
+        }
+    };
+
+    if (selectedIds && selectedIds.length > 0) {
+        return await prisma.application.findMany({
+            where: {
+                id: { in: selectedIds },
+                deletedAt: null
+            },
+            include,
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+    }
 
     const where: any = {
         deletedAt: null,
@@ -89,27 +132,7 @@ export const getApplicationsForExportRepository = async (params: Omit<ExportRequ
 
     return await prisma.application.findMany({
         where,
-        include: {
-            job: {
-                select: {
-                    title: true,
-                    company: true
-                }
-            },
-            user: {
-                select: {
-                    email: true,
-                    profile: {
-                        select: {
-                            fullName: true,
-                            rollNo: true,
-                            cgpa: true,
-                            branch: true
-                        }
-                    }
-                }
-            }
-        },
+        include,
         orderBy: {
             createdAt: "desc"
         }

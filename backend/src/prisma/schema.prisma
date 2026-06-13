@@ -27,6 +27,7 @@ model User {
   semesters    SemesterResult[]
   jobsCreated  Job[]
   notificationsCreated NotificationMessage[]
+  exportLogs   ExportLog[]
 
   @@index([role])
 }
@@ -263,6 +264,21 @@ model NotificationMessage {
 
   // Relations
   createdBy   User     @relation(fields: [createdById], references: [id])
+}
+
+model ExportLog {
+  id          Int      @id @default(autoincrement())
+  exportedBy  Int
+  type        String
+  fileUrl     String
+  filters     Json
+  selectedIds Int[]    @default([])
+  recordCount Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  admin User @relation(fields: [exportedBy], references: [id])
+
+  @@index([exportedBy])
 }
 
 enum ATSAnalysisType {

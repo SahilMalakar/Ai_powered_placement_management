@@ -33,15 +33,23 @@ import { type UploadApiResponse } from 'cloudinary';
 export const uploadBufferToCloudinary = (
     buffer: Buffer,
     folder: string = 'ats_resumes',
-    resourceType: 'auto' | 'image' | 'raw' | 'video' = 'auto'
+    resourceType: 'auto' | 'image' | 'raw' | 'video' = 'auto',
+    publicId?: string
 ): Promise<UploadApiResponse> => {
     return new Promise((resolve, reject) => {
+        const options: any = {
+            folder,
+            resource_type: resourceType,
+            access_mode: 'public',
+            use_filename: true,
+            unique_filename: false,
+        };
+        if (publicId !== undefined) {
+            options.public_id = publicId;
+        }
+
         const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder,
-                resource_type: resourceType,
-                access_mode: 'public',
-            },
+            options,
             (error, result) => {
                 if (error) {
                     return reject(

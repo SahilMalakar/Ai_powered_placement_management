@@ -14,7 +14,7 @@ export const exportQueue = new Queue(EXPORT_QUEUE_NAME, {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connection: getRedisConnection() as any,
     defaultJobOptions: {
-        attempts: 2,
+        attempts: 3,
         backoff: {
             type: 'exponential',
             delay: 3000,
