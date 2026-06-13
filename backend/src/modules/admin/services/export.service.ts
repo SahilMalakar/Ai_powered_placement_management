@@ -3,6 +3,7 @@ import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
 import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 import { NotFoundError } from '../../../shared/utils/errors/httpErrors.js';
 import type { ExportRequestInput, ExportJobResult } from '../../../shared/types/admin/export.js';
+import { getExportLogsRepository, countExportLogsRepository, deleteExportLogRepository } from '../repositories/export.repository.js';
 
 export const requestExportService = async (payload: ExportRequestInput, userId: number) => {
     // 1. Queue the BullMQ job
@@ -35,3 +36,29 @@ export const getExportStatusService = async (jobId: string) => {
     const jobResult: ExportJobResult = JSON.parse(cachedData);
     return jobResult;
 };
+
+export const getExportLogsService = async ({ page, limit }: { page: number; limit: number }) => {
+  const [logs, total] = await Promise.all([
+    getExportLogsRepository({ page, limit }),
+    countExportLogsRepository(),
+  ]);
+  return {
+    logs,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+export const deleteExportLogService = async (id: number) => {
+  try {
+    return await deleteExportLogRepository(id);
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      throw new NotFoundError('Export log not found');
+    }
+    throw error;
+  }
+};
+

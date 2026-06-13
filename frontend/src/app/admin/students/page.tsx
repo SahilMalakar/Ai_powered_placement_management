@@ -8,10 +8,9 @@ import { StudentTable } from "@/components/admin/students/StudentTable";
 import { StudentPagination } from "@/components/admin/students/StudentPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, FileDown, ShieldCheck, Clock, UserX, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAdminExport } from "@/hooks/admin/useExport";
+import { Users, ShieldCheck, Clock, UserX, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default function AdminStudentsPage() {
   // ─── Local search text (updates instantly on keystroke) ──────
@@ -44,7 +43,6 @@ export default function AdminStudentsPage() {
   }), [filters, debouncedSearch]);
 
   const { data, isLoading, isFetching, isError, error } = useAdminStudents(queryFilters);
-  const { exportData, isExporting } = useAdminExport();
 
   const handleFilterChange = useCallback((newFilters: Partial<GetAllStudentsQueryInput>) => {
     // If search changed, route it to the local input state (debounce handles the rest)
@@ -59,16 +57,6 @@ export default function AdminStudentsPage() {
     }
     setFilters((prev) => ({ ...prev, ...newFilters, page: newFilters.page ?? 1 }));
   }, []);
-
-  const handleExport = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { page, limit, ...exportFilters } = filters;
-    exportData({
-      type: "students",
-      ...exportFilters,
-      ...(debouncedSearch ? { search: debouncedSearch } : {}),
-    });
-  };
 
   // Derive stats from current page data
   const stats = useMemo(() => {
@@ -101,14 +89,6 @@ export default function AdminStudentsPage() {
             Manage, verify, and monitor student academic profiles across all branches.
           </p>
         </div>
-        <Button 
-          className="h-10 px-5 bg-gradient-to-r from-brand-blue to-brand-indigo hover:opacity-90 transition-all text-white font-semibold text-xs gap-2 rounded-md shadow-button border-none shrink-0 group"
-          onClick={handleExport}
-          disabled={isExporting}
-        >
-          <FileDown className={cn("size-4 transition-transform duration-300", isExporting ? "animate-bounce" : "group-hover:translate-y-0.5")} /> 
-          {isExporting ? "Exporting..." : "Export Data"}
-        </Button>
       </div>
 
       {/* ─── Stats Cards ──────────────────────────────────────────── */}

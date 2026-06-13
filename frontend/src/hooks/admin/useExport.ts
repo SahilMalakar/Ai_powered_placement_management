@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { adminExportService } from "@/services/admin/export.service";
 import { adminStudentService } from "@/services/admin/student.service";
 import { adminJobApplicationService } from "@/services/admin/jobApplication.service";
@@ -74,6 +74,7 @@ export const useAdminExport = () => {
 
 export const useExportMutation = () => {
   const { setExportJobId, setExportStatus, setExportDownloadUrl, setExportError } = useAppStore();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (payload: {
@@ -94,6 +95,7 @@ export const useExportMutation = () => {
     onSuccess: (data, variables) => {
       setExportJobId(data.jobId);
       setExportStatus('processing');
+      queryClient.invalidateQueries({ queryKey: ['export', 'logs'] });
       toast.info(`Export job queued for ${variables.type}. Processing in background...`);
     },
     onError: (error: any) => {
@@ -108,6 +110,7 @@ export const useExportMutation = () => {
 export const useExportStatusQuery = (jobId: string | null) => {
   const { setExportStatus, setExportDownloadUrl, setExportError } = useAppStore();
   const [hasHandled, setHasHandled] = useState(false);
+  const queryClient = useQueryClient();
   
   useEffect(() => {
     if (jobId) setHasHandled(false);
@@ -144,13 +147,15 @@ export const useExportStatusQuery = (jobId: string | null) => {
           window.open(downloadUrl, '_blank');
           toast.success("CSV export compiled and downloaded successfully!");
         }
+        queryClient.invalidateQueries({ queryKey: ['export', 'logs'] });
       } else if (status === 'failed') {
         setHasHandled(true);
         setExportError(error || "Export failed on the server.");
         toast.error(error || "Export failed on the server.");
+        queryClient.invalidateQueries({ queryKey: ['export', 'logs'] });
       }
     }
-  }, [query.data, hasHandled, setExportStatus, setExportDownloadUrl, setExportError]);
+  }, [query.data, hasHandled, setExportStatus, setExportDownloadUrl, setExportError, queryClient]);
 
   return query;
 };
@@ -160,23 +165,24 @@ export const useExportPreviewQuery = (
   filters: any,
   options: { enabled?: boolean } = {}
 ) => {
+  const { exportFilters, previewTriggered, exportType } = useAppStore();
+
   return useQuery({
-    queryKey: [QUERY_KEYS.ADMIN_EXPORT_PREVIEW, type, filters],
+    queryKey: [QUERY_KEYS.ADMIN_EXPORT_PREVIEW, type, exportFilters],
     queryFn: async () => {
       if (type === "students") {
-        const queryParams: any = {
+        const studentParams: any = {
+          search: exportFilters.search || undefined,
+          branch: exportFilters.branch === 'all' ? undefined : exportFilters.branch,
+          cgpa: exportFilters.cgpa || undefined,
+          backlogAllowed: exportFilters.backlogAllowed,
+          verificationStatus: exportFilters.verificationStatus === 'all' ? undefined : exportFilters.verificationStatus,
           page: 1,
-          limit: 10,
+          limit: 50,
         };
-        if (filters.search) queryParams.search = filters.search;
-        if (filters.branch && filters.branch !== "all") queryParams.branch = filters.branch;
-        if (filters.cgpa) queryParams.cgpa = filters.cgpa;
-        if (filters.backlogAllowed !== undefined) queryParams.backlogAllowed = filters.backlogAllowed;
-        if (filters.verificationStatus && filters.verificationStatus !== "all") {
-          queryParams.verificationStatus = filters.verificationStatus;
-        }
+        Object.keys(studentParams).forEach(k => studentParams[k] === undefined && delete studentParams[k]);
 
-        const res = await adminStudentService.getAllStudents(queryParams);
+        const res = await adminStudentService.getAllStudents(studentParams);
         return {
           records: res.data.students.map((student) => ({
             id: student.id,
@@ -190,19 +196,18 @@ export const useExportPreviewQuery = (
           totalCount: res.data.pagination.totalCount,
         };
       } else {
-        const queryParams: any = {
+        const appParams: any = {
+          search: exportFilters.search || undefined,
+          status: exportFilters.status === 'all' ? undefined : exportFilters.status,
+          branch: exportFilters.branch === 'all' ? undefined : exportFilters.branch,
+          verificationStatus: exportFilters.verificationStatus === 'all' ? undefined : exportFilters.verificationStatus,
           page: 1,
-          limit: 10,
+          limit: 50,
         };
-        if (filters.search) queryParams.search = filters.search;
-        if (filters.status && filters.status !== "all") queryParams.status = filters.status;
-        if (filters.branch && filters.branch !== "all") queryParams.branch = filters.branch;
-        if (filters.verificationStatus && filters.verificationStatus !== "all") {
-          queryParams.verificationStatus = filters.verificationStatus;
-        }
+        Object.keys(appParams).forEach(k => appParams[k] === undefined && delete appParams[k]);
 
-        if (filters.jobId && filters.jobId !== "all") {
-          const res = await adminJobApplicationService.getJobApplicants(String(filters.jobId), queryParams);
+        if (exportFilters.jobId && exportFilters.jobId !== "all") {
+          const res = await adminJobApplicationService.getJobApplicants(String(exportFilters.jobId), appParams);
           return {
             records: res.data.applicants.map((app) => ({
               id: app.id,
@@ -216,7 +221,7 @@ export const useExportPreviewQuery = (
             totalCount: res.data.pagination.total,
           };
         } else {
-          const res = await adminJobApplicationService.getAllApplications(queryParams);
+          const res = await adminJobApplicationService.getAllApplications(appParams);
           return {
             records: res.data.applicants.map((app) => ({
               id: app.id,
@@ -232,7 +237,32 @@ export const useExportPreviewQuery = (
         }
       }
     },
-    enabled: options.enabled,
+    enabled: exportType === type && previewTriggered === true,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+export const useExportLogsQuery = (page: number, isProcessing: boolean) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.EXPORT_LOGS(page),
+    queryFn: () => adminExportService.getExportLogsService(page),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: true,
+    staleTime: 30_000,
+    refetchInterval: isProcessing ? 3000 : false,
+  });
+};
+
+export const useDeleteExportLogMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminExportService.deleteExportLogService(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['export', 'logs'] });
+      toast.success('Export log deleted');
+    },
+    onError: () => {
+      toast.error('Failed to delete export log');
+    },
   });
 };

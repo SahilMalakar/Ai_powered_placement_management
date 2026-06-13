@@ -138,3 +138,22 @@ export const getApplicationsForExportRepository = async (params: Omit<ExportRequ
         }
     });
 };
+
+export const getExportLogsRepository = async ({ page, limit }: { page: number; limit: number }) => {
+  return prisma.exportLog.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      admin: {
+        select: { id: true, email: true }
+      }
+    }
+  });
+};
+
+export const countExportLogsRepository = () => prisma.exportLog.count();
+
+export const deleteExportLogRepository = async (id: number) => {
+  return prisma.exportLog.delete({ where: { id } });
+};

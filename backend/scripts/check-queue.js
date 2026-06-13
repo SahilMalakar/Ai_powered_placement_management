@@ -29,6 +29,19 @@ async function clearQueue(queueName) {
   console.log(`🗑️  Cleared ${keys.length} keys for ${queueName}`);
 }
 
+async function clearAllQueues() {
+  const allKeys = await redis.keys("bull:*");
+
+  if (allKeys.length === 0) {
+    console.log("✅ No queues found.");
+    return;
+  }
+
+  await redis.del(...allKeys);
+  console.log(`✅ Cleared all ${allKeys.length} queue keys`);
+}
+
+
 async function listCache() {
   const keys = await redis.keys("*");
   const cacheKeys = keys.filter(k => !k.startsWith("bull:"));
@@ -72,6 +85,8 @@ async function main() {
     await listCache();
   } else if (arg === "--clear-cache") {
     await clearCache();
+  } else if(arg === "--clear-all-queues") {
+    await clearAllQueues();
   } else {
     console.log("\n📊 Queue Statistics:");
     for (const queue of QUEUES) {

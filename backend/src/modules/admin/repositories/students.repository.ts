@@ -6,22 +6,27 @@ import type { GetAllStudentsQueryInput } from "../../../shared/types/admin/stude
 export const getAllStudentRepository = async (params: GetAllStudentsQueryInput & { skip: number }) => {
     const { limit: take, skip, search, branch, cgpa, backlogAllowed, verificationStatus } = params;
 
+    const profileConditions = [
+        search
+            ? {
+                  OR: [
+                      { fullName: { contains: search, mode: 'insensitive' as const } },
+                      { rollNo:   { contains: search, mode: 'insensitive' as const } },
+                  ],
+              }
+            : null,
+        branch             ? { branch }                          : null,
+        cgpa               ? { cgpa: { gte: Number(cgpa) } }    : null,
+        backlogAllowed !== undefined ? { backlog: backlogAllowed } : null,
+        verificationStatus ? { verificationStatus }              : null,
+    ].filter((c): c is NonNullable<typeof c> => c !== null);
+
     const where: Prisma.UserWhereInput = {
-        role: "STUDENT",
-        profile: {
-            AND: [
-                search ? {
-                    OR: [
-                        { fullName: { contains: search, mode: "insensitive" } },
-                        { rollNo: { contains: search, mode: "insensitive" } }
-                    ]
-                } : {},
-                branch ? { branch: branch } : {},
-                cgpa ? { cgpa: { gte: Number(cgpa) } } : {},
-                backlogAllowed !== undefined ? { backlog: Boolean(backlogAllowed) } : {},
-                verificationStatus ? { verificationStatus: verificationStatus } : {}
-            ]
-        }
+        role: 'STUDENT',
+        deletedAt: null,
+        ...(profileConditions.length > 0
+            ? { profile: { is: { AND: profileConditions } } }
+            : { profile: { isNot: null } }),
     };
 
     const [students, totalCount] = await Promise.all([

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 import { User } from '@/types/auth';
-import { ExportJobStatus } from '@/types/admin/export';
+import { ExportJobStatus, ExportFilters } from '@/types/admin/export';
 
 interface AppState {
   user: User | null;
@@ -23,10 +23,16 @@ interface AppState {
   exportStatus: ExportJobStatus;
   exportDownloadUrl: string | null;
   exportError: string | null;
+  previewTriggered: boolean;
+  exportType: 'students' | 'applications';
+  exportFilters: ExportFilters;
   setExportJobId: (jobId: string | null) => void;
   setExportStatus: (status: ExportJobStatus) => void;
   setExportDownloadUrl: (url: string | null) => void;
   setExportError: (error: string | null) => void;
+  setPreviewTriggered: (triggered: boolean) => void;
+  setExportType: (type: 'students' | 'applications') => void;
+  setExportFilters: (filters: ExportFilters) => void;
   resetExportState: () => void;
 }
 
@@ -59,15 +65,24 @@ export const useAppStore = create<AppState>()(
     exportStatus: 'idle',
     exportDownloadUrl: null,
     exportError: null,
+    previewTriggered: true,
+    exportType: 'students',
+    exportFilters: {},
     setExportJobId: (exportJobId) => set({ exportJobId }),
     setExportStatus: (exportStatus) => set({ exportStatus }),
     setExportDownloadUrl: (exportDownloadUrl) => set({ exportDownloadUrl }),
     setExportError: (exportError) => set({ exportError }),
+    setPreviewTriggered: (previewTriggered) => set({ previewTriggered }),
+    setExportType: (exportType) => set({ exportType, previewTriggered: false }),
+    setExportFilters: (exportFilters) => set({ exportFilters }),
     resetExportState: () => set({ 
       exportJobId: null, 
       exportStatus: 'idle', 
       exportDownloadUrl: null, 
-      exportError: null 
+      exportError: null,
+      previewTriggered: true,
+      exportType: 'students',
+      exportFilters: {}
     }),
   }))
 );

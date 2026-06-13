@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requestExportController, getExportStatusController } from '../../../modules/admin/controllers/export.controller.js';
+import { requestExportController, getExportStatusController, getExportLogsController, deleteExportLogController } from '../../../modules/admin/controllers/export.controller.js';
 import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
 import { requireAdmin } from '../../../shared/middlewares/rbac.middleware.js';
 
@@ -60,6 +60,20 @@ exportRouter.post(
  *       200:
  *         description: Status retrieved successfully
  */
+exportRouter.get(
+    '/logs',
+    authMiddleware,
+    requireAdmin,
+    getExportLogsController
+);
+
+exportRouter.delete(
+    '/logs/:id',
+    authMiddleware,
+    requireAdmin,
+    deleteExportLogController
+);
+
 exportRouter.get(
     '/:jobId/status',
     authMiddleware,

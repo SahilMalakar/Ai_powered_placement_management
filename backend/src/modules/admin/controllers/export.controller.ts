@@ -3,7 +3,7 @@ import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
 import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
 import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 import { exportRequestSchema } from '../../../shared/types/admin/export.js';
-import { requestExportService, getExportStatusService } from '../services/export.service.js';
+import { requestExportService, getExportStatusService, getExportLogsService, deleteExportLogService } from '../services/export.service.js';
 
 export const requestExportController = asyncHandler(async (req, res) => {
     console.log("=== requestExportController HIT ===");
@@ -57,3 +57,42 @@ export const getExportStatusController = asyncHandler(async (req, res) => {
         HTTP_STATUS.OK
     );
 });
+
+export const getExportLogsController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    const page = Number(req.query.page) || 1;
+    const limit = Math.min(Number(req.query.limit) || 10, 10);
+
+    const result = await getExportLogsService({ page, limit });
+
+    return sendSuccess(
+        res,
+        result,
+        'Export logs retrieved successfully',
+        HTTP_STATUS.OK
+    );
+});
+
+export const deleteExportLogController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError('Unauthorized');
+    }
+
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+        throw new BadRequestError('Invalid export log ID');
+    }
+
+    await deleteExportLogService(id);
+
+    return sendSuccess(
+        res,
+        null,
+        'Export log deleted successfully',
+        HTTP_STATUS.OK
+    );
+});
+

@@ -29,9 +29,22 @@ import ExportFieldSelector from "@/components/admin/export/ExportFieldSelector";
 import ExportPreviewTable from "@/components/admin/export/ExportPreviewTable";
 import ExportJobStatusPanel from "@/components/admin/export/ExportJobStatusPanel";
 import { STUDENT_EXPORT_FIELDS, APPLICATION_EXPORT_FIELDS } from "@/constants/exportFieldConfig";
+import { Separator } from "@/components/ui/separator";
+import ExportHistoryPanel from "@/components/admin/export/ExportHistoryPanel";
 
 export default function AdminExportPage() {
-  const [exportType, setExportType] = useState<"students" | "applications">("students");
+  const { 
+    exportType, 
+    setExportType,
+    exportFilters,
+    setExportFilters,
+    setPreviewTriggered,
+    exportJobId,
+    exportStatus,
+    exportDownloadUrl,
+    exportError,
+    resetExportState 
+  } = useAppStore();
   
   // Field and record selection
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -64,14 +77,27 @@ export default function AdminExportPage() {
     setSelectedIds([]);
   }, [exportType]);
 
-  // Global Export State & Polling
-  const { exportJobId, exportStatus, exportDownloadUrl, exportError, resetExportState } = useAppStore();
+  // Sync active filters to store
+  const activeFilters = exportType === "students" ? studentFilters : appFilters;
   
+  // Sync active filters to store and reset previewTriggered
+  useEffect(() => {
+    setExportFilters(activeFilters);
+    setPreviewTriggered(false);
+  }, [activeFilters, setExportFilters, setPreviewTriggered]);
+
+  // Debounce: wait 600ms after filters stop changing before triggering preview
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPreviewTriggered(true);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [exportFilters, exportType, setPreviewTriggered]);
+
   // Enable polling if there's a processing job
   useExportStatusQuery(exportJobId);
 
   // Preview Query
-  const activeFilters = exportType === "students" ? studentFilters : appFilters;
   const { data: previewData, isLoading: isPreviewLoading } = useExportPreviewQuery(
     exportType, 
     activeFilters, 
@@ -419,6 +445,9 @@ export default function AdminExportPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Separator className="my-8" />
+      <ExportHistoryPanel />
     </div>
   );
 }

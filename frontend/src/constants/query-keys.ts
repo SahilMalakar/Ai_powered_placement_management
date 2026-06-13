@@ -23,5 +23,6 @@ export const QUERY_KEYS = {
   ADMIN_EXPORT_PREVIEW: "admin-export-preview",
   ADMIN_EXPORT_STATUS: "admin-export-status",
   ADMIN_ALL_APPLICATIONS: "admin-all-applications",
+  EXPORT_LOGS: (page: number) => ['export', 'logs', page] as const,
 } as const;
 

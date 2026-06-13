@@ -30,3 +30,23 @@ export interface ExportStatusResponse {
     createdAt: string;
   };
 }
+
+export interface ExportLogEntry {
+  id: number;
+  type: 'students' | 'applications';
+  fileUrl: string;
+  filters: Record<string, any>;
+  selectedIds: number[];
+  recordCount: number;
+  createdAt: string;
+  admin: { id: number; email: string };
+}
+
+export interface ExportLogsResponse {
+  logs: ExportLogEntry[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
