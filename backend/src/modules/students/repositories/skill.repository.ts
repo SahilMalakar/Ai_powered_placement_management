@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import type { SkillInput, UpdateSkillInput } from "../../../types/students/profile.js";
+import type { SkillInput, UpdateSkillInput } from "../../../shared/types/students/profile.js";
 
 export const addSkillRepo = async (profileId: number, data: SkillInput) => {
     return await prisma.skill.create({

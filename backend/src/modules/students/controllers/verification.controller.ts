@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import { initiateVerificationService } from '../services/verification.service.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { BadRequestError } from '../../../utils/errors/httpErrors.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { BadRequestError } from '../../../shared/utils/errors/httpErrors.js';
 
 /**
  * Controller to handle the initiation of document verification.

@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { validateRequest } from '../../../middlewares/validate.middlware.js';
+import { validateRequest } from '../../../shared/middlewares/validate.middlware.js';
 import {
     changePasswordSchma,
     forgetPasswordSchema,
     loginSchema,
     resetPasswordSchema,
     signupSchema,
-} from '../../../types/auth.js';
+} from '../../../shared/types/auth.js';
 import {
     changePasswordController,
     forgetPasswordController,
@@ -17,8 +17,8 @@ import {
     resetPasswordController,
     signupController,
 } from '../../../modules/auth/controllers/auth.controller.js';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { authRateLimit } from '../../../middlewares/rateLimit.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { authRateLimit } from '../../../shared/middlewares/rateLimit.middleware.js';
 
 /**
  * @swagger

@@ -1,6 +1,6 @@
 import { applyToJobService, getApplicationService } from '../services/application.service.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { NotFoundError } from '../../../utils/errors/httpErrors.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { NotFoundError } from '../../../shared/utils/errors/httpErrors.js';
 
 /**
  * Controller to handle student job applications.

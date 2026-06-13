@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import type { ExperienceInput, UpdateExperienceInput } from "../../../types/students/profile.js";
+import type { ExperienceInput, UpdateExperienceInput } from "../../../shared/types/students/profile.js";
 
 export const addExperienceRepo = async (profileId: number, data: ExperienceInput) => {
     return await prisma.experience.create({

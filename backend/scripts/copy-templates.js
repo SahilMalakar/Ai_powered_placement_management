@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const srcDir = path.join(process.cwd(), 'src/utils/templates');
-const distDir = path.join(process.cwd(), 'dist/utils/templates');
+const srcDir = path.join(process.cwd(), 'src/shared/utils/templates');
+const distDir = path.join(process.cwd(), 'dist/shared/utils/templates');
 
 if (!fs.existsSync(distDir)) {
     fs.mkdirSync(distDir, { recursive: true });

@@ -1,8 +1,8 @@
 import { applyToJobWithTransaction, getApplicationRepo } from '../repositories/application.repository.js';
-import { applicationSnapshotSchema } from '../../../types/students/application.js';
-import type { ApplicationSnapshot } from '../../../types/students/application.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
+import { applicationSnapshotSchema } from '../../../shared/types/students/application.js';
+import type { ApplicationSnapshot } from '../../../shared/types/students/application.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
 
 /**
  * Handles the high-level logic for applying to a job.

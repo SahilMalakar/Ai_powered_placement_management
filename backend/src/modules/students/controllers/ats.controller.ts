@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 import {
     requestAtsAnalysisService,
     getAtsResultsService,
     getAtsStatusService,
     deleteAtsResultService,
 } from '../services/ats.service.js';
-import { BadRequestError } from '../../../utils/errors/httpErrors.js';
+import { BadRequestError } from '../../../shared/utils/errors/httpErrors.js';
 import fs from 'fs/promises';
 
 // Controller to handle POST /students/ats/analyze
@@ -46,7 +46,7 @@ export const requestAtsAnalysisController = asyncHandler(
             throw error;
         } finally {
             // Always attempt to cleanup the local file
-            await fs.unlink(filePath).catch(() => {});
+            await fs.unlink(filePath).catch(() => { });
         }
     }
 );

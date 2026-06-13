@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireAdmin } from '../../../middlewares/rbac.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireAdmin } from '../../../shared/middlewares/rbac.middleware.js';
 import { updateApplicationStatusController, getAllApplicationsController } from '../../../modules/admin/controllers/jobApplication.controller.js';
 
 const jobApplicationRouter: Router = Router();

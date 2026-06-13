@@ -6,12 +6,12 @@ import {
     updateExperienceRepo
 } from "../repositories/experience.repository.js";
 import { getProfileRepo } from "../repositories/profile.repository.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
-import type { ExperienceInput, UpdateExperienceInput } from "../../../types/students/profile.js";
+import { ForbiddenError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
+import type { ExperienceInput, UpdateExperienceInput } from "../../../shared/types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
-import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
-import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
-import { invalidateExperienceCache } from "../../../utils/cacheInvalidation.js";
+import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
+import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
+import { invalidateExperienceCache } from "../../../shared/utils/cacheInvalidation.js";
 
 export const addExperienceService = async (userId: number, data: ExperienceInput) => {
     const profile = await getProfileRepo(userId);

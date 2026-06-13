@@ -6,12 +6,12 @@ import {
     updateSkillRepo
 } from "../repositories/skill.repository.js";
 import { getProfileRepo } from "../repositories/profile.repository.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
-import type { SkillInput, UpdateSkillInput } from "../../../types/students/profile.js";
+import { ForbiddenError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
+import type { SkillInput, UpdateSkillInput } from "../../../shared/types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
-import { invalidateSkillCache } from "../../../utils/cacheInvalidation.js";
-import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
-import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { invalidateSkillCache } from "../../../shared/utils/cacheInvalidation.js";
+import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
+import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
 
 export const addSkillService = async (userId: number, data: SkillInput) => {
     const profile = await getProfileRepo(userId);

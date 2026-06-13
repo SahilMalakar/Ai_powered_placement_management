@@ -1,9 +1,9 @@
-import { sendSuccess } from "../../../utils/ApiResonse.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
-import { BadRequestError, UnauthorizedError } from "../../../utils/errors/httpErrors.js";
-import { HTTP_STATUS } from "../../../utils/httpStatus.js";
+import { sendSuccess } from "../../../shared/utils/ApiResonse.js";
+import { asyncHandler } from "../../../shared/utils/asyncHandler.js";
+import { BadRequestError, UnauthorizedError } from "../../../shared/utils/errors/httpErrors.js";
+import { HTTP_STATUS } from "../../../shared/utils/httpStatus.js";
 import { getJobApplicantsService, updateApplicationStatusService, getAllApplicationsService } from "../services/jobApplication.service.js";
-import { getJobApplicantsQuerySchema, updateApplicationStatusSchema } from "../../../types/admin/jobApplication.js";
+import { getJobApplicantsQuerySchema, updateApplicationStatusSchema } from "../../../shared/types/admin/jobApplication.js";
 
 /**
  * Controller to fetch all applications across all jobs with pagination and filters.
@@ -35,7 +35,7 @@ export const getJobApplicantsController = asyncHandler(async (req, res) => {
     }
 
     const jobId = Number(req.params.id);
-    
+
     // 1. Validate query parameters
     const query = getJobApplicantsQuerySchema.parse(req.query);
 

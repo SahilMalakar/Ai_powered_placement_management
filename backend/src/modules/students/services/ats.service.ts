@@ -1,6 +1,6 @@
-import { extractTextFromPdf } from '../../../utils/fileHandler/pdfParser.js';
-import { extractTextFromDocx } from '../../../utils/fileHandler/docxParser.js';
-import { addAtsJobToQueue } from '../../../queues/ats.queue.js';
+import { extractTextFromPdf } from '../../../shared/utils/fileHandler/pdfParser.js';
+import { extractTextFromDocx } from '../../../shared/utils/fileHandler/docxParser.js';
+import { addAtsJobToQueue } from '../../../shared/queues/ats.queue.js';
 import {
     countAtsAnalysesToday,
     createAtsResult,
@@ -12,7 +12,7 @@ import {
     BadRequestError,
     ForbiddenError,
     NotFoundError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 import path from 'path';
 
 // Service to handle ATS analysis requests.

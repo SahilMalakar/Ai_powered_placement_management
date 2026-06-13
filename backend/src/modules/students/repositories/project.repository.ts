@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import type { ProjectInput, UpdateProjectInput } from "../../../types/students/profile.js";
+import type { ProjectInput, UpdateProjectInput } from "../../../shared/types/students/profile.js";
 
 export const addProjectRepo = async (profileId: number, data: ProjectInput) => {
     return await prisma.project.create({

@@ -1,8 +1,8 @@
-import { addExportJobToQueue } from '../../../queues/export.queue.js';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
-import { NotFoundError } from '../../../utils/errors/httpErrors.js';
-import type { ExportRequestInput, ExportJobResult } from '../../../types/admin/export.js';
+import { addExportJobToQueue } from '../../../shared/queues/export.queue.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
+import { NotFoundError } from '../../../shared/utils/errors/httpErrors.js';
+import type { ExportRequestInput, ExportJobResult } from '../../../shared/types/admin/export.js';
 
 export const requestExportService = async (payload: ExportRequestInput, userId: number) => {
     // 1. Queue the BullMQ job

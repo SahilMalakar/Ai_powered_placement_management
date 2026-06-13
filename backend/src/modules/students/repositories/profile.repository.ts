@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js"
-import type { CreateProfileInput, UpdateProfileInput } from "../../../types/students/profile.js"
+import type { CreateProfileInput, UpdateProfileInput } from "../../../shared/types/students/profile.js"
 
 export const getFullStudentData = async (userId: number) => {
     // We fetch via the User model to get both StudentProfile and SemesterResults

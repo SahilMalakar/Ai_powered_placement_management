@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import { applyToJobController, getApplicationsController } from '../../../modules/students/controllers/application.controller.js';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireStudent } from '../../../middlewares/rbac.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireStudent } from '../../../shared/middlewares/rbac.middleware.js';
 import {
     validateParams,
     validateRequest,
-} from '../../../middlewares/validate.middlware.js';
-import { applicationRateLimiter } from '../../../middlewares/rateLimit.middleware.js';
+} from '../../../shared/middlewares/validate.middlware.js';
+import { applicationRateLimiter } from '../../../shared/middlewares/rateLimit.middleware.js';
 import {
     applyToJobParamsSchema,
-} from '../../../types/students/application.js';
+} from '../../../shared/types/students/application.js';
 
 /**
  * @swagger

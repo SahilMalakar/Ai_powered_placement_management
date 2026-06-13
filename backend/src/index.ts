@@ -1,14 +1,14 @@
 import { app } from './server.js';
 import { serverConfig } from './configs/index.js';
-import { errorMiddleware } from './middlewares/error.middleware.js';
-import { InternalServerError } from './utils/errors/httpErrors.js';
-import { sendEmailFromQueueViaWorker } from './workers/notification.worker.js';
-import { initializeAtsWorker } from './workers/ats.worker.js';
-import { initializeResumeWorker } from './workers/resume.worker.js';
-import { initializeDocumentWorker } from './workers/document.worker.js';
-import { initializeVerificationWorker } from './workers/verification.worker.js';
-import { initializeExportWorker } from './workers/export.worker.js';
-import { clearUploadsDirectory } from './utils/fileHandler/cleanup.js';
+import { errorMiddleware } from './shared/middlewares/error.middleware.js';
+import { InternalServerError } from './shared/utils/errors/httpErrors.js';
+import { sendEmailFromQueueViaWorker } from './shared/workers/notification.worker.js';
+import { initializeAtsWorker } from './shared/workers/ats.worker.js';
+import { initializeResumeWorker } from './shared/workers/resume.worker.js';
+import { initializeDocumentWorker } from './shared/workers/document.worker.js';
+import { initializeVerificationWorker } from './shared/workers/verification.worker.js';
+import { initializeExportWorker } from './shared/workers/export.worker.js';
+import { clearUploadsDirectory } from './shared/utils/fileHandler/cleanup.js';
 
 // Cleanup and Worker initialization
 try {

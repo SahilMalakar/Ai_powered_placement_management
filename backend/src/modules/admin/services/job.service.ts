@@ -9,17 +9,17 @@ import {
     getJobsWithApplicationStats,
 } from '../repositories/job.repository.js';
 import { findApplicationByUserIdAndJobId } from '../../students/repositories/application.repository.js';
-import { BadRequestError } from '../../../utils/errors/httpErrors.js';
+import { BadRequestError } from '../../../shared/utils/errors/httpErrors.js';
 import type {
     CreateJobInput,
     GetAllJobsQueryInput,
     UpdateJobInput,
-} from '../../../types/admin/job.js';
+} from '../../../shared/types/admin/job.js';
 import type { JobCreateInput } from '../../../prisma/generated/prisma/models/Job.js';
-import type { NotificationTypes } from '../../../types/admin/notification.js';
-import { addBulkEmailsToQueue } from '../../../queues/notification.queue.js';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import type { NotificationTypes } from '../../../shared/types/admin/notification.js';
+import { addBulkEmailsToQueue } from '../../../shared/queues/notification.queue.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 
 export const createJobService = async (jobData: CreateJobInput) => {
     const job = await createJob(jobData as JobCreateInput);

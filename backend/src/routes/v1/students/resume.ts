@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireStudent } from '../../../middlewares/rbac.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireStudent } from '../../../shared/middlewares/rbac.middleware.js';
 import {
     generateResumeController,
     getResumeByIdController,
@@ -9,8 +9,8 @@ import {
     exportResumeController,
     deleteResumeController,
 } from '../../../modules/students/controllers/resume.controller.js';
-import { validateRequest } from '../../../middlewares/validate.middlware.js';
-import { resumeJsonSchema } from '../../../types/students/resume.js';
+import { validateRequest } from '../../../shared/middlewares/validate.middlware.js';
+import { resumeJsonSchema } from '../../../shared/types/students/resume.js';
 
 /**
  * @swagger

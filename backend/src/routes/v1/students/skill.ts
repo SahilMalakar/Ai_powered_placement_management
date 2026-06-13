@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../middlewares/auth.middleware.js";
-import { requireStudent } from "../../../middlewares/rbac.middleware.js";
-import { validateRequest } from "../../../middlewares/validate.middlware.js";
-import { skillSchema, updateSkillSchema } from "../../../types/students/profile.js";
+import { authMiddleware } from "../../../shared/middlewares/auth.middleware.js";
+import { requireStudent } from "../../../shared/middlewares/rbac.middleware.js";
+import { validateRequest } from "../../../shared/middlewares/validate.middlware.js";
+import { skillSchema, updateSkillSchema } from "../../../shared/types/students/profile.js";
 import { 
     addSkillController, 
-    deleteSkillController, 
+    deleteSkillController,  
     getSkillsController, 
     updateSkillController 
 } from "../../../modules/students/controllers/skill.controller.js";

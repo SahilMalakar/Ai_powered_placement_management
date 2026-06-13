@@ -4,14 +4,14 @@ import {
     transitionToProcessing,
 } from '../repositories/verification.repository.js';
 import { getProfileRepo } from '../repositories/profile.repository.js';
-import { addVerificationJob } from '../../../queues/verification.queue.js';
+import { addVerificationJob } from '../../../shared/queues/verification.queue.js';
 import {
     BadRequestError,
     ConflictError,
     NotFoundError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 import { VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
-import { invalidateStudentCache } from '../../../utils/cacheInvalidation.js';
+import { invalidateStudentCache } from '../../../shared/utils/cacheInvalidation.js';
 
 /**
  * Service to initiate the verification process.

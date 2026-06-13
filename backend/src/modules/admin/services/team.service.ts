@@ -8,8 +8,8 @@ import {
     reactivateAdminUser,
     findUserByIdIncludingDeleted,
 } from '../repositories/team.repository.js';
-import { BadRequestError, NotFoundError } from '../../../utils/errors/httpErrors.js';
-import type { CreateAdminInput, UpdateAdminRoleInput, ReactivateAdminInput } from '../../../types/admin/team.js';
+import { BadRequestError, NotFoundError } from '../../../shared/utils/errors/httpErrors.js';
+import type { CreateAdminInput, UpdateAdminRoleInput, ReactivateAdminInput } from '../../../shared/types/admin/team.js';
 import type { Role } from '../../../prisma/generated/prisma/enums.js';
 import bcrypt from 'bcrypt';
 

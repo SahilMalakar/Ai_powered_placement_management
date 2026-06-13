@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "../../../middlewares/auth.middleware.js";
-import { requireStudent } from "../../../middlewares/rbac.middleware.js";
+import { authMiddleware } from "../../../shared/middlewares/auth.middleware.js";
+import { requireStudent } from "../../../shared/middlewares/rbac.middleware.js";
 import { getStudentAnnouncementsController } from "../../../modules/students/controllers/announcement.controller.js";
 
 const announcementsRouter: Router = Router();

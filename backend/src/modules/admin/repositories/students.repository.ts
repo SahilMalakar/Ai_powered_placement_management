@@ -1,6 +1,6 @@
 import type { Prisma } from "../../../prisma/generated/prisma/client.js";
 import { prisma } from "../../../prisma/prisma.js";
-import type { GetAllStudentsQueryInput } from "../../../types/admin/student.js";
+import type { GetAllStudentsQueryInput } from "../../../shared/types/admin/student.js";
 
 
 export const getAllStudentRepository = async (params: GetAllStudentsQueryInput & { skip: number }) => {

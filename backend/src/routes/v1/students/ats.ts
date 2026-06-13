@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireStudent } from '../../../middlewares/rbac.middleware.js';
-import { atsUpload } from '../../../utils/fileHandler/multer.js';
-import { atsRateLimiter } from '../../../middlewares/rateLimit.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireStudent } from '../../../shared/middlewares/rbac.middleware.js';
+import { atsUpload } from '../../../shared/utils/fileHandler/multer.js';
+import { atsRateLimiter } from '../../../shared/middlewares/rateLimit.middleware.js';
 import {
     requestAtsAnalysisController,
     getAtsResultsController,

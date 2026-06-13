@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import type { AdditionalDetailInput, UpdateAdditionalDetailInput } from "../../../types/students/profile.js";
+import type { AdditionalDetailInput, UpdateAdditionalDetailInput } from "../../../shared/types/students/profile.js";
 
 export const addAdditionalDetailRepo = async (profileId: number, data: AdditionalDetailInput) => {
     return await prisma.additionalDetail.create({

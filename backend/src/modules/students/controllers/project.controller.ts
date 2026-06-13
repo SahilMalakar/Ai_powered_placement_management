@@ -1,13 +1,13 @@
-import { sendSuccess } from "../../../utils/ApiResonse.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
-import { BadRequestError, UnauthorizedError } from "../../../utils/errors/httpErrors.js";
+import { sendSuccess } from "../../../shared/utils/ApiResonse.js";
+import { asyncHandler } from "../../../shared/utils/asyncHandler.js";
+import { BadRequestError, UnauthorizedError } from "../../../shared/utils/errors/httpErrors.js";
 import {
     addProjectService,
     deleteProjectService,
     getProjectsService,
     updateProjectService
 } from "../services/project.service.js";
-import { HTTP_STATUS } from "../../../utils/httpStatus.js";
+import { HTTP_STATUS } from "../../../shared/utils/httpStatus.js";
 
 export const addProjectController = asyncHandler(async (req, res) => {
     if (!req.user) {
@@ -18,7 +18,7 @@ export const addProjectController = asyncHandler(async (req, res) => {
 });
 
 export const updateProjectController = asyncHandler(async (req, res) => {
-    if (!req.user) { 
+    if (!req.user) {
         throw new UnauthorizedError("Unauthorized");
     }
     const projectId = Number(req.params.id);
@@ -31,7 +31,7 @@ export const updateProjectController = asyncHandler(async (req, res) => {
 
 export const deleteProjectController = asyncHandler(async (req, res) => {
     if (!req.user) {
-         throw new UnauthorizedError("Unauthorized");
+        throw new UnauthorizedError("Unauthorized");
     }
     const projectId = Number(req.params.id);
     if (isNaN(projectId)) {
@@ -43,7 +43,7 @@ export const deleteProjectController = asyncHandler(async (req, res) => {
 
 export const getProjectsController = asyncHandler(async (req, res) => {
     if (!req.user) {
-         throw new UnauthorizedError("Unauthorized");
+        throw new UnauthorizedError("Unauthorized");
     }
     const result = await getProjectsService(req.user.userId);
     return sendSuccess(res, result, "Projects fetched successfully", HTTP_STATUS.OK);

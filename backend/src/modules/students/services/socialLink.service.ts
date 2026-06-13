@@ -6,12 +6,12 @@ import {
     updateSocialLinkRepo
 } from "../repositories/socialLink.repository.js";
 import { getProfileRepo } from "../repositories/profile.repository.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
-import type { SocialLinkInput, UpdateSocialLinkInput } from "../../../types/students/profile.js";
+import { ForbiddenError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
+import type { SocialLinkInput, UpdateSocialLinkInput } from "../../../shared/types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
-import { invalidateSocialLinkCache } from "../../../utils/cacheInvalidation.js";
-import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
-import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { invalidateSocialLinkCache } from "../../../shared/utils/cacheInvalidation.js";
+import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
+import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
 
 export const addSocialLinkService = async (userId: number, data: SocialLinkInput) => {
     const profile = await getProfileRepo(userId);

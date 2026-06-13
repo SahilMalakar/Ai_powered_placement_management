@@ -1,5 +1,5 @@
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 import {
     getDashboardCounts,
     getRecentActivities,

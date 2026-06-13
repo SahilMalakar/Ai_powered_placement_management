@@ -1,8 +1,8 @@
 import {
     addDocumentJobToQueue,
     type DocumentJobFile,
-} from '../../../queues/document.queue.js';
-import { deleteFromCloudinary } from '../../../utils/fileHandler/cloudinary.js';
+} from '../../../shared/queues/document.queue.js';
+import { deleteFromCloudinary } from '../../../shared/utils/fileHandler/cloudinary.js';
 import {
     hardDeleteDocumentRecord,
     findDocumentById,
@@ -13,15 +13,15 @@ import { DocumentType, VerificationStatus } from '../../../prisma/generated/pris
 import {
     ForbiddenError,
     NotFoundError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 import { getProfileRepo } from '../repositories/profile.repository.js';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 import {
     invalidateDocumentCache,
     invalidateStudentCache
-} from '../../../utils/cacheInvalidation.js';
-import type { UploadDocumentInput } from '../../../types/students/document.js';
+} from '../../../shared/utils/cacheInvalidation.js';
+import type { UploadDocumentInput } from '../../../shared/types/students/document.js';
 
 /**
  * Service to fetch all documents for the student.

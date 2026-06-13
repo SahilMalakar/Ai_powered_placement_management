@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import type { SocialLinkInput, UpdateSocialLinkInput } from "../../../types/students/profile.js";
+import type { SocialLinkInput, UpdateSocialLinkInput } from "../../../shared/types/students/profile.js";
 
 export const addSocialLinkRepo = async (profileId: number, data: SocialLinkInput) => {
     return await prisma.socialLink.create({

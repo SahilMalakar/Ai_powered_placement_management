@@ -5,7 +5,7 @@ import type {
 } from '../../../prisma/generated/prisma/models/Job.js';
 import { JobStatus, Branch } from '../../../prisma/generated/prisma/enums.js';
 import { prisma } from '../../../prisma/prisma.js';
-import type { UpdateJobInput } from '../../../types/admin/job.js';
+import type { UpdateJobInput } from '../../../shared/types/admin/job.js';
 
 export const createJob = async (jobData: JobCreateInput) => {
     return await prisma.job.create({

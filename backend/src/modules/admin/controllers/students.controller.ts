@@ -1,9 +1,9 @@
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { BadRequestError, UnauthorizedError } from '../../../utils/errors/httpErrors.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 import { getAllStudentService, getStudentByIdService, softDeleteStudentService } from '../services/student.service.js';
-import { getAllStudentsQuerySchema } from '../../../types/admin/student.js';
+import { getAllStudentsQuerySchema } from '../../../shared/types/admin/student.js';
 
 /**
  * Controller to fetch all students with filtering and pagination.
@@ -53,12 +53,12 @@ export const getStudentByIdController = asyncHandler(async (req, res) => {
     )
 })
 
-export const softDeleteStudentController = asyncHandler(async(req,res)=>{
-    if(!req.user){
+export const softDeleteStudentController = asyncHandler(async (req, res) => {
+    if (!req.user) {
         throw new UnauthorizedError("Unauthorized")
     }
 
-    const {id:studentId} = req.params;
+    const { id: studentId } = req.params;
     const data = await softDeleteStudentService(Number(studentId))
 
     return sendSuccess(

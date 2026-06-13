@@ -1,7 +1,7 @@
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { BadRequestError, UnauthorizedError } from '../../../utils/errors/httpErrors.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 import {
     createJobService,
     updateJobByIdService,
@@ -12,7 +12,7 @@ import {
     deleteJobService,
     getApplicationDashboardService,
 } from '../services/job.service.js';
-import { getAllJobsQuerySchema } from '../../../types/admin/job.js';
+import { getAllJobsQuerySchema } from '../../../shared/types/admin/job.js';
 
 export const createJobController = asyncHandler(async (req, res) => {
     if (!req.user) {

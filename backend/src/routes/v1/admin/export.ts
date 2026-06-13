@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requestExportController, getExportStatusController } from '../../../modules/admin/controllers/export.controller.js';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireAdmin } from '../../../middlewares/rbac.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireAdmin } from '../../../shared/middlewares/rbac.middleware.js';
 
 const exportRouter: Router = Router();
 

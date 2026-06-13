@@ -1,7 +1,7 @@
 import type {
     CreateProfileInput,
     UpdateProfileInput,
-} from '../../../types/students/profile.js';
+} from '../../../shared/types/students/profile.js';
 import {
     createStudentProfileRepo,
     getProfileRepo,
@@ -13,11 +13,11 @@ import {
     ConflictError,
     ForbiddenError,
     NotFoundError,
-} from '../../../utils/errors/httpErrors.js';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+} from '../../../shared/utils/errors/httpErrors.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 import { VerificationStatus } from '../../../prisma/generated/prisma/enums.js';
-import { invalidateStudentCache } from '../../../utils/cacheInvalidation.js';
+import { invalidateStudentCache } from '../../../shared/utils/cacheInvalidation.js';
 
 // get profile + user service
 export const getStudentProfileService = async (userId: number) => {

@@ -1,6 +1,6 @@
 import type { Prisma } from "../../../prisma/generated/prisma/client.js";
 import { prisma } from "../../../prisma/prisma.js";
-import type { ExportRequestInput } from "../../../types/admin/export.js";
+import type { ExportRequestInput } from "../../../shared/types/admin/export.js";
 
 export const getStudentsForExportRepository = async (params: Omit<ExportRequestInput, 'type'>) => {
     const { search, branch, cgpa, backlogAllowed, verificationStatus } = params;

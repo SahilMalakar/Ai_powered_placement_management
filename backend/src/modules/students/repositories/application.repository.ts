@@ -3,12 +3,12 @@ import {
     ForbiddenError,
     ConflictError,
     NotFoundError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 import {
     VerificationStatus,
     JobStatus,
 } from '../../../prisma/generated/prisma/enums.js';
-import type { ApplicationSnapshot } from '../../../types/students/application.js';
+import type { ApplicationSnapshot } from '../../../shared/types/students/application.js';
 
 /**
  * Fetches an application by user and job ID to check for duplicates.
@@ -92,33 +92,33 @@ export const applyToJobWithTransaction = async (
 };
 
 
-export const getApplicationRepo = async(userId:number)=>{
+export const getApplicationRepo = async (userId: number) => {
     return await prisma.application.findMany({
-        where:{
-            userId:userId,
-            deletedAt:null,
-            job:{
-                deletedAt:null
+        where: {
+            userId: userId,
+            deletedAt: null,
+            job: {
+                deletedAt: null
             }
         },
-        select:{
-            id:true,
-            userId:true,
-            jobId:true,
-            status:true,
-            createdAt:true,
-            job:{
-                select:{
-                    id:true,
-                    title:true,
-                    company:true,
-                    status:true,
-                    deadline:true,
+        select: {
+            id: true,
+            userId: true,
+            jobId: true,
+            status: true,
+            createdAt: true,
+            job: {
+                select: {
+                    id: true,
+                    title: true,
+                    company: true,
+                    status: true,
+                    deadline: true,
                 }
             }
         },
-        orderBy:{
-            createdAt:"desc"
+        orderBy: {
+            createdAt: "desc"
         }
     })
 }

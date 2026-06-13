@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getAllStudentsController, getStudentByIdController, softDeleteStudentController } from '../../../modules/admin/controllers/students.controller.js';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireAdmin, requireSuperAdmin } from '../../../middlewares/rbac.middleware.js';
-import { validateParams } from '../../../middlewares/validate.middlware.js';
-import { idSchema } from '../../../types/auth.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireAdmin, requireSuperAdmin } from '../../../shared/middlewares/rbac.middleware.js';
+import { validateParams } from '../../../shared/middlewares/validate.middlware.js';
+import { idSchema } from '../../../shared/types/auth.js';
 
 const studentRouter: Router = Router();
 

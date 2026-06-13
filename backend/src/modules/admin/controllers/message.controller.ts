@@ -1,8 +1,8 @@
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-import { BadRequestError, UnauthorizedError } from '../../../utils/errors/httpErrors.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
-import { createAdminMessageSchema, getAdminMessagesHistoryQuerySchema } from '../../../types/admin/message.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
+import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
+import { createAdminMessageSchema, getAdminMessagesHistoryQuerySchema } from '../../../shared/types/admin/message.js';
 import { sendAdminMessageService, getAdminMessagesHistoryService } from '../services/message.service.js';
 
 /**
@@ -36,7 +36,7 @@ export const sendAdminMessageController = asyncHandler(async (req, res) => {
     });
 
     // 4. Custom message for UX if no student recipients found in branches
-    const successMsg = data.recipientCount === 0 
+    const successMsg = data.recipientCount === 0
         ? 'Announcement logged successfully, but no active student profiles were found in targeted branches.'
         : `Broadcast queued successfully for ${data.recipientCount} student(s) in targeted branch(es).`;
 

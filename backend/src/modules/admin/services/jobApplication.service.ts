@@ -1,10 +1,10 @@
 import type { ApplicationStatus } from "../../../prisma/generated/prisma/enums.js";
-import type { UpdateApplicationStatusInput } from "../../../types/admin/jobApplication.js";
-import type { NotificationTypes } from "../../../types/admin/notification.js";
-import { BadRequestError, NotFoundError } from "../../../utils/errors/httpErrors.js";
+import type { UpdateApplicationStatusInput } from "../../../shared/types/admin/jobApplication.js";
+import type { NotificationTypes } from "../../../shared/types/admin/notification.js";
+import { BadRequestError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
 import { getApplicantByJobIdRepository, bulkUpdateApplicationStatusRepository, getAllApplicationsRepository } from "../repositories/JobApplication.repository.js";
 import { getJobById } from "../repositories/job.repository.js";
-import { addBulkEmailsToQueue } from "../../../queues/notification.queue.js";
+import { addBulkEmailsToQueue } from "../../../shared/queues/notification.queue.js";
 
 // ─── Valid state transitions ───────────────────────────────────────
 // Only forward transitions trigger notifications.

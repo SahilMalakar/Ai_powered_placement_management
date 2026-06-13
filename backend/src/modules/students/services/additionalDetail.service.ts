@@ -6,12 +6,12 @@ import {
     updateAdditionalDetailRepo
 } from "../repositories/additionalDetail.repository.js";
 import { getProfileRepo } from "../repositories/profile.repository.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
-import type { AdditionalDetailInput, UpdateAdditionalDetailInput } from "../../../types/students/profile.js";
+import { ForbiddenError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
+import type { AdditionalDetailInput, UpdateAdditionalDetailInput } from "../../../shared/types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
-import { invalidateAdditionalDetailCache } from "../../../utils/cacheInvalidation.js";
-import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
-import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { invalidateAdditionalDetailCache } from "../../../shared/utils/cacheInvalidation.js";
+import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
+import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
 
 export const addAdditionalDetailService = async (userId: number, data: AdditionalDetailInput) => {
     const profile = await getProfileRepo(userId);

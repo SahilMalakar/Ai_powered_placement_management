@@ -1,6 +1,6 @@
 import type { Prisma } from '../../../prisma/generated/prisma/client.js';
 import { prisma } from '../../../prisma/prisma.js';
-import { UniqueConstraintError } from '../../../utils/errors/databaseErrors.js';
+import { UniqueConstraintError } from '../../../shared/utils/errors/databaseErrors.js';
 
 export const findUserByEmail = async (email: string) => {
     return prisma.user.findUnique({

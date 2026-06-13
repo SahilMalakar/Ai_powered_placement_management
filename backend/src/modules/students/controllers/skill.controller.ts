@@ -1,13 +1,13 @@
-import { sendSuccess } from "../../../utils/ApiResonse.js";
-import { asyncHandler } from "../../../utils/asyncHandler.js";
-import { BadRequestError, UnauthorizedError } from "../../../utils/errors/httpErrors.js";
+import { sendSuccess } from "../../../shared/utils/ApiResonse.js";
+import { asyncHandler } from "../../../shared/utils/asyncHandler.js";
+import { BadRequestError, UnauthorizedError } from "../../../shared/utils/errors/httpErrors.js";
 import {
     addSkillService,
     deleteSkillService,
     getSkillsService,
     updateSkillService
 } from "../services/skill.service.js";
-import { HTTP_STATUS } from "../../../utils/httpStatus.js";
+import { HTTP_STATUS } from "../../../shared/utils/httpStatus.js";
 
 export const addSkillController = asyncHandler(async (req, res) => {
     if (!req.user) {
@@ -18,7 +18,7 @@ export const addSkillController = asyncHandler(async (req, res) => {
 });
 
 export const updateSkillController = asyncHandler(async (req, res) => {
-    if (!req.user) { 
+    if (!req.user) {
         throw new UnauthorizedError("Unauthorized");
     }
     const skillId = Number(req.params.id);
@@ -31,7 +31,7 @@ export const updateSkillController = asyncHandler(async (req, res) => {
 
 export const deleteSkillController = asyncHandler(async (req, res) => {
     if (!req.user) {
-         throw new UnauthorizedError("Unauthorized");
+        throw new UnauthorizedError("Unauthorized");
     }
     const skillId = Number(req.params.id);
     if (isNaN(skillId)) {
@@ -43,7 +43,7 @@ export const deleteSkillController = asyncHandler(async (req, res) => {
 
 export const getSkillsController = asyncHandler(async (req, res) => {
     if (!req.user) {
-         throw new UnauthorizedError("Unauthorized");
+        throw new UnauthorizedError("Unauthorized");
     }
     const result = await getSkillsService(req.user.userId);
     return sendSuccess(res, result, "Skills fetched successfully", HTTP_STATUS.OK);

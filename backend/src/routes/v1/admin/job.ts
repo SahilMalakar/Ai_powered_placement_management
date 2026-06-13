@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireAdmin } from '../../../middlewares/rbac.middleware.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireAdmin } from '../../../shared/middlewares/rbac.middleware.js';
 import {
     validateParams,
     validateRequest,
-} from '../../../middlewares/validate.middlware.js';
-import { createJobSchema, updateJobSchema } from '../../../types/admin/job.js';
+} from '../../../shared/middlewares/validate.middlware.js';
+import { createJobSchema, updateJobSchema } from '../../../shared/types/admin/job.js';
 import {
     createJobController,
     updateJobByIdController,
@@ -17,7 +17,7 @@ import {
     getApplicationDashboardController,
 } from '../../../modules/admin/controllers/job.controller.js';
 import { getJobApplicantsController } from '../../../modules/admin/controllers/jobApplication.controller.js';
-import { idSchema } from '../../../types/auth.js';
+import { idSchema } from '../../../shared/types/auth.js';
 
 /**
  * @swagger

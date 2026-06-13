@@ -14,7 +14,10 @@
         "format:check": "prettier --check .",
         "db:generate": "cd src && pnpm dlx prisma generate",
         "cache:clear": "node scripts/check-queue.js --clear-cache",
-        "cache:list": "node scripts/check-queue.js --list-cache"
+        "cache:list": "node scripts/check-queue.js --list-cache",
+        "db:start": "docker compose -f docker/docker-compose.dev.yml up -d",
+        "db:stop": "docker compose -f docker/docker-compose.dev.yml down",
+        "db:logs": "docker compose -f docker/docker-compose.dev.yml logs -f"
     },
     "keywords": [],
     "author": "",

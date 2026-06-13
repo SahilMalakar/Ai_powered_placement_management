@@ -1,6 +1,6 @@
 import type { ATSAnalysisType, ATSStatus } from '../../../prisma/generated/prisma/enums.js';
 import { prisma } from '../../../prisma/prisma.js';
-import type { ATSResultType } from '../../../types/students/ats.js';
+import type { ATSResultType } from '../../../shared/types/students/ats.js';
 
 // Saves a new ATS analysis result to the database in PENDING status.
 export const createAtsResult = async (

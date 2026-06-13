@@ -6,12 +6,12 @@ import {
     updateProjectRepo
 } from "../repositories/project.repository.js";
 import { getProfileRepo } from "../repositories/profile.repository.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors/httpErrors.js";
-import type { ProjectInput, UpdateProjectInput } from "../../../types/students/profile.js";
+import { ForbiddenError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
+import type { ProjectInput, UpdateProjectInput } from "../../../shared/types/students/profile.js";
 import { VerificationStatus } from "../../../prisma/generated/prisma/enums.js";
-import { invalidateProjectCache } from "../../../utils/cacheInvalidation.js";
-import { CACHE_KEYS } from "../../../utils/cacheKeys.js";
-import { getRedisConnectionForCaching } from "../../../configs/redis.config.js";
+import { invalidateProjectCache } from "../../../shared/utils/cacheInvalidation.js";
+import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
+import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
 
 export const addProjectService = async (userId: number, data: ProjectInput) => {
     const profile = await getProfileRepo(userId);

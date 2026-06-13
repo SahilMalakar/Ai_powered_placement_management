@@ -6,11 +6,11 @@ import {
     deleteAdminController,
     reactivateAdminController,
 } from '../../../modules/admin/controllers/team.controller.js';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireSuperAdmin } from '../../../middlewares/rbac.middleware.js';
-import { validateParams, validateRequest } from '../../../middlewares/validate.middlware.js';
-import { createAdminSchema, updateAdminRoleSchema, reactivateAdminSchema } from '../../../types/admin/team.js';
-import { idSchema } from '../../../types/auth.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireSuperAdmin } from '../../../shared/middlewares/rbac.middleware.js';
+import { validateParams, validateRequest } from '../../../shared/middlewares/validate.middlware.js';
+import { createAdminSchema, updateAdminRoleSchema, reactivateAdminSchema } from '../../../shared/types/admin/team.js';
+import { idSchema } from '../../../shared/types/auth.js';
 
 const teamRouter: Router = Router();
 

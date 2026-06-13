@@ -1,13 +1,13 @@
-import { 
-    createMessageRepository, 
+import {
+    createMessageRepository,
     getStudentsByBranchesRepository,
     getAdminByIdRepository,
     getAdminMessagesHistoryRepository,
     updateMessageStatusRepository,
 } from "../repositories/message.repository.js";
-import { addBulkEmailsToQueue } from "../../../queues/notification.queue.js";
+import { addBulkEmailsToQueue } from "../../../shared/queues/notification.queue.js";
 import type { Branch } from "../../../prisma/generated/prisma/enums.js";
-import type { GetAdminMessagesHistoryQueryInput } from "../../../types/admin/message.js";
+import type { GetAdminMessagesHistoryQueryInput } from "../../../shared/types/admin/message.js";
 
 /**
  * Smart URL parser to deduce a contextual CTA button label for student emails.
@@ -15,64 +15,64 @@ import type { GetAdminMessagesHistoryQueryInput } from "../../../types/admin/mes
  */
 const getButtonLabelForLink = (url?: string): string => {
     if (!url) return 'View Details';
-    
+
     const lowerUrl = url.toLowerCase();
-    
+
     // Edge Case Fix: Strip query parameters (?) and hashes (#) to get the clean file path for suffix matching
     const cleanUrlPath = (lowerUrl.split('?')[0] || '').split('#')[0] || '';
-    
+
     // 1. Google Sheets, Excel spreadsheets, or CSV downloads
     if (
-        lowerUrl.includes('docs.google.com/spreadsheets') || 
-        lowerUrl.includes('sheets.new') || 
+        lowerUrl.includes('docs.google.com/spreadsheets') ||
+        lowerUrl.includes('sheets.new') ||
         cleanUrlPath.endsWith('.csv') ||
         cleanUrlPath.endsWith('.xlsx') ||
         cleanUrlPath.endsWith('.xls')
     ) {
         return 'Open Spreadsheet';
     }
-    
+
     // 2. Google Forms Surveys
     if (
-        lowerUrl.includes('docs.google.com/forms') || 
+        lowerUrl.includes('docs.google.com/forms') ||
         lowerUrl.includes('forms.gle')
     ) {
         return 'Open Google Form';
     }
-    
+
     // 3. Google Docs (Word Documents)
     if (
-        lowerUrl.includes('docs.google.com/document') || 
-        lowerUrl.includes('docs.new') || 
+        lowerUrl.includes('docs.google.com/document') ||
+        lowerUrl.includes('docs.new') ||
         cleanUrlPath.endsWith('.docx') ||
         cleanUrlPath.endsWith('.doc')
     ) {
         return 'Open Google Doc';
     }
-    
+
     // 4. Google Slides (Presentations)
     if (
-        lowerUrl.includes('docs.google.com/presentation') || 
-        lowerUrl.includes('slides.new') || 
+        lowerUrl.includes('docs.google.com/presentation') ||
+        lowerUrl.includes('slides.new') ||
         cleanUrlPath.endsWith('.pptx') ||
         cleanUrlPath.endsWith('.ppt')
     ) {
         return 'Open Presentation';
     }
-    
+
     // 5. Google Drive Shared Files or Folders
     if (
-        lowerUrl.includes('drive.google.com') || 
+        lowerUrl.includes('drive.google.com') ||
         lowerUrl.includes('shared-drive')
     ) {
         return 'Access Google Drive';
     }
-    
+
     // 6. PDF Documents
     if (cleanUrlPath.endsWith('.pdf')) {
         return 'View PDF Document';
     }
-    
+
     return 'View Details';
 };
 

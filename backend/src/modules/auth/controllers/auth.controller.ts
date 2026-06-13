@@ -1,12 +1,12 @@
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
 import {
     accessTokenCookieOptions,
     cookieOption,
     refreshTokenCookieOptions,
-} from '../../../utils/cookieOption.js';
-import { UnauthorizedError } from '../../../utils/errors/httpErrors.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+} from '../../../shared/utils/cookieOption.js';
+import { UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 import {
     changePasswordService,
     forgetPasswordService,

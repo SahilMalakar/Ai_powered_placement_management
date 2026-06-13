@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express';
-import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
 import {
     getDocumentsService,
     uploadSingleDocumentService,
     deleteDocumentService,
 } from '../services/document.service.js';
-import { sendSuccess } from '../../../utils/ApiResonse.js';
-import { BadRequestError, UnauthorizedError } from '../../../utils/errors/httpErrors.js';
-import { HTTP_STATUS } from '../../../utils/httpStatus.js';
+import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
+import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
 
 /**
  * Controller to fetch all documents for the logged-in student.

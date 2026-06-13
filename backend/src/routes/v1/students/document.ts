@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../../middlewares/auth.middleware.js';
-import { requireStudent } from '../../../middlewares/rbac.middleware.js';
-import { documentUpload } from '../../../utils/fileHandler/multer.js';
-import { validateRequest } from '../../../middlewares/validate.middlware.js';
-import { uploadDocumentSchema } from '../../../types/students/document.js';
+import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
+import { requireStudent } from '../../../shared/middlewares/rbac.middleware.js';
+import { documentUpload } from '../../../shared/utils/fileHandler/multer.js';
+import { validateRequest } from '../../../shared/middlewares/validate.middlware.js';
+import { uploadDocumentSchema } from '../../../shared/types/students/document.js';
 import {
     getDocumentsController,
     uploadDocumentController,

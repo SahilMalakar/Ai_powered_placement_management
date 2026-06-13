@@ -1,6 +1,5 @@
 import { getFullStudentData } from '../repositories/profile.repository.js';
 import {
-    countUserResumes,
     findResumesByUserId,
     findResumeById,
     updateResumeJson,
@@ -9,15 +8,14 @@ import {
     getLatestResumeVersion,
     deleteResumeRecord,
 } from '../repositories/resume.repository.js';
-import { deleteFromCloudinary } from '../../../utils/fileHandler/cloudinary.js';
-import { addResumeJobToQueue } from '../../../queues/resume.queue.js';
-import { resumeJsonSchema } from '../../../types/students/resume.js';
+import { deleteFromCloudinary } from '../../../shared/utils/fileHandler/cloudinary.js';
+import { addResumeJobToQueue } from '../../../shared/queues/resume.queue.js';
+import { resumeJsonSchema } from '../../../shared/types/students/resume.js';
 import {
     BadRequestError,
     NotFoundError,
     ConflictError,
-    InternalServerError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 
 const MAX_RESUMES = 5;
 

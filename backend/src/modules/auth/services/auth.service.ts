@@ -6,18 +6,18 @@ import type {
     LoginInput,
     ResetPasswordInput,
     SignupInput,
-} from '../../../types/auth.js';
-import { InvalidCredentialsError } from '../../../utils/errors/authErrors.js';
-import { UniqueConstraintError } from '../../../utils/errors/databaseErrors.js';
+} from '../../../shared/types/auth.js';
+import { InvalidCredentialsError } from '../../../shared/utils/errors/authErrors.js';
+import { UniqueConstraintError } from '../../../shared/utils/errors/databaseErrors.js';
 import {
     ForbiddenError,
     NotFoundError,
     UnauthorizedError,
-} from '../../../utils/errors/httpErrors.js';
+} from '../../../shared/utils/errors/httpErrors.js';
 import {
     generateRefreshToken,
     generateToken,
-} from '../../../utils/jwt/generateToken.js';
+} from '../../../shared/utils/jwt/generateToken.js';
 import {
     createUser,
     findUserByEmail,
@@ -27,12 +27,12 @@ import {
 } from '../repositories/auth.repository.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { getRedisConnectionForCaching } from '../../../configs/redis.config.js';
-import { CACHE_KEYS } from '../../../utils/cacheKeys.js';
+import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
+import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 import {
     notificationQueue,
     notifcationQueue,
-} from '../../../queues/notification.queue.js';
+} from '../../../shared/queues/notification.queue.js';
 
 export const signupService = async (signupData: SignupInput) => {
     const isUserExist = await findUserByEmail(signupData.email);

@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/prisma.js";
-import { BadRequestError } from "../../../utils/errors/httpErrors.js";
+import { BadRequestError } from "../../../shared/utils/errors/httpErrors.js";
 
 /**
  * Service to fetch paginated broadcasts/announcements targeted to the student's registered branch.
