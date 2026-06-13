@@ -20,4 +20,7 @@ export const CACHE_KEYS = {
     ADMIN_DASHBOARD_STATS: 'admin:dashboard:stats',
     PASSWORD_RESET_OTP: (email: string) => `otp:reset:${email}`,
     EXPORT_JOB: (jobId: string | number) => `export:job:${jobId}`,
+    RESUME_JOB: (jobId: string) => `resume:job:${jobId}`,
+    STUDENT_RESUMES: (userId: number) => `student:resumes:${userId}`,
+    GITHUB_SCRAPE_JOB: (jobId: string) => `github:scrape:job:${jobId}`,
 };

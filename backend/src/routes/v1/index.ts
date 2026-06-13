@@ -19,6 +19,8 @@ import teamRouter from './admin/team.js';
 import { messageRouter } from './admin/message.js';
 import { dashboardRouter } from './admin/dashboard.js';
 import { exportRouter } from './admin/export.js';
+import { optimizeResumeRouter } from './students/optimizeResume.js';
+import { githubScraperRouter } from './students/githubScraper.js';
 
 const router: Router = Router();
 
@@ -35,6 +37,8 @@ router.use('/v1/students/document', documentRouter);
 router.use('/v1/students/verification', verificationRouter);
 router.use('/v1/students/application', applicationRouter);
 router.use('/v1/students/announcements', announcementsRouter);
+router.use('/v1/students/resume/optimize', optimizeResumeRouter);
+router.use('/v1/students', githubScraperRouter);
 
 
 router.use("/v1/admin-apps", jobApplicationRouter);

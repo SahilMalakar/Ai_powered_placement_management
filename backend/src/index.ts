@@ -8,6 +8,8 @@ import { initializeResumeWorker } from './shared/workers/resume.worker.js';
 import { initializeDocumentWorker } from './shared/workers/document.worker.js';
 import { initializeVerificationWorker } from './shared/workers/verification.worker.js';
 import { initializeExportWorker } from './shared/workers/export.worker.js';
+import { initializeOptimizeResumeWorker } from './shared/workers/optimizeResume.worker.js';
+import { initializeGithubScraperWorker } from './shared/workers/githubScraper.worker.js';
 import { clearUploadsDirectory } from './shared/utils/fileHandler/cleanup.js';
 
 // Cleanup and Worker initialization
@@ -20,6 +22,8 @@ try {
     initializeDocumentWorker();
     initializeVerificationWorker();
     initializeExportWorker();
+    initializeOptimizeResumeWorker();
+    initializeGithubScraperWorker();
     console.log(`Successfully initialized background workers`);
 } catch (error) {
     console.log(error);
