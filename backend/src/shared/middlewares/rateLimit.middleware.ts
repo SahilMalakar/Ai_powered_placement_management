@@ -17,6 +17,7 @@ export const authRateLimit = rateLimit({
     },
     // Skip successful requests if needed, but for auth, we usually want to limit all attempts to prevent brute force
     skipSuccessfulRequests: false,
+    skip: () => process.env.NODE_ENV === 'test',
 });
 
 //
@@ -47,6 +48,7 @@ export const applicationRateLimiter = rateLimit({
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    skip: () => process.env.NODE_ENV === 'test',
 });
 
 // Custom rate limiter for ATS creation.
@@ -74,4 +76,5 @@ export const atsRateLimiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === 'test',
 });

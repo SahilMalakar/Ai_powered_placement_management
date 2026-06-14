@@ -17,7 +17,12 @@
         "cache:list": "node scripts/check-queue.js --list-cache",
         "db:start": "docker compose -f docker/docker-compose.dev.yml up -d",
         "db:stop": "docker compose -f docker/docker-compose.dev.yml down",
-        "db:logs": "docker compose -f docker/docker-compose.dev.yml logs -f"
+        "db:logs": "docker compose -f docker/docker-compose.dev.yml logs -f",
+        "test:db:up": "docker compose -f docker/docker-compose.test.yml up -d",
+        "test:db:down": "docker compose -f docker/docker-compose.test.yml down",
+        "test:db:migrate": "dotenv -e .env.test -- prisma migrate deploy --schema=src/prisma/schema.prisma",
+        "test": "dotenv -e .env.test -- vitest run",
+        "test:watch": "dotenv -e .env.test -- vitest"
     },
     "keywords": [],
     "author": "",
@@ -70,14 +75,18 @@
         "@types/pdf-parse": "^1.1.5",
         "@types/pg": "^8.20.0",
         "@types/react": "^19.2.14",
+        "@types/supertest": "^7.2.0",
         "@types/swagger-jsdoc": "^6.0.4",
         "@types/swagger-ui-express": "^4.1.8",
+        "dotenv-cli": "^11.0.0",
         "eslint": "^10.2.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.5",
         "prettier": "^3.8.2",
         "prisma": "^7.5.0",
+        "supertest": "^7.2.2",
         "typescript": "^6.0.2",
-        "typescript-eslint": "^8.58.1"
+        "typescript-eslint": "^8.58.1",
+        "vitest": "^4.1.8"
     }
 }

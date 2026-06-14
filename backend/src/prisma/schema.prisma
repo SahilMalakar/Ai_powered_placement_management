@@ -19,15 +19,15 @@ model User {
   deletedAt DateTime?
 
   // Relations
-  profile      StudentProfile?
-  documents    Document[]
-  applications Application[]
-  resumes      Resume[]
-  atsResults   ATSResult[]
-  semesters    SemesterResult[]
-  jobsCreated  Job[]
+  profile              StudentProfile?
+  documents            Document[]
+  applications         Application[]
+  resumes              Resume[]
+  atsResults           ATSResult[]
+  semesters            SemesterResult[]
+  jobsCreated          Job[]
   notificationsCreated NotificationMessage[]
-  exportLogs   ExportLog[]
+  exportLogs           ExportLog[]
 
   @@index([role])
 }
@@ -263,7 +263,7 @@ model NotificationMessage {
   updatedAt   DateTime           @updatedAt
 
   // Relations
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdBy User @relation(fields: [createdById], references: [id])
 }
 
 model ExportLog {
@@ -342,7 +342,6 @@ enum ResumeStatus {
   COMPLETED
   FAILED
 }
-
 
 enum NotificationStatus {
   QUEUED

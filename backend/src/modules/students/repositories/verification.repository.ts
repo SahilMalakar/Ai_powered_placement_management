@@ -119,8 +119,8 @@ export const saveVerifiedAcademicData = async (
  */
 export const resetVerificationState = async (userId: number) => {
     return await prisma.$transaction(async (tx) => {
-        // 1. Reset Profile status and clear academic data
-        const profile = await tx.studentProfile.update({
+        // 1. Reset Profile status and clear academic data (use updateMany so it doesn't throw if profile doesn't exist)
+        await tx.studentProfile.updateMany({
             where: { userId },
             data: {
                 verificationStatus: VerificationStatus.NOT_VERIFIED,
@@ -137,7 +137,7 @@ export const resetVerificationState = async (userId: number) => {
             where: { userId },
         });
 
-        return profile;
+        return { userId };
     });
 };
 

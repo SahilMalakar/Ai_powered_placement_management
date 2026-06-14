@@ -142,18 +142,13 @@ export const getStudentByIdRepository = async (studentId: number) => {
 }
 
 export const softDeleteStudentRepository = async (studentId: number) => {
-    return await prisma.user.update({
+    const result = await prisma.user.update({
         where: {
             id: studentId,
             role: "STUDENT"
         },
         data: {
             deletedAt: new Date(),
-            profile: {
-                update: {
-                    deletedAt: new Date()
-                }
-            },
             documents: {
                 updateMany: {
                     where: { deletedAt: null },
@@ -184,5 +179,12 @@ export const softDeleteStudentRepository = async (studentId: number) => {
             email: true,
             deletedAt: true,
         }
-    })
+    });
+
+    await prisma.studentProfile.updateMany({
+        where: { userId: studentId, deletedAt: null },
+        data: { deletedAt: new Date() }
+    });
+
+    return result;
 }
