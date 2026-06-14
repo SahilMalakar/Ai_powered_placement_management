@@ -3,9 +3,8 @@ import { API_ROUTES } from '@/constants/api';
 import { GithubScrapeResponse } from '@/types/student/resume';
 
 export const scrapeGithubService = async (
-  projectId: number,
   githubUrl: string
 ): Promise<GithubScrapeResponse> => {
-  const response = await api.post(API_ROUTES.GITHUB_SCRAPE(projectId), { githubUrl });
+  const response = await api.post(API_ROUTES.GITHUB_SCRAPE, { githubUrl });
   return response.data.data;
 };

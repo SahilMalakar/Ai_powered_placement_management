@@ -3,13 +3,13 @@ import { scrapeGithubService } from "@/services/student/githubScraper.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
 import { toast } from "sonner";
 
-export function useGithubScraperMutation(projectId: number) {
+export function useGithubScraperMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (githubUrl: string) => scrapeGithubService(projectId, githubUrl),
+    mutationFn: (githubUrl: string) => scrapeGithubService(githubUrl),
     onSuccess: () => {
-      toast.success("GitHub project import queued. Description will update shortly.");
+      toast.success("GitHub project imported successfully. Check your projects.");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENT_PROFILE] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENT_PROJECTS] });
     },

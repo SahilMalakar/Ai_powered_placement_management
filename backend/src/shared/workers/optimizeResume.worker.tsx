@@ -80,7 +80,7 @@ const estimatorNode = async (state: typeof ResumeOptimizerStateAnnotation.State)
             detectedRole: state.detectedRole,
         })
     );
-    const maxIterations = estimation.candidateTier === 'newbie' ? 2 : 3;
+    const maxIterations = 1;
     return {
         estimatedCeiling: estimation.estimatedCeiling,
         candidateTier: estimation.candidateTier,
@@ -198,6 +198,8 @@ workflow.addEdge('fabricationDetector', 'critique');
 
 // Conditional transition based on loop criteria
 const shouldContinue = (state: typeof ResumeOptimizerStateAnnotation.State) => {
+    if (state.iterationCount >= 1) return 'generateGapReport';
+
     const isBelowCeiling = state.presentationScore < state.estimatedCeiling;
     const hasMoreIterations = state.iterationCount < state.maxIterations;
 
@@ -216,6 +218,7 @@ const shouldContinue = (state: typeof ResumeOptimizerStateAnnotation.State) => {
 workflow.addConditionalEdges('critique', shouldContinue, {
     optimizer: 'optimizer',
     jsonMapper: 'jsonMapper',
+    generateGapReport: 'jsonMapper',
 });
 
 workflow.addEdge('jsonMapper', 'gapReporter');
@@ -258,7 +261,7 @@ export const initializeOptimizeResumeWorker = () => {
                     presentationScore: 0,
                     contentScore: 0,
                     improvementDelta: 0,
-                    maxIterations: 2,
+                    maxIterations: 1,
                     fabricationsFound: false,
                 });
 

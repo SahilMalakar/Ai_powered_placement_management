@@ -8,12 +8,11 @@ export const EXPORT_ENDPOINTS = {
 } as const;
 
 export const API_ROUTES = {
-  OPTIMIZE_RESUME: '/student/resume/optimize',
-  OPTIMIZE_RESUME_BY_ID: (id: number) => `/student/resume/optimize/${id}`,
-  OPTIMIZE_RESUME_DELETE: (id: number) => `/student/resume/optimize/${id}`,
-  ALL_RESUMES: '/student/resume/optimize',
-  GITHUB_SCRAPE: (projectId: number) =>
-    `/student/projects/${projectId}/scrape-github`,
+  OPTIMIZE_RESUME: '/students/resume/optimize',
+  OPTIMIZE_RESUME_BY_ID: (id: number) => `/students/resume/optimize/${id}`,
+  OPTIMIZE_RESUME_DELETE: (id: number) => `/students/resume/optimize/${id}`,
+  ALL_RESUMES: '/students/resume/optimize',
+  GITHUB_SCRAPE: '/students/projects/scrape-github',
 } as const;
 
 

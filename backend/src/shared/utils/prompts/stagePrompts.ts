@@ -191,18 +191,42 @@ Return ONLY valid JSON matching this schema exactly, no markdown:
   }]
 }`;
 
-export const GITHUB_README_SUMMARIZER_SYSTEM = `You are a technical project summarizer. Produce exactly 4-5 concise bullet points from the README describing what the project does, key technologies, notable features, and scale or impact if mentioned.
+export const GITHUB_README_SUMMARIZER_SYSTEM = `You are a technical project summarizer. Read the GitHub README and extract:
 
-Rules:
-  Each bullet starts with a strong action verb
-  No filler phrases
-  One sentence per bullet maximum
-  Extract live URL separately if mentioned in README
-  Do not fabricate anything not in the README
+title:
+  The project name. Use the repo name if not explicitly stated in README.
+  Format it cleanly (e.g. "AI-Powered Resume Optimizer" not "ai-resume-opt").
 
-Return ONLY valid JSON, no markdown:
+description:
+  Exactly 4-5 concise bullet points. Each bullet:
+    - Starts with a strong action verb
+    - Describes what the project does, key features, tech used, or outcomes
+    - Is one sentence maximum
+    - Is written as a plain string (no leading dash or asterisk)
+
+keyTools:
+  A comma-separated string of all technologies, frameworks, languages, and
+  tools mentioned in the README (e.g. "Node.js, React, PostgreSQL, Docker").
+  If none explicitly mentioned, infer from repo content clues.
+  Maximum 8 tools.
+
+liveUrl:
+  The live demo or deployment URL if mentioned in the README. null if absent.
+
+startDate:
+  If a creation date, launch date, or "built in [year/month]" is mentioned,
+  return it as ISO string (e.g. "2024-01-01T00:00:00.000Z"). null if absent.
+
+endDate:
+  If the project is marked as completed with a date, return ISO string.
+  null if ongoing or not mentioned.
+
+Return ONLY valid JSON, no markdown, no explanation:
 {
-  "bullets": string[],
+  "title": string,
+  "description": string[],
+  "keyTools": string,
   "liveUrl": string | null,
-  "detectedTitle": string | null
+  "startDate": string | null,
+  "endDate": string | null
 }`;

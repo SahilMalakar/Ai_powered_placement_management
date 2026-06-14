@@ -6,13 +6,14 @@ import { getRedisConnection, getRedisConnectionForCaching } from '../../infra/re
 import { CACHE_KEYS } from '../utils/cacheKeys.js';
 import { callLLM } from '../utils/llmHelper.js';
 import { GITHUB_README_SUMMARIZER_SYSTEM } from '../utils/prompts/stagePrompts.js';
+import { invalidateCache } from '../utils/cacheInvalidation.js';
 
 export const initializeGithubScraperWorker = () => {
     const scraperWorker = new Worker(
         GITHUB_SCRAPER_QUEUE_NAME,
         async (job: Job) => {
-            const { projectId, userId, githubUrl } = job.data;
-            console.log(`[GitHub Scraper Worker] Processing job ${job.id} for project ${projectId} (User: ${userId})...`);
+            const { userId, githubUrl } = job.data;
+            console.log(`[GitHub Scraper Worker] Processing job ${job.id} (User: ${userId})...`);
 
             const cache = getRedisConnectionForCaching();
             const cacheKey = CACHE_KEYS.GITHUB_SCRAPE_JOB(job.id!);
@@ -62,29 +63,44 @@ export const initializeGithubScraperWorker = () => {
                 console.log(`[GitHub Scraper Worker] README fetched successfully (${readmeText.length} characters). Summarizing with LLM...`);
 
                 // Call LLM to summarize README
-                const summary: any = await callLLM(GITHUB_README_SUMMARIZER_SYSTEM, readmeText);
-                const { bullets, liveUrl } = summary;
+                const result: any = await callLLM(GITHUB_README_SUMMARIZER_SYSTEM, readmeText);
+                const { title, description, keyTools, liveUrl, startDate, endDate } = result;
 
-                if (!bullets || !Array.isArray(bullets) || bullets.length === 0) {
+                if (!description || !Array.isArray(description) || description.length === 0) {
                     throw new Error('LLM failed to produce project bullet points');
                 }
 
-                console.log(`[GitHub Scraper Worker] Summarized. Bullets: ${bullets.length}, Live URL: ${liveUrl}. Updating Project...`);
+                console.log(`[GitHub Scraper Worker] Summarized. Bullets: ${description.length}, Live URL: ${liveUrl}. Creating Project...`);
 
-                // Update Project model in Prisma DB
-                await prisma.project.update({
-                    where: { id: projectId },
+                // Step 1: get the student's profileId from userId
+                const profile = await prisma.studentProfile.findUnique({
+                    where: { userId },
+                    select: { id: true }
+                });
+                if (!profile) throw new Error('Student profile not found');
+
+                // Step 2: create the project
+                const createdProject = await prisma.project.create({
                     data: {
-                        description: bullets,
-                        ...(liveUrl ? { link: liveUrl } : {})
+                        profileId: profile.id,
+                        title: result.title,
+                        description: result.description,
+                        keyTools: result.keyTools,
+                        link: githubUrl,
+                        secondaryLink: result.liveUrl ?? null,
+                        startDate: result.startDate ? new Date(result.startDate) : null,
+                        endDate: result.endDate ? new Date(result.endDate) : null,
                     }
                 });
+
+                // Step 3: Invalidate projects cache
+                await invalidateCache(CACHE_KEYS.STUDENT_PROJECTS(userId));
 
                 // Update Redis cache with success status
                 const successResult = {
                     status: 'completed',
-                    projectId,
-                    bullets,
+                    projectId: createdProject.id,
+                    bullets: description,
                     liveUrl,
                     createdAt: new Date().toISOString()
                 };

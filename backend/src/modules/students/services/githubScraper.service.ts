@@ -5,7 +5,6 @@ import { getRedisConnectionForCaching } from '../../../infra/redis.config.js';
 import { CACHE_KEYS } from '../../../shared/utils/cacheKeys.js';
 
 export const requestGithubScrapeService = async (
-    projectId: number,
     userId: number,
     githubUrl: string
 ) => {
@@ -15,12 +14,7 @@ export const requestGithubScrapeService = async (
     });
     if (!profile) throw new NotFoundError('Student profile not found');
 
-    const project = await prisma.project.findFirst({
-        where: { id: projectId, profileId: profile.id },
-    });
-    if (!project) throw new NotFoundError('Project not found');
-
-    const job = await addGithubScraperJobToQueue({ projectId, userId, githubUrl });
+    const job = await addGithubScraperJobToQueue({ userId, githubUrl });
     return { jobId: job.id };
 };
 

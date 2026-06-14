@@ -6,11 +6,8 @@ import { githubScrapeRequestSchema } from '../../../shared/types/students/github
 import { requestGithubScrapeService, getGithubScrapeStatusService } from '../services/githubScraper.service.js';
 
 export const requestGithubScrape = asyncHandler(async (req: Request, res: Response) => {
-    const projectId = Number(req.params.projectId);
-    if (isNaN(projectId)) throw new BadRequestError('Invalid project ID');
-
     const body = githubScrapeRequestSchema.parse(req.body);
-    const result = await requestGithubScrapeService(projectId, req.user!.userId, body.githubUrl);
+    const result = await requestGithubScrapeService(req.user!.userId, body.githubUrl);
     return sendSuccess(res, result, 'GitHub scrape queued', 202);
 });
 

@@ -31,13 +31,13 @@ router.use('/v1/students/profile/socialLink', socialLinkRouter);
 router.use('/v1/students/profile/project', projectRouter);
 router.use('/v1/students/profile/skill', skillRouter);
 router.use('/v1/students/profile/additionalDetail', additionalDetailRouter);
+router.use('/v1/students/resume/optimize', optimizeResumeRouter);
 router.use('/v1/students/resume', resumeRouter);
 router.use('/v1/students/ats', atsRouter);
 router.use('/v1/students/document', documentRouter);
 router.use('/v1/students/verification', verificationRouter);
 router.use('/v1/students/application', applicationRouter);
 router.use('/v1/students/announcements', announcementsRouter);
-router.use('/v1/students/resume/optimize', optimizeResumeRouter);
 router.use('/v1/students', githubScraperRouter);
 
 

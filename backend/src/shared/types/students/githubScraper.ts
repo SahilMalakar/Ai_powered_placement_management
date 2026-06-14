@@ -7,7 +7,6 @@ export const githubScrapeRequestSchema = z.object({
 export type GithubScrapeRequest = z.infer<typeof githubScrapeRequestSchema>;
 
 export interface GithubScraperJobPayload {
-    projectId: number;
     userId: number;
     githubUrl: string;
 }

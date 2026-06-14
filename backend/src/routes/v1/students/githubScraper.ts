@@ -7,7 +7,7 @@ const githubScraperRouter: Router = Router();
 
 githubScraperRouter.use(authMiddleware, requireStudent);
 
-githubScraperRouter.post('/projects/:projectId/scrape-github', requestGithubScrape);
+githubScraperRouter.post('/projects/scrape-github', requestGithubScrape);
 githubScraperRouter.get('/projects/jobs/:jobId/status', getGithubScrapeStatus);
 
 export { githubScraperRouter };

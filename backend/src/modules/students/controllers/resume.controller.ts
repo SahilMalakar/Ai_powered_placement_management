@@ -1,7 +1,7 @@
 import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
 import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
 import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
-import { UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
+import { UnauthorizedError, BadRequestError } from '../../../shared/utils/errors/httpErrors.js';
 import {
     generateResumeService,
     getResumeByIdService,
@@ -55,6 +55,9 @@ export const getResumeByIdController = asyncHandler(async (req, res) => {
 
     const userId = req.user.userId;
     const resumeId = parseInt(req.params.id as string);
+    if (isNaN(resumeId)) {
+        throw new BadRequestError('Invalid resume ID.');
+    }
     const result = await getResumeByIdService(resumeId, userId);
 
     return sendSuccess(
@@ -73,6 +76,9 @@ export const updateResumeController = asyncHandler(async (req, res) => {
 
     const userId = req.user.userId;
     const resumeId = parseInt(req.params.id as string);
+    if (isNaN(resumeId)) {
+        throw new BadRequestError('Invalid resume ID.');
+    }
     const result = await updateResumeService(resumeId, userId, req.body);
 
     return sendSuccess(
@@ -93,6 +99,9 @@ export const exportResumeController = asyncHandler(async (req, res) => {
 
     const userId = req.user.userId;
     const resumeId = parseInt(req.params.id as string);
+    if (isNaN(resumeId)) {
+        throw new BadRequestError('Invalid resume ID.');
+    }
 
     const result = await exportResumePdfService(resumeId, userId);
 
@@ -112,6 +121,9 @@ export const deleteResumeController = asyncHandler(async (req, res) => {
 
     const userId = req.user.userId;
     const resumeId = parseInt(req.params.id as string);
+    if (isNaN(resumeId)) {
+        throw new BadRequestError('Invalid resume ID.');
+    }
     await deleteResumeService(resumeId, userId);
 
     return sendSuccess(

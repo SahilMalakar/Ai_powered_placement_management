@@ -44,7 +44,7 @@ export const studentNavItems: NavItem[] = [
   },
   {
     label: "Optimize Resume",
-    href: "/student/optimize-resume",
+    href: "/optimize-resume",
     icon: Sparkles,
   },
   {
