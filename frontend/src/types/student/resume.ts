@@ -68,3 +68,23 @@ export interface Resume {
   createdAt: string;
   updatedAt: string;
 }
+
+export type ResumeStatus = 'GENERATING' | 'COMPLETED' | 'FAILED';
+
+export interface ResumeEntry {
+  id: number;
+  version: number;
+  status: ResumeStatus;
+  pdfUrl: string | null;
+  createdAt: string;
+}
+
+export interface OptimizeResumeResponse {
+  jobId: string;
+  resumeId: number;
+}
+
+export interface GithubScrapeResponse {
+  jobId: string;
+}
+

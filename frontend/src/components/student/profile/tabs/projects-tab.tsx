@@ -7,6 +7,7 @@ import { Plus, Edit2, Trash2, ExternalLink, GitFork } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProjectDialog } from "./project-dialog"
 import { Project } from "@/types/student/profile"
+import { GithubImportCard } from "../GithubImportCard"
 
 interface ProjectsTabProps {
   onNext: () => void
@@ -65,6 +66,8 @@ export function ProjectsTab({ onNext, onPrev }: ProjectsTabProps) {
   return (
     <div className="space-y-6 flex flex-col h-full">
       <div className="flex-1 space-y-6">
+        <GithubImportCard />
+
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Personal Projects</h3>
           <Button 

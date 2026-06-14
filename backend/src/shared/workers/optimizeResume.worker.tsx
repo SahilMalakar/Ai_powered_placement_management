@@ -15,7 +15,7 @@ import {
     DOMAIN_CRITIQUE_SYSTEM,
     GAP_REPORT_SYSTEM,
     RESUME_JSON_MAPPER_SYSTEM,
-} from '../utils/prompts/resumeOptimizer/stagePrompts.js';
+} from '../utils/prompts/stagePrompts.js';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { ResumeTemplate } from '../utils/templates/resumeTemplate.js';
 import { uploadBufferToCloudinary } from '../utils/fileHandler/cloudinary.js';
@@ -310,7 +310,7 @@ export const initializeOptimizeResumeWorker = () => {
 
             } catch (error: any) {
                 console.error(`[Optimize Resume Worker] ❌ Job ${job.id} failed:`, error);
-                
+
                 // Mark database record as failed
                 try {
                     await updateResumeRepository(resumeId, { status: 'FAILED' });

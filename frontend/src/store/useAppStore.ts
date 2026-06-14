@@ -34,6 +34,14 @@ interface AppState {
   setExportType: (type: 'students' | 'applications') => void;
   setExportFilters: (filters: ExportFilters) => void;
   resetExportState: () => void;
+
+  // Optimize Resume State
+  activeResumeJobId: string | null;
+  activeResumeId: number | null;
+  isResumePolling: boolean;
+  setActiveResumeJob: (job: { jobId: string; resumeId: number } | null) => void;
+  setResumePolling: (val: boolean) => void;
+  clearResumeJob: () => void;
 }
 
 /**
@@ -83,6 +91,21 @@ export const useAppStore = create<AppState>()(
       previewTriggered: true,
       exportType: 'students',
       exportFilters: {}
+    }),
+
+    // Optimize Resume State Implementation
+    activeResumeJobId: null,
+    activeResumeId: null,
+    isResumePolling: false,
+    setActiveResumeJob: (job) => set({
+      activeResumeJobId: job?.jobId ?? null,
+      activeResumeId: job?.resumeId ?? null,
+    }),
+    setResumePolling: (isResumePolling) => set({ isResumePolling }),
+    clearResumeJob: () => set({
+      activeResumeJobId: null,
+      activeResumeId: null,
+      isResumePolling: false,
     }),
   }))
 );

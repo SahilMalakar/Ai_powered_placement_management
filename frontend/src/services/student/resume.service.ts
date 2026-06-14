@@ -1,5 +1,6 @@
 import api from '../api';
-import { Resume, ResumeJson } from '@/types/student/resume';
+import { Resume, ResumeJson, OptimizeResumeResponse, ResumeEntry } from '@/types/student/resume';
+import { API_ROUTES } from '@/constants/api';
 
 /**
  * Service for student resume management.
@@ -53,3 +54,29 @@ export const resumeService = {
     await api.delete(`/students/resume/${id}`);
   },
 };
+
+export const optimizeResumeService = async (file: File): Promise<OptimizeResumeResponse> => {
+  const formData = new FormData();
+  formData.append('resume', file);
+  const response = await api.post(API_ROUTES.OPTIMIZE_RESUME, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data.data;
+};
+
+export const getResumeByIdService = async (id: number): Promise<ResumeEntry> => {
+  const response = await api.get(API_ROUTES.OPTIMIZE_RESUME_BY_ID(id));
+  return response.data.data;
+};
+
+export const getAllResumesService = async (): Promise<ResumeEntry[]> => {
+  const response = await api.get(API_ROUTES.ALL_RESUMES);
+  return response.data.data;
+};
+
+export const deleteResumeService = async (id: number): Promise<void> => {
+  await api.delete(API_ROUTES.OPTIMIZE_RESUME_DELETE(id));
+};
+

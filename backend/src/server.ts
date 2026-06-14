@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 // cors setup to pass specific endpoints only
 app.use(
     cors({
-        origin: 'http://localhost:3000', // Allow only your frontend origin
+        origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow only your frontend origin
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Authorization', 'Content-Type', 'X-Requested-With'],
         credentials: true, // allow cookies / auth headers

@@ -5,7 +5,7 @@ import { GITHUB_SCRAPER_QUEUE_NAME } from '../queues/githubScraper.queue.js';
 import { getRedisConnection, getRedisConnectionForCaching } from '../../infra/redis.config.js';
 import { CACHE_KEYS } from '../utils/cacheKeys.js';
 import { callLLM } from '../utils/llmHelper.js';
-import { GITHUB_README_SUMMARIZER_SYSTEM } from '../utils/prompts/resumeOptimizer/stagePrompts.js';
+import { GITHUB_README_SUMMARIZER_SYSTEM } from '../utils/prompts/stagePrompts.js';
 
 export const initializeGithubScraperWorker = () => {
     const scraperWorker = new Worker(

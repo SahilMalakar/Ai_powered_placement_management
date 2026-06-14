@@ -6,6 +6,7 @@ import {
   User,
   ClipboardList,
   Bell,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -40,6 +41,11 @@ export const studentNavItems: NavItem[] = [
     label: "Resume Builder",
     href: "/resume",
     icon: FileText,
+  },
+  {
+    label: "Optimize Resume",
+    href: "/student/optimize-resume",
+    icon: Sparkles,
   },
   {
     label: "ATS Analyzer",

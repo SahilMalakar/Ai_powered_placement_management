@@ -24,5 +24,7 @@ export const QUERY_KEYS = {
   ADMIN_EXPORT_STATUS: "admin-export-status",
   ADMIN_ALL_APPLICATIONS: "admin-all-applications",
   EXPORT_LOGS: (page: number) => ['export', 'logs', page] as const,
+  OPTIMIZE_RESUME_BY_ID: (id: number) => ['resume', 'optimize', id] as const,
+  ALL_RESUMES: ['resume', 'all'] as const,
 } as const;
 
