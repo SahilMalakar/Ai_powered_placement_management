@@ -461,7 +461,7 @@ Duration    13.60s
 | Admin Dashboard | 1 | ✅ All Pass |
 | Admin Notifications | 2 | ✅ All Pass |
 | Admin Team | 5 | ✅ All Pass |
-| **Total** | **68 cases** | **✅ All Pass** |
+| **Total** | **123 cases** | **✅ All Pass** |
 
 > Integration tests use Vitest + Supertest against Dockerized PostgreSQL (port 5433) and Redis (port 6380). Rate limiters are bypassed in `NODE_ENV=test`.
 
