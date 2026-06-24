@@ -129,7 +129,7 @@ export function AdminJobCard({
                 "bg-success/10 border-success/20 text-success dark:bg-success/10 dark:border-success/20 dark:text-success"
             )}
           >
-            {backlogAllowed ? "Backlog OK" : "No Backlog"}
+            {backlogAllowed ? "Backlog Allowed" : "No Backlog"}
           </Badge>
         </div>
 

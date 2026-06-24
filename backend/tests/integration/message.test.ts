@@ -28,6 +28,7 @@ describe('Admin Message Module Integration Tests', () => {
                 email: `student-msg1-${Date.now()}@example.com`,
                 password: 'HashedPassword123',
                 role: 'STUDENT',
+                isProfileCompleted: true,
             },
         });
         await prisma.studentProfile.create({
@@ -47,6 +48,7 @@ describe('Admin Message Module Integration Tests', () => {
                 email: `student-msg2-${Date.now()}@example.com`,
                 password: 'HashedPassword123',
                 role: 'STUDENT',
+                isProfileCompleted: true,
             },
         });
         await prisma.studentProfile.create({

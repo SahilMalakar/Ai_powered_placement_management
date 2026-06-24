@@ -103,7 +103,7 @@ export function JobCard({ job }: JobCardProps) {
                 : ""
             )}
           >
-            {backlogAllowed ? "Backlog OK" : "No backlog"}
+            {backlogAllowed ? "Backlog Allowed" : "No backlog"}
           </Badge>
         </div>
 

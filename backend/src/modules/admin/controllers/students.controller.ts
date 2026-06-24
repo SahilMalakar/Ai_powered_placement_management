@@ -2,7 +2,7 @@ import { sendSuccess } from '../../../shared/utils/ApiResonse.js';
 import { asyncHandler } from '../../../shared/utils/asyncHandler.js';
 import { BadRequestError, UnauthorizedError } from '../../../shared/utils/errors/httpErrors.js';
 import { HTTP_STATUS } from '../../../shared/utils/httpStatus.js';
-import { getAllStudentService, getStudentByIdService, softDeleteStudentService } from '../services/student.service.js';
+import { getAllStudentService, getStudentByIdService, softDeleteStudentService, reactivateStudentService } from '../services/student.service.js';
 import { getAllStudentsQuerySchema } from '../../../shared/types/admin/student.js';
 
 /**
@@ -65,6 +65,22 @@ export const softDeleteStudentController = asyncHandler(async (req, res) => {
         res,
         data,
         "Student deleted successfully",
+        HTTP_STATUS.OK
+    )
+})
+
+export const reactivateStudentController = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError("Unauthorized")
+    }
+
+    const { id: studentId } = req.params;
+    const data = await reactivateStudentService(Number(studentId))
+
+    return sendSuccess(
+        res,
+        data,
+        "Student reactivated successfully",
         HTTP_STATUS.OK
     )
 })

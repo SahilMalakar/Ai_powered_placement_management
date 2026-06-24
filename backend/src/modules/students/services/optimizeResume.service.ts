@@ -53,4 +53,3 @@ export const getOptimizeResumeJobStatusService = async (jobId: string) => {
 
     return JSON.parse(cachedData);
 };
-

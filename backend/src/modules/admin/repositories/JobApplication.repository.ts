@@ -81,6 +81,35 @@ export const getApplicantByJobIdRepository = async (jobId: number, query: any) =
     };
 };
 
+/**
+ * Get per-status application counts for a specific job.
+ * Excludes soft-deleted applications and soft-deleted users.
+ */
+export const getApplicationStatusCountsRepository = async (jobId: number) => {
+    const groups = await prisma.application.groupBy({
+        by: ['status'],
+        where: {
+            jobId,
+            deletedAt: null,
+            user: { deletedAt: null }
+        },
+        _count: { status: true }
+    });
+
+    // Normalize into a flat object with all statuses defaulting to 0
+    const counts: Record<string, number> = {
+        APPLIED: 0,
+        SHORTLISTED: 0,
+        SELECTED: 0,
+        REJECTED: 0
+    };
+
+    for (const g of groups) {
+        counts[g.status] = g._count.status;
+    }
+
+    return counts;
+};
 
 /**
  * Atomically fetch eligible applications and update their status.

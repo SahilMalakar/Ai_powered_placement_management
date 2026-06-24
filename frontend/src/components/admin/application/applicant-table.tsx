@@ -5,22 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-  MoreVertical,
-  Eye,
-  UserCheck,
-  UserX,
   ChevronLeft,
   ChevronRight,
   Loader2
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { Applicant, ApplicationStatus, PaginationData } from "@/types/admin/jobApplication";
 
@@ -61,7 +49,7 @@ interface ApplicantTableProps {
   selectedIds: Set<number>;
   onToggleSelect: (id: number) => void;
   onToggleAll: () => void;
-  onViewDetails: (applicant: Applicant) => void;
+  onRowClick: (applicant: Applicant) => void;
   onPageChange?: (page: number) => void;
 }
 
@@ -72,7 +60,7 @@ export function ApplicantTable({
   selectedIds,
   onToggleSelect,
   onToggleAll,
-  onViewDetails,
+  onRowClick,
   onPageChange,
 }: ApplicantTableProps) {
   const allSelected =
@@ -110,7 +98,6 @@ export function ApplicantTable({
               <th className="px-4 py-3 text-left font-heading font-semibold text-foreground/80 text-xs uppercase tracking-wider">
                 Applied On
               </th>
-              <th className="w-12 px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -132,7 +119,7 @@ export function ApplicantTable({
                     "border-b border-border/50 transition-colors hover:bg-accent/50 cursor-pointer group/row",
                     isSelected && "bg-primary/5 hover:bg-primary/8"
                   )}
-                  onClick={() => onViewDetails(applicant)}
+                  onClick={() => onRowClick(applicant)}
                 >
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
@@ -193,42 +180,13 @@ export function ApplicantTable({
                   <td className="px-4 py-3 text-mist dark:text-muted-foreground/60 text-xs font-medium">
                     {format(new Date(applicant.createdAt), "d MMM yyyy")}
                   </td>
-                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="h-8 w-8 text-muted-foreground"
-                          >
-                            <MoreVertical className="size-4" />
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="end" className="w-48 shadow-modal">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onViewDetails(applicant)} className="gap-2 cursor-pointer">
-                          <Eye className="size-4" /> View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 cursor-pointer">
-                          <UserCheck className="size-4" /> Verify Student
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="gap-2 cursor-pointer text-error focus:text-error focus:bg-error/10">
-                          <UserX className="size-4" /> Reject Profile
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
                 </tr>
               );
             })}
             
             {!isLoading && applicants.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-20 text-center text-mist">
+                <td colSpan={7} className="px-4 py-20 text-center text-mist">
                   No applicants found matching the filters.
                 </td>
               </tr>

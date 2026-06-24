@@ -9,7 +9,8 @@ import {
   UserX,
   AlertCircle,
   BookOpen,
-  Mail
+  Mail,
+  RefreshCw
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Student } from "@/types/admin/student";
 import Link from "next/link";
-import { useSoftDeleteStudent } from "@/hooks/admin/useStudents";
+import { useSoftDeleteStudent, useReactivateStudent } from "@/hooks/admin/useStudents";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -108,7 +109,9 @@ interface StudentTableProps {
 
 export function StudentTable({ students }: StudentTableProps) {
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [reactivateId, setReactivateId] = useState<number | null>(null);
   const { mutate: deleteStudent, isPending: isDeleting } = useSoftDeleteStudent();
+  const { mutate: reactivateStudent, isPending: isReactivating } = useReactivateStudent();
 
   const handleDelete = () => {
     if (deleteId) {
@@ -276,12 +279,21 @@ export function StudentTable({ students }: StudentTableProps) {
                               <UserX className="size-3.5 text-error" /> Reject Verification
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-xs font-medium text-error focus:text-error cursor-pointer gap-2 py-2"
-                              onClick={() => setDeleteId(student.id)}
-                            >
-                              <Trash2 className="size-3.5" /> Deactivate Account
-                            </DropdownMenuItem>
+                            {isBanned ? (
+                              <DropdownMenuItem 
+                                className="text-xs font-medium text-success focus:text-success cursor-pointer gap-2 py-2"
+                                onClick={() => setReactivateId(student.id)}
+                              >
+                                <RefreshCw className="size-3.5" /> Reactivate Account
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem 
+                                className="text-xs font-medium text-error focus:text-error cursor-pointer gap-2 py-2"
+                                onClick={() => setDeleteId(student.id)}
+                              >
+                                <Trash2 className="size-3.5" /> Deactivate Account
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -311,6 +323,35 @@ export function StudentTable({ students }: StudentTableProps) {
                 disabled={isDeleting}
               >
                 {isDeleting ? "Deactivating..." : "Confirm Deactivation"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={reactivateId !== null} onOpenChange={(open) => !open && setReactivateId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-success">
+                <RefreshCw className="size-5" /> Reactivate Student Account?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This will restore the student's account and all associated documents, applications, and resumes. The student will be able to log in and apply for jobs again.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => {
+                  if (reactivateId) {
+                    reactivateStudent(reactivateId, {
+                      onSuccess: () => setReactivateId(null)
+                    });
+                  }
+                }}
+                className="bg-success hover:bg-success/90 text-white font-bold"
+                disabled={isReactivating}
+              >
+                {isReactivating ? "Reactivating..." : "Confirm Reactivation"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

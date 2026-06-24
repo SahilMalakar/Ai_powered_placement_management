@@ -7,7 +7,7 @@ const jobApplicationRouter: Router = Router();
 
 /**
  * @swagger
- * /api/v1/admin/job/application/list:
+ * /api/v1/admin-apps/list:
  *   get:
  *     summary: Get all applications across all jobs (Admin Only)
  *     tags: [Admin - Job Management]
@@ -25,7 +25,7 @@ jobApplicationRouter.get("/list",
 
 /**
  * @swagger
- * /api/v1/admin/job/application/status:
+ * /api/v1/admin-apps/status:
  *   post:
  *     summary: Batch update application statuses (Admin Only)
  *     description: >
@@ -86,7 +86,7 @@ jobApplicationRouter.get("/list",
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-jobApplicationRouter.post("/application/status",
+jobApplicationRouter.post("/status",
     authMiddleware,
     requireAdmin,
     updateApplicationStatusController

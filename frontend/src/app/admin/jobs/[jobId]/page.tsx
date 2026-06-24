@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sheet } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 import { useAdminJob } from "@/hooks/admin/useAdminJobs";
@@ -36,7 +35,6 @@ import {
   type ApplicantFilters,
 } from "@/components/admin/application/applicant-filters";
 import { StatusUpdateBar } from "@/components/admin/application/status-update-bar";
-import { ApplicantDetailsSheet } from "@/components/admin/application/applicant-details-sheet";
 import { JobPagination } from "@/components/student/jobs/JobPagination";
 import type { Applicant, ApplicationStatus } from "@/types/admin/jobApplication";
 
@@ -63,7 +61,6 @@ export default function AdminJobDetailPage() {
   });
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [activeApplicant, setActiveApplicant] = useState<Applicant | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -151,9 +148,13 @@ export default function AdminJobDetailPage() {
   };
 
   // ─── Stats (Computed from all applicants or summary if provided) ───
-  // Note: For real scale, backend should return these summary counts.
-  // Using a mock or partial summary for now if not in data.
-  const appCount = job?._count?.applications || 0;
+  const statusCounts = applicantsResponse?.data?.statusCounts;
+  const totalCount = statusCounts
+    ? statusCounts.APPLIED +
+      statusCounts.SHORTLISTED +
+      statusCounts.SELECTED +
+      statusCounts.REJECTED
+    : 0;
 
   // ─── Loading state ─────────────────────────────────────────────
   if (isJobLoading) {
@@ -202,9 +203,6 @@ export default function AdminJobDetailPage() {
           Back to Jobs
         </button>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="shadow-button">
-            Edit Job
-          </Button>
           <Button 
             size="sm" 
             className="shadow-button btn-primary"
@@ -260,19 +258,13 @@ export default function AdminJobDetailPage() {
                     "gap-1.5 h-7",
                     job.backlogAllowed ? "bg-success/10 border-success/20 text-success" : "bg-pale/20 border-pale/50 text-deep-blue dark:bg-muted/30 dark:text-foreground"
                   )}>
-                    {job.backlogAllowed ? "Backlog OK" : "No Backlog"}
+                    {job.backlogAllowed ? "Backlog Allowed" : "No Backlog"}
                   </Badge>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 lg:border-l border-border/50 lg:pl-10">
-              <StatItem 
-                label="Total Applications" 
-                value={appCount.toString()} 
-                icon={Users} 
-                color="text-primary" 
-              />
               <StatItem 
                 label="Deadline" 
                 value={format(new Date(job.deadline), "dd MMM yyyy")} 
@@ -321,9 +313,21 @@ export default function AdminJobDetailPage() {
             
             {/* Quick Status Stats (Mocked or real based on full result count if available) */}
             <div className="flex flex-wrap gap-3">
-              <StatusMiniPill label="Applied" count={appCount} color="bg-pale/20 text-steel" />
-              <StatusMiniPill label="Shortlisted" count={0} color="bg-warning/10 text-warning" />
-              <StatusMiniPill label="Selected" count={0} color="bg-success/10 text-success" />
+              <StatusMiniPill
+                label="Applied"
+                count={statusCounts?.APPLIED ?? 0}
+                color="bg-pale/20 text-steel"
+              />
+              <StatusMiniPill
+                label="Shortlisted"
+                count={statusCounts?.SHORTLISTED ?? 0}
+                color="bg-warning/10 text-warning"
+              />
+              <StatusMiniPill
+                label="Selected"
+                count={statusCounts?.SELECTED ?? 0}
+                color="bg-success/10 text-success"
+              />
             </div>
           </div>
 
@@ -346,7 +350,7 @@ export default function AdminJobDetailPage() {
                   <Users className="size-16 text-muted-foreground/10 mb-4" />
                   <h3 className="text-xl font-heading font-bold">No applicants found</h3>
                   <p className="text-muted-foreground max-w-sm mt-2">
-                    {appCount === 0 
+                    {totalCount === 0 
                       ? "No students have applied for this job yet. Reach out to students to increase participation." 
                       : "We couldn't find any applicants matching your current filter criteria."}
                   </p>
@@ -379,7 +383,9 @@ export default function AdminJobDetailPage() {
                   selectedIds={selectedIds}
                   onToggleSelect={toggleSelect}
                   onToggleAll={toggleAll}
-                  onViewDetails={setActiveApplicant}
+                  onRowClick={(applicant) =>
+                    router.push(`/admin/students/${applicant.user.id}`)
+                  }
                 />
 
                 {pagination && (
@@ -447,12 +453,6 @@ export default function AdminJobDetailPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Applicant Details Side Panel */}
-      <ApplicantDetailsSheet
-        applicant={activeApplicant}
-        open={!!activeApplicant}
-        onOpenChange={(open) => !open && setActiveApplicant(null)}
-      />
     </div>
   );
 }

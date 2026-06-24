@@ -155,7 +155,7 @@ export function StudentFilters({ filters, onFilterChange }: StudentFiltersProps)
 
           {filters.backlogAllowed !== undefined && (
             <Badge variant="outline" className="gap-1 px-2.5 h-7 rounded-md bg-primary/5 border-primary/20 text-primary">
-              {filters.backlogAllowed ? "Backlog OK" : "No Backlog"}
+              {filters.backlogAllowed ? "Backlog Allowed" : "No Backlog"}
               <X className="size-3 cursor-pointer" onClick={() => onFilterChange({ backlogAllowed: undefined })} />
             </Badge>
           )}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -15,13 +16,25 @@ import {
   IdCard,
   AlertCircle,
   History,
+  RefreshCw,
+  UserX,
 } from "lucide-react";
-import { useAdminStudent, useSoftDeleteStudent } from "@/hooks/admin/useStudents";
+import { useAdminStudent, useSoftDeleteStudent, useReactivateStudent } from "@/hooks/admin/useStudents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +48,13 @@ const safeFormat = (dateStr: string | undefined | null, formatStr: string) => {
 export default function AdminStudentDetailPage() {
   const { studentId } = useParams();
   const router = useRouter();
+  
+  const [isDeactivateOpen, setIsDeactivateOpen] = useState(false);
+  const [isReactivateOpen, setIsReactivateOpen] = useState(false);
+
   const { data: student, isLoading, isError } = useAdminStudent(Number(studentId));
   const { mutate: deleteStudent, isPending: isDeleting } = useSoftDeleteStudent();
+  const { mutate: reactivateStudent, isPending: isReactivating } = useReactivateStudent();
 
   if (isLoading) {
     return (
@@ -111,14 +129,28 @@ export default function AdminStudentDetailPage() {
               </Badge>
             </div>
           </div>
-
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <Button className="flex-1 md:flex-none h-12 px-8 bg-gradient-to-r from-brand-blue to-brand-indigo text-white font-semibold rounded-md shadow-button hover:opacity-90 transition-all gap-2">
-              <UserCheck className="size-5" /> Verify Profile
-            </Button>
-            <Button variant="outline" size="icon" className="size-12 rounded-xl border-border/60 text-error hover:bg-error/10 hover:border-error/20 shadow-card transition-all">
-              <Trash2 className="size-5" />
-            </Button>
+          
+          <div className="flex gap-3">
+            {studentData.deletedAt ? (
+              <div className="flex flex-col items-end gap-2">
+                <Badge variant="destructive" className="h-6 font-bold uppercase tracking-wider text-[10px] px-3">
+                  Banned / Deactivated
+                </Badge>
+                <Button
+                  onClick={() => setIsReactivateOpen(true)}
+                  className="bg-success hover:bg-success/90 text-white font-bold gap-2"
+                >
+                  <RefreshCw className="size-4 animate-spin-hover" /> Reactivate Account
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={() => setIsDeactivateOpen(true)}
+                className="bg-error hover:bg-error/90 text-white font-bold gap-2"
+              >
+                <UserX className="size-4" /> Deactivate Account
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -311,6 +343,61 @@ export default function AdminStudentDetailPage() {
           </CardContent>
         </Tabs>
       </Card>
+
+      {/* Confirmation Dialogs */}
+      <AlertDialog open={isDeactivateOpen} onOpenChange={setIsDeactivateOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-error">
+              <AlertCircle className="size-5" /> Deactivate Student Account?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will soft-delete the student account, profile, documents, and all active job applications. The student will no longer be able to log in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                deleteStudent(Number(studentId), {
+                  onSuccess: () => setIsDeactivateOpen(false)
+                });
+              }}
+              className="bg-error hover:bg-error/90 text-white"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deactivating..." : "Confirm Deactivation"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isReactivateOpen} onOpenChange={setIsReactivateOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-success">
+              <RefreshCw className="size-5" /> Reactivate Student Account?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will restore the student's account and all associated documents, applications, and resumes. The student will be able to log in and apply for jobs again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                reactivateStudent(Number(studentId), {
+                  onSuccess: () => setIsReactivateOpen(false)
+                });
+              }}
+              className="bg-success hover:bg-success/90 text-white font-bold"
+              disabled={isReactivating}
+            >
+              {isReactivating ? "Reactivating..." : "Confirm Reactivation"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

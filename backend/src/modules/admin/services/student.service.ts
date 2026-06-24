@@ -2,7 +2,7 @@ import { getRedisConnectionForCaching } from "../../../infra/redis.config.js";
 import { CACHE_KEYS } from "../../../shared/utils/cacheKeys.js";
 import type { GetAllStudentsQueryInput } from "../../../shared/types/admin/student.js";
 import { NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
-import { getAllStudentRepository, getStudentByIdRepository, softDeleteStudentRepository } from "../repositories/students.repository.js";
+import { getAllStudentRepository, getStudentByIdRepository, softDeleteStudentRepository, reactivateStudentRepository } from "../repositories/students.repository.js";
 
 export const getAllStudentService = async (query: GetAllStudentsQueryInput) => {
     // get all the students from the database
@@ -123,6 +123,44 @@ export const softDeleteStudentService = async (studentId: number) => {
 
     if (!student) {
         throw new NotFoundError("Student not Found")
+    }
+
+    // Cache Invalidation
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const keys = await cacheClient.keys(`${CACHE_KEYS.ADMIN_STUDENTS_LIST}*`);
+        if (keys.length > 0) {
+            await cacheClient.del(keys);
+            console.log(`🧹 Student List Cache Invalidated (${keys.length} keys)`);
+        }
+        await cacheClient.del(CACHE_KEYS.ADMIN_STUDENT_DETAILS(studentId));
+        console.log(`🧹 Student Detail Cache Invalidated: ${CACHE_KEYS.ADMIN_STUDENT_DETAILS(studentId)}`);
+    } catch (error) {
+        console.error('❌ Cache Invalidation Failed (Deactivate):', error);
+    }
+
+    return student;
+}
+
+export const reactivateStudentService = async (studentId: number) => {
+    const student = await reactivateStudentRepository(studentId);
+
+    if (!student) {
+        throw new NotFoundError("Student not Found or already active")
+    }
+
+    // Cache Invalidation
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const keys = await cacheClient.keys(`${CACHE_KEYS.ADMIN_STUDENTS_LIST}*`);
+        if (keys.length > 0) {
+            await cacheClient.del(keys);
+            console.log(`🧹 Student List Cache Invalidated (${keys.length} keys)`);
+        }
+        await cacheClient.del(CACHE_KEYS.ADMIN_STUDENT_DETAILS(studentId));
+        console.log(`🧹 Student Detail Cache Invalidated: ${CACHE_KEYS.ADMIN_STUDENT_DETAILS(studentId)}`);
+    } catch (error) {
+        console.error('❌ Cache Invalidation Failed (Reactivate):', error);
     }
 
     return student;

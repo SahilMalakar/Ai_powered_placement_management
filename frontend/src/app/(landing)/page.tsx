@@ -1,7 +1,13 @@
+import { SocialProofStrip } from "@/components/landing/SocialProofStrip";
+import { HeroTerminal } from "@/components/landing/HeroTerminal";
+import { BentoFeatures } from "@/components/landing/BentoFeatures";
+
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-[calc(100vh-64px)] w-full items-center justify-center bg-background">
-      {/* Empty canvas for GSAP animations */}
+    <div className="flex flex-col w-full items-center">
+      <HeroTerminal />
+      <SocialProofStrip />
+      <BentoFeatures />
     </div>
   );
 }

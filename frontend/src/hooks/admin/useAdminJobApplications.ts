@@ -36,6 +36,10 @@ export const useUpdateApplicationStatus = (jobId: string) => {
     onSuccess: (response) => {
       queryClient.invalidateQueries({
         queryKey: APPLICANT_KEYS.all(jobId),
+        refetchType: "active",
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ADMIN_JOB_DETAIL, jobId],
       });
       toast.success(
         response.message ||

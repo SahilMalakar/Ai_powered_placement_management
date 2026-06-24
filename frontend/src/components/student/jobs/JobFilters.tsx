@@ -216,7 +216,7 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
                   : "bg-warning/10 border-warning/20 text-warning"
               )}
             >
-              {filters.backlogAllowed ? 'Backlog OK' : 'No Backlog'}
+              {filters.backlogAllowed ? 'Backlog Allowed' : 'No Backlog'}
               <X
                 className="size-3 cursor-pointer hover:text-error transition-colors"
                 onClick={() => onFilterChange({ backlogAllowed: undefined, page: 1 })}

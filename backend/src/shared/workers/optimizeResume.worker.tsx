@@ -1,5 +1,4 @@
 import { Worker, Job, UnrecoverableError } from 'bullmq';
-import React from 'react';
 import { OPTIMIZE_RESUME_QUEUE_NAME } from '../queues/optimizeResume.queue.js';
 import { updateResumeRepository } from '../../modules/students/repositories/optimizeResume.repository.js';
 import { getRedisConnection, getRedisConnectionForCaching } from '../../infra/redis.config.js';

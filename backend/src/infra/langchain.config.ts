@@ -24,6 +24,7 @@ const createModel = (modelName: string) => {
         model: modelName,
         temperature: 0.1,
         apiKey: serverConfig.GEMINI_API_KEY,
+        maxRetries: 0, // Disable excessive internal retries to trigger fallback models immediately
     });
 };
 

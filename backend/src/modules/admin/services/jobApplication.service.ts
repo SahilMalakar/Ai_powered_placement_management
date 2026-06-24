@@ -2,7 +2,7 @@ import type { ApplicationStatus } from "../../../prisma/generated/prisma/enums.j
 import type { UpdateApplicationStatusInput } from "../../../shared/types/admin/jobApplication.js";
 import type { NotificationTypes } from "../../../shared/types/admin/notification.js";
 import { BadRequestError, NotFoundError } from "../../../shared/utils/errors/httpErrors.js";
-import { getApplicantByJobIdRepository, bulkUpdateApplicationStatusRepository, getAllApplicationsRepository } from "../repositories/JobApplication.repository.js";
+import { getApplicantByJobIdRepository, bulkUpdateApplicationStatusRepository, getAllApplicationsRepository, getApplicationStatusCountsRepository } from "../repositories/JobApplication.repository.js";
 import { getJobById } from "../repositories/job.repository.js";
 import { addBulkEmailsToQueue } from "../../../shared/queues/notification.queue.js";
 
@@ -23,7 +23,11 @@ export const getJobApplicantsService = async (jobId: number, query: any) => {
     if (!job) {
         throw new NotFoundError("Job Not Found");
     }
-    return await getApplicantByJobIdRepository(jobId, query);
+    const [applicantsData, statusCounts] = await Promise.all([
+        getApplicantByJobIdRepository(jobId, query),
+        getApplicationStatusCountsRepository(jobId)
+    ]);
+    return { ...applicantsData, statusCounts };
 };
 
 /**

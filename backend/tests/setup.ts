@@ -1,4 +1,4 @@
-import { beforeAll, afterAll } from 'vitest';
+import { beforeAll } from 'vitest';
 import { prisma } from '../src/prisma/prisma.js';
 import { getRedisConnection, getRedisConnectionForCaching } from '../src/infra/redis.config.js';
 import { app } from '../src/server.js';
@@ -49,20 +49,4 @@ beforeAll(async () => {
     } catch (error) {
         // Cache Redis connection might not be active, ignore
     }
-});
-
-afterAll(async () => {
-    // Disconnect Prisma
-    await prisma.$disconnect();
-    
-    // Close Redis connections
-    try {
-        const redis = getRedisConnection();
-        await redis.quit();
-    } catch (e) {}
-    
-    try {
-        const redisCache = getRedisConnectionForCaching();
-        await redisCache.quit();
-    } catch (e) {}
 });

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllStudentsController, getStudentByIdController, softDeleteStudentController } from '../../../modules/admin/controllers/students.controller.js';
+import { getAllStudentsController, getStudentByIdController, softDeleteStudentController, reactivateStudentController } from '../../../modules/admin/controllers/students.controller.js';
 import { authMiddleware } from '../../../shared/middlewares/auth.middleware.js';
 import { requireAdmin, requireSuperAdmin } from '../../../shared/middlewares/rbac.middleware.js';
 import { validateParams } from '../../../shared/middlewares/validate.middlware.js';
@@ -124,6 +124,31 @@ studentRouter.delete("/:id",
     authMiddleware,
     requireSuperAdmin,
     softDeleteStudentController
+)
+
+/**
+ * @swagger
+ * /v1/admin/students/{id}/reactivate:
+ *   post:
+ *     summary: Reactivate a deactivated student account (Super Admin Only)
+ *     tags: [Admin - Student Management]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Student account reactivated successfully
+ */
+studentRouter.post("/:id/reactivate",
+    validateParams(idSchema),
+    authMiddleware,
+    requireSuperAdmin,
+    reactivateStudentController
 )
 
 export default studentRouter;

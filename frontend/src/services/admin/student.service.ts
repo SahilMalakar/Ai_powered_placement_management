@@ -20,4 +20,9 @@ export const adminStudentService = {
     const response = await api.delete(`/admin/students/${id}`);
     return response.data;
   },
+
+  reactivateStudent: async (id: number): Promise<SingleStudentResponse> => {
+    const response = await api.post(`/admin/students/${id}/reactivate`);
+    return response.data;
+  },
 };

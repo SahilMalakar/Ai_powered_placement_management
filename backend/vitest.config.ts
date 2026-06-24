@@ -7,13 +7,12 @@ export default defineConfig({
         testTimeout: 20000,
         hookTimeout: 20000,
         setupFiles: ['./tests/setup.ts'],
+        globalSetup: './tests/globalSetup.ts',
         include: ['tests/integration/**/*.test.ts'],
         pool: 'forks',
-        poolOptions: {
-            forks: {
-                singleFork: true,
-            },
-        },
+        maxWorkers: 1,
+        isolate: false,
+        fileParallelism: false,
         sequence: {
             concurrent: false,
         },

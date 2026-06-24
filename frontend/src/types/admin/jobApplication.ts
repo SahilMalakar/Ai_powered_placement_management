@@ -74,12 +74,20 @@ export interface PaginationData {
   totalPages: number;
 }
 
+export interface StatusCounts {
+  APPLIED: number;
+  SHORTLISTED: number;
+  SELECTED: number;
+  REJECTED: number;
+}
+
 export interface ApplicantsResponse {
   success: boolean;
   message: string;
   data: {
     applicants: Applicant[];
     pagination: PaginationData;
+    statusCounts: StatusCounts;
   };
 }
 

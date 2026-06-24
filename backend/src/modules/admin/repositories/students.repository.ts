@@ -9,21 +9,20 @@ export const getAllStudentRepository = async (params: GetAllStudentsQueryInput &
     const profileConditions = [
         search
             ? {
-                  OR: [
-                      { fullName: { contains: search, mode: 'insensitive' as const } },
-                      { rollNo:   { contains: search, mode: 'insensitive' as const } },
-                  ],
-              }
+                OR: [
+                    { fullName: { contains: search, mode: 'insensitive' as const } },
+                    { rollNo: { contains: search, mode: 'insensitive' as const } },
+                ],
+            }
             : null,
-        branch             ? { branch }                          : null,
-        cgpa               ? { cgpa: { gte: Number(cgpa) } }    : null,
+        branch ? { branch } : null,
+        cgpa ? { cgpa: { gte: Number(cgpa) } } : null,
         backlogAllowed !== undefined ? { backlog: backlogAllowed } : null,
-        verificationStatus ? { verificationStatus }              : null,
+        verificationStatus ? { verificationStatus } : null,
     ].filter((c): c is NonNullable<typeof c> => c !== null);
 
     const where: Prisma.UserWhereInput = {
         role: 'STUDENT',
-        deletedAt: null,
         ...(profileConditions.length > 0
             ? { profile: { is: { AND: profileConditions } } }
             : { profile: { isNot: null } }),
@@ -184,6 +183,96 @@ export const softDeleteStudentRepository = async (studentId: number) => {
     await prisma.studentProfile.updateMany({
         where: { userId: studentId, deletedAt: null },
         data: { deletedAt: new Date() }
+    });
+
+    return result;
+}
+
+export const reactivateStudentRepository = async (studentId: number) => {
+    // 1. Fetch user's deletedAt time
+    const user = await prisma.user.findFirst({
+        where: { id: studentId, role: "STUDENT" },
+        select: { deletedAt: true }
+    });
+
+    if (!user || !user.deletedAt) {
+        return null;
+    }
+
+    const deactivationTime = user.deletedAt;
+    // 2-second tolerance window for matching timestamps
+    const minTime = new Date(deactivationTime.getTime() - 2000);
+    const maxTime = new Date(deactivationTime.getTime() + 2000);
+
+    // 2. Restore User and related entities that fell within the tolerance window
+    const result = await prisma.user.update({
+        where: {
+            id: studentId,
+            role: "STUDENT"
+        },
+        data: {
+            deletedAt: null,
+            documents: {
+                updateMany: {
+                    where: {
+                        deletedAt: {
+                            gte: minTime,
+                            lte: maxTime
+                        }
+                    },
+                    data: { deletedAt: null }
+                }
+            },
+            applications: {
+                updateMany: {
+                    where: {
+                        deletedAt: {
+                            gte: minTime,
+                            lte: maxTime
+                        }
+                    },
+                    data: { deletedAt: null }
+                }
+            },
+            resumes: {
+                updateMany: {
+                    where: {
+                        deletedAt: {
+                            gte: minTime,
+                            lte: maxTime
+                        }
+                    },
+                    data: { deletedAt: null }
+                }
+            },
+            atsResults: {
+                updateMany: {
+                    where: {
+                        deletedAt: {
+                            gte: minTime,
+                            lte: maxTime
+                        }
+                    },
+                    data: { deletedAt: null }
+                }
+            }
+        },
+        select: {
+            id: true,
+            email: true,
+            deletedAt: true,
+        }
+    });
+
+    await prisma.studentProfile.updateMany({
+        where: {
+            userId: studentId,
+            deletedAt: {
+                gte: minTime,
+                lte: maxTime
+            }
+        },
+        data: { deletedAt: null }
     });
 
     return result;

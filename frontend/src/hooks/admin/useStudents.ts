@@ -42,3 +42,19 @@ export const useSoftDeleteStudent = () => {
     },
   });
 };
+
+export const useReactivateStudent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => adminStudentService.reactivateStudent(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_STUDENT_KEYS.all });
+      toast.success(response.message || "Student account reactivated.");
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || "Failed to reactivate student.";
+      toast.error(message);
+    },
+  });
+};

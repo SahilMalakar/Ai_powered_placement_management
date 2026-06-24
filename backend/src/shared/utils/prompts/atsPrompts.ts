@@ -7,6 +7,18 @@ import { PromptTemplate } from '@langchain/core/prompts';
 //   temperature: 0.0          ← critical for score consistency
 //   responseMimeType: "application/json"
 //   topP: 1, topK: 1          ← maximally deterministic
+//
+// CHANGELOG (bug-fix revision):
+//   - Fixed Step 1 role detection: tools and job titles now take
+//     strict priority over degree branch. An ETE graduate doing
+//     backend work is scored against CSE/IT keywords, not ETE ones.
+//   - Added explicit "cross-domain" rule with worked examples.
+//   - Moved "detectedRoleDomain" ahead of "analysisMode" in the
+//     self-check so a wrong domain triggers a recompute before
+//     keywords are extracted.
+//   - Tightened GENERIC keyword table for CSE/IT to include modern
+//     backend terms missing from the original (queue, worker, ORM,
+//     async, distributed, microservices, gRPC, observability).
 // =============================================================
 export const ATS_ANALYSIS_PROMPT = PromptTemplate.fromTemplate(`
 You are a deterministic ATS (Applicant Tracking System) scoring engine.
@@ -21,24 +33,43 @@ RESUME TEXT:
 JOB DESCRIPTION:
 {jobDescription}
 
-=== STEP 1: DETECT MODE AND ROLE ===
-Determine mode:
-- JD_MATCHED: A non-empty job description was provided. All keyword matching is
-  against the JD.
-- GENERIC: Job description is empty or absent. Use domain best-practice keywords
-  for the detected role category.
+=== STEP 1: DETECT MODE AND ROLE DOMAIN ===
 
-Detect role domain from resume content (use branch signals, job titles, tools):
-- CSE/IT: Developer, Engineer, Data Scientist, DevOps, ML, Cloud, QA
-- ETE/ECE: Embedded, VLSI, IoT, Network, RF, Signal Processing
-- EE/EEE: Power Systems, Control Systems, Electrical Design, Instrumentation
-- ME: Mechanical Design, Thermal, Robotics, Manufacturing, Automotive
-- CE: Structural, Construction, Site Engineer, Infrastructure
-- CHE: Process, Chemical Plant, HSE, Environmental
-- Sales/BD: Sales Engineer, Account Executive, Business Development
-- Management: Product Manager, Project Manager, Scrum Master, Program Manager
+** CRITICAL PRIORITY ORDER — read carefully before assigning a domain **
 
-Set detectedRole = the most specific matching category.
+Role domain is determined by the CANDIDATE'S ACTUAL WORK, not their degree.
+Apply this priority order strictly:
+
+  Priority 1 — Job titles / company roles listed in Experience section.
+               If any title contains "Backend", "Frontend", "Full Stack",
+               "Software Engineer", "Developer", "Data", "DevOps", "ML",
+               "Cloud", "QA" → assign CSE/IT regardless of degree branch.
+
+  Priority 2 — Tools and technologies listed in Skills or Projects.
+               If Node.js, Python, React, TypeScript, PostgreSQL, MongoDB,
+               Docker, AWS, REST API, gRPC, Redis, BullMQ, Prisma, or any
+               other software development tool appears prominently →
+               assign CSE/IT regardless of degree branch.
+
+  Priority 3 — Degree branch / academic field.
+               Use ONLY when Priority 1 and Priority 2 produce no clear
+               signal (e.g. a fresh graduate with no projects and no titles).
+
+WORKED EXAMPLES (follow these):
+  - B.Tech ETE student, titles: "Full Stack Developer", tools: Node.js,
+    PostgreSQL, Docker → detectedRoleDomain = "CSE/IT"  ← NOT "ETE/ECE"
+  - B.Tech ETE student, no job, projects: PCB design, FPGA → "ETE/ECE"
+  - B.Tech ME student, titles: "Data Analyst", tools: Python, SQL → "CSE/IT"
+  - B.Tech CSE student, no job, no projects → "CSE/IT"
+
+Detect mode:
+- JD_MATCHED: A non-empty job description was provided. All keyword
+  matching is against the JD keywords only (ignore DOMAIN_KEYWORDS).
+- GENERIC: Job description is empty or absent. Use DOMAIN_KEYWORDS for
+  the detectedRoleDomain assigned above.
+
+Set detectedRole = the most specific role title found (e.g. "Backend Engineer",
+"Embedded Systems Engineer"). If none found, use detectedRoleDomain.
 Set analysisMode = "JD_MATCHED" or "GENERIC".
 
 === STEP 2: EXTRACT KEYWORD LISTS ===
@@ -52,7 +83,7 @@ If JD_MATCHED:
   - Label this list: JD_KEYWORDS
 
 If GENERIC:
-  - Use the standard keyword set for detectedRole (see domain tables below).
+  - Use the standard keyword set for detectedRoleDomain (see domain tables below).
   - Label this list: DOMAIN_KEYWORDS
 
 2B. RESUME KEYWORDS
@@ -61,31 +92,52 @@ If GENERIC:
   - Label this list: RESUME_KEYWORDS
 
 2C. MATCH/MISS
-  - matchedKeywords = JD_KEYWORDS (or DOMAIN_KEYWORDS) ∩ RESUME_KEYWORDS
-    (case-insensitive, singular/plural treated as same)
-  - missingKeywords = JD_KEYWORDS (or DOMAIN_KEYWORDS) − RESUME_KEYWORDS
+  - matchedKeywords = SOURCE_KEYWORDS ∩ RESUME_KEYWORDS
+    (case-insensitive, singular/plural treated as same,
+     abbreviation variants treated as same: e.g. "Postgres" = "PostgreSQL",
+     "JS" = "JavaScript", "TS" = "TypeScript", "k8s" = "Kubernetes")
+  - missingKeywords = SOURCE_KEYWORDS − RESUME_KEYWORDS
     (cap list at 10 most important missing terms)
   - matchRatio = count(matchedKeywords) / count(sourceKeywords)
     Round matchRatio to 2 decimal places.
 
 DOMAIN KEYWORD REFERENCE (use only for GENERIC mode):
-CSE/IT:        REST API, SQL, Git, Docker, CI/CD, Linux, Python, JavaScript,
-               TypeScript, Node.js, React, system design, microservices,
-               cloud (AWS/GCP/Azure), testing, agile
-ETE/ECE:       C, C++, RTOS, UART, SPI, I2C, PCB design, FPGA, HDL, Verilog,
-               VHDL, signal processing, embedded systems, ARM, oscilloscope
-EE/EEE:        MATLAB, Simulink, power electronics, PLC, SCADA, AutoCAD
-               Electrical, circuit design, transformer, motor drives, protection relay
-ME:            SolidWorks, AutoCAD, ANSYS, FEA, CAD/CAM, GD&T, manufacturing
-               process, thermodynamics, CNC, tolerance analysis
-CE:            AutoCAD, STAAD Pro, ETABS, structural analysis, IS 456, IS 800,
-               site management, quantity surveying, project scheduling, RCC design
-CHE:           Aspen Plus, HYSYS, process simulation, mass balance, heat transfer,
-               reactor design, distillation, safety analysis, P&ID
-Sales/BD:      CRM, Salesforce, pipeline management, B2B, account management,
-               negotiation, quota, lead generation, discovery call, forecasting
-Management:    agile, scrum, JIRA, roadmap, OKR, stakeholder, sprint, backlog,
-               cross-functional, KPI, delivery, product lifecycle
+
+CSE/IT (Backend / Full-Stack / DevOps / ML focus):
+  REST API, SQL, Git, Docker, CI/CD, Linux, Python, JavaScript,
+  TypeScript, Node.js, React, system design, microservices, PostgreSQL,
+  Redis, MongoDB, cloud (AWS/GCP/Azure), testing, agile, queue/worker,
+  ORM, async processing, distributed systems, gRPC, API gateway,
+  authentication, JWT, caching, observability, message broker
+
+ETE/ECE:
+  C, C++, RTOS, UART, SPI, I2C, PCB design, FPGA, HDL, Verilog,
+  VHDL, signal processing, embedded systems, ARM, oscilloscope,
+  communication protocols, RF design, network stack
+
+EE/EEE:
+  MATLAB, Simulink, power electronics, PLC, SCADA, AutoCAD Electrical,
+  circuit design, transformer, motor drives, protection relay
+
+ME:
+  SolidWorks, AutoCAD, ANSYS, FEA, CAD/CAM, GD&T, manufacturing process,
+  thermodynamics, CNC, tolerance analysis
+
+CE:
+  AutoCAD, STAAD Pro, ETABS, structural analysis, IS 456, IS 800,
+  site management, quantity surveying, project scheduling, RCC design
+
+CHE:
+  Aspen Plus, HYSYS, process simulation, mass balance, heat transfer,
+  reactor design, distillation, safety analysis, P&ID
+
+Sales/BD:
+  CRM, Salesforce, pipeline management, B2B, account management,
+  negotiation, quota, lead generation, discovery call, forecasting
+
+Management:
+  agile, scrum, JIRA, roadmap, OKR, stakeholder, sprint, backlog,
+  cross-functional, KPI, delivery, product lifecycle
 
 === STEP 3: SCORE EACH SECTION ===
 Compute each sub-score using the mechanical rule only.
@@ -180,6 +232,10 @@ suggestions (exactly 3 items):
 
 === STEP 5: SELF-CHECK BEFORE OUTPUT ===
 Verify each of these before returning output. If any fail, recompute:
+0. detectedRoleDomain was assigned using PRIORITY ORDER (job titles first,
+   then tools, then degree branch) — NOT based on degree branch alone?
+   If a CSE/IT tool (Node.js, Python, React, etc.) appears in the resume,
+   detectedRoleDomain MUST be "CSE/IT". Recompute Steps 2–4 if wrong.
 1. keywordScore = round(matchRatio × 30)?
 2. experienceScore is the sum of exactly the 5 binary signals above?
 3. projectScore is the sum of exactly the 5 binary signals above?

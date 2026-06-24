@@ -160,11 +160,15 @@ export const deactivateJobService = async (jobId: number) => {
     const deactivatedJob = await updateJobStatus(jobId, 'DEACTIVE');
 
     // Cache Invalidation
-    const cacheClient = getRedisConnectionForCaching();
-    const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
-    if (listKeys.length > 0) await cacheClient.del(listKeys);
-    await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
-    console.log(`🧹 Cache Invalidated: ${CACHE_KEYS.JOBS_LIST} & ${CACHE_KEYS.JOB_DETAILS(jobId)}`);
+    try {
+        const cacheClient = getRedisConnectionForCaching();
+        const listKeys = await cacheClient.keys(`${CACHE_KEYS.JOBS_LIST}*`);
+        if (listKeys.length > 0) await cacheClient.del(listKeys);
+        await cacheClient.del(CACHE_KEYS.JOB_DETAILS(jobId));
+        console.log(`🧹 Cache Invalidated: ${CACHE_KEYS.JOBS_LIST} & ${CACHE_KEYS.JOB_DETAILS(jobId)}`);
+    } catch (error) {
+        console.error('⚠️ Cache Invalidation Warning (Deactivate):', error);
+    }
 
     return deactivatedJob;
 };

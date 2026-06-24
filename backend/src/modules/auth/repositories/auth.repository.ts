@@ -1,4 +1,3 @@
-import type { Prisma } from '../../../prisma/generated/prisma/client.js';
 import { prisma } from '../../../prisma/prisma.js';
 import { UniqueConstraintError } from '../../../shared/utils/errors/databaseErrors.js';
 
